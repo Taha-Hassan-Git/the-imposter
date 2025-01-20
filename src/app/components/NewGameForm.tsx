@@ -1,22 +1,96 @@
 "use client";
 import { useState } from "react";
 import { createOrJoinRoom } from "../utils/createOrJoinRoom";
-import Link from "next/link";
 
-type FormData = { category: Category; roomId: RoomId };
+export type FormData = { category: Category; roomId: RoomId };
 type Category = "films" | "animals" | "countries" | "sports";
-type RoomId = number;
+type RoomId = string;
+
+const partOne = [
+  "gay",
+  "lesbian",
+  "bi",
+  "genderqueer",
+  "trans",
+  "ace",
+  "pan",
+  "poly",
+  "queer",
+  "intersex",
+  "nonbinary",
+  "agender",
+  "genderfluid",
+];
+const partTwo = [
+  "unicorn",
+  "orangutan",
+  "wyvyrn",
+  "dragon",
+  "phoenix",
+  "griffin",
+  "pegasus",
+  "mermaid",
+  "merman",
+  "siren",
+  "kraken",
+  "hippogriff",
+  "minotaur",
+  "centaur",
+  "harpy",
+  "sphinx",
+  "chimera",
+  "gryphon",
+];
+const partThree = [
+  "adventure",
+  "attack",
+  "awakening",
+  "battle",
+  "beginning",
+  "challenge",
+  "clash",
+  "conquest",
+  "crusade",
+  "discovery",
+  "encounter",
+  "epic",
+  "expedition",
+  "exploration",
+  "fable",
+  "fate",
+  "journey",
+  "legend",
+  "myth",
+  "odyssey",
+  "quest",
+  "saga",
+  "search",
+  "struggle",
+  "tale",
+  "triumph",
+  "victory",
+  "voyage",
+  "war",
+];
 
 const defaultFormData: FormData = {
   category: "films",
-  roomId: Number.parseInt((Math.random() * 1000).toFixed(0)),
+  roomId: generateRoomId(),
 };
+function generateRoomId() {
+  return `${partOne[Math.floor(Math.random() * partOne.length)]}-${
+    partTwo[Math.floor(Math.random() * partTwo.length)]
+  }-${partThree[Math.floor(Math.random() * partThree.length)]}`;
+}
 const categories: Array<Category> = ["films", "animals", "countries", "sports"];
 export default function NewGameForm() {
   const [formData, setFormData] = useState<FormData>(defaultFormData);
+  const [showJoinExisting, setShowJoinExisting] = useState(false);
   return (
     <form
-      action={createOrJoinRoom}
+      action={() => {
+        createOrJoinRoom(formData);
+      }}
       className="flex flex-col gap-5"
       id="game-form"
     >
@@ -44,24 +118,34 @@ export default function NewGameForm() {
           })}
         </select>
       </div>
-      <div>
-        <label htmlFor="roomId">Room ID:</label>
-        <input
-          className="w-full p-2.5 text-base border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          type="text"
-          // value={formData.roomId}
-        />
-      </div>
+      {showJoinExisting && (
+        <div>
+          <label htmlFor="roomId">Room ID:</label>
+          <input
+            className="w-full p-2.5 text-base border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            type="text"
+            // value={formData.roomId}
+          />
+        </div>
+      )}
       <div>
         <button
           type="submit"
           className="w-full bg-gray-800 hover:bg-gray-950 text-white py-3 px-5 text-base font-medium rounded-md transition-colors duration-300"
           id="new-room-btn"
         >
-          New Room
+          {showJoinExisting ? "Join Room" : "Create Room"}
         </button>
       </div>
-      <button className="self-center">Join existing room?</button>
+      <button
+        onClick={(e) => {
+          e.preventDefault();
+          setShowJoinExisting((prev) => !prev);
+        }}
+        className="self-center"
+      >
+        {showJoinExisting ? "Join existing room?" : "Create new room?"}
+      </button>
     </form>
   );
 }
