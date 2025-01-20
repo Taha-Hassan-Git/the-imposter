@@ -1,9 +1,12 @@
+import Game from "../../components/Game";
+
 export default async function Page({
   params,
 }: {
-  params: Promise<{ roomid: string }>;
+  params: Promise<{ roomId: string }>;
 }) {
-  const roomId = (await params).roomid;
+  console.log(params);
+  const roomId = (await params).roomId;
 
-  return <div>game: {roomId}</div>;
+  return <Game roomId={roomId} />;
 }
