@@ -71,14 +71,14 @@ export default function NewGameForm() {
           />
         </div>
       )}
-      <div>
+      <div className="self-center">
         <Link
           suppressHydrationWarning
           href={{
             pathname: `/game/${formData.roomId}`,
             query: { playerName: formData.name, category: formData.category },
           }}
-          className="w-full bg-gray-800 hover:bg-gray-950 text-white py-3 px-5 text-base font-medium rounded-md transition-colors duration-300"
+          className="w-full bg-gray-800 hover:bg-gray-950 text-white py-3 px-5 text-base font-medium rounded-md transition-colors duration-300 text-nowrap"
           id="new-room-btn"
         >
           {showJoinExisting ? "Join Room" : "Create Room"}
@@ -91,7 +91,7 @@ export default function NewGameForm() {
         }}
         className="self-center"
       >
-        {showJoinExisting ? "Join existing room?" : "Create new room?"}
+        {showJoinExisting ? "Create new room?" : "Join existing room?"}
       </button>
     </form>
   );
