@@ -1,68 +1,28 @@
 "use client";
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
-import { Category } from "./NewGameForm";
-
-type Player = {
-  name: string;
-  score: number;
-  ready: boolean;
-  avatarColor: AvatarColor;
-};
-type AvatarColor = "red" | "blue" | "green" | "yellow" | "purple" | "pink";
-const avatarColors: AvatarColor[] = [
-  "red",
-  "blue",
-  "green",
-  "yellow",
-  "purple",
-  "pink",
-];
-type GameInfo = { roomId: string; players: Player[]; category: Category };
-type GameError = { name: "error" };
-type GameWaiting = { name: "waiting" } & GameInfo;
-type GamePlaying = { name: "playing" } & GameInfo;
-type GameVoting = { name: "voting" } & GameInfo;
-type GameState = GameError | GameWaiting | GamePlaying | GameVoting;
+import {
+  GameWaiting,
+  getPlayer,
+  Player,
+  useGameState,
+} from "../hooks/useGameState";
 
 export default function Game({ roomId }: { roomId: string }) {
   const searchParams = useSearchParams();
   const playerName = searchParams.get("playerName");
   const category = searchParams.get("category");
 
-  const [gameState, setGameState] = useState<GameState>(() =>
-    getInitialGameState()
-  );
-
-  function getInitialGameState(): GameState {
-    if (!playerName || !category) {
-      return { name: "error" };
-    }
-    const randomColorIndex = Math.floor(Math.random() * avatarColors.length);
-    return {
-      name: "waiting",
-      roomId,
-      players: [
-        {
-          name: playerName,
-          score: 0,
-          ready: false,
-          avatarColor: avatarColors[randomColorIndex],
-        },
-      ],
-      category: category as Category,
-    };
-  }
+  const gameState = useGameState(roomId, playerName, category);
 
   return (
-    <div className="flex flex-col w-full justify-center align-center">
-      {gameState.name === "error" ? (
+    <div className="flex flex-col w-full items-center">
+      {gameState.state === "error" ? (
         <ErrorScreen />
-      ) : gameState.name === "waiting" ? (
-        <WaitingScreen gameState={gameState} setGameState={setGameState} />
-      ) : gameState.name === "playing" ? (
+      ) : gameState.state === "waiting" ? (
+        <WaitingScreen self={playerName as string} gameState={gameState} />
+      ) : gameState.state === "playing" ? (
         <PlayingScreen />
-      ) : gameState.name === "voting" ? (
+      ) : gameState.state === "voting" ? (
         <VotingScreen />
       ) : null}
     </div>
@@ -72,22 +32,25 @@ export default function Game({ roomId }: { roomId: string }) {
 function ErrorScreen() {
   return <div>Error Screen</div>;
 }
+
 function WaitingScreen({
+  self,
   gameState,
-  setGameState,
 }: {
+  self: string;
   gameState: GameWaiting;
-  setGameState: (gameState: GameState) => void;
 }) {
+  const player = getPlayer(gameState.info.players, self)!;
   return (
-    <div className="flex flex-col gap-5 max-w-md p-5 items-center">
-      <div className="bg-white rounded-lg shadow-md p-6 w-72">
+    <div className="flex flex-col gap-5 p-5 items-center">
+      <div className="bg-white rounded-lg shadow-md p-8 min-w-[360px]">
         <h2 className="text-2xl font-bold mb-4 text-center">Players</h2>
         <ul className="space-y-3">
-          {gameState.players.map((player) => (
+          {gameState.info.players.map((player: Player) => (
             <li key={"player" + player.name} className="flex items-center">
               <div
                 className="w-6 h-6 rounded-full mr-3"
+                suppressHydrationWarning
                 style={{ backgroundColor: player.avatarColor, opacity: 0.6 }}
               />
               <span className="font-bold flex-1">{player.name}</span>
@@ -108,6 +71,15 @@ function WaitingScreen({
             </li>
           ))}
         </ul>
+      </div>
+      <div>
+        <button
+          onClick={() => {
+            gameState.actions.toggleReady(self);
+          }}
+        >
+          {player.ready ? "Ready" : "Not Ready"}
+        </button>
       </div>
     </div>
   );
