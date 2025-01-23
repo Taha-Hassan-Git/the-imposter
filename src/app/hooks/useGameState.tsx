@@ -74,23 +74,22 @@ export function GameProvider({
         toggleReady: (playerName: string) => {
           setGameState((prev) => {
             if (prev.state !== "waiting") return prev;
-            const oldPlayer = prev.info.players[0].ready;
+
             // copy the old state
             const newState = { ...prev };
 
             // find the player
-            newState.info.players = newState.info.players.map((player) => {
+            const newPlayers = newState.info.players.map((player) => {
               if (player.name === playerName) {
                 return { ...player, ready: !player.ready };
               }
-              return player;
+              return { ...player };
             });
 
-            console.log({
-              newPlayer: newState.info.players[0].ready,
-              oldPlayer,
-            });
-            return newState;
+            return {
+              ...newState,
+              info: { ...newState.info, players: newPlayers },
+            };
           });
         },
       },
