@@ -2,7 +2,7 @@
 
 # dependencies
 /node_modules
-/partykit
+/.partykit
 /.pnp
 package-lock.json
 .pnp.*
