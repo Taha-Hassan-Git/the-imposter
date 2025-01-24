@@ -8,7 +8,7 @@ interface GameFormInfo {
   category: Category;
 }
 export default class Server implements Party.Server {
-  constructor(readonly party: Party.Party) {}
+  constructor(readonly party: Party.Room) {}
 
   game: GameInfo | undefined;
 
@@ -56,7 +56,7 @@ export default class Server implements Party.Server {
   }
 
   async onStart() {
-    this.game = await this.party.storage.get<GameInfo>("poll");
+    this.game = await this.party.storage.get<GameInfo>("game");
   }
 }
 

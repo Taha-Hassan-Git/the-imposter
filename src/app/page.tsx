@@ -8,7 +8,7 @@ export default function Home() {
     "use server";
     const playerName = formData.get("name");
     let roomId = formData.get("roomId");
-    const category = formData.get("category");
+    let category = formData.get("category");
 
     if (!roomId) {
       roomId = generateRoomId();
@@ -20,14 +20,16 @@ export default function Home() {
         },
       });
     } else {
-      await fetch(`${PARTYKIT_URL}/party/${roomId}`, {
+      const res = await fetch(`${PARTYKIT_URL}/party/${roomId}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
       });
+      const data = await res.json();
+      category = data.category;
     }
-    redirect(`/game/${roomId}`);
+    redirect(`/game/${roomId}?playerName=${playerName}&category=${category}`);
   }
   return (
     <div className="max-w-md bg-white rounded-lg shadow-md p-8 mt-5">
