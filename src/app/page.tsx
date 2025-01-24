@@ -13,7 +13,7 @@ export default function Home() {
     if (!roomId) {
       roomId = generateRoomId();
 
-      await fetch(`${PARTYKIT_URL}/party/${roomId}`, {
+      await fetch(`${PARTYKIT_URL}/parties/main/${roomId}`, {
         method: "POST",
         body: JSON.stringify({ playerName, category, roomId }),
         headers: {
@@ -21,7 +21,7 @@ export default function Home() {
         },
       });
     } else {
-      const res = await fetch(`${PARTYKIT_URL}/party/${roomId}`, {
+      const res = await fetch(`${PARTYKIT_URL}/parties/main/${roomId}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
