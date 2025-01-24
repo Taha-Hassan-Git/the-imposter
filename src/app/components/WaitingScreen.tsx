@@ -26,7 +26,6 @@ export function WaitingScreen({
 }
 
 function PlayerListItem({ player }: { player: Player }) {
-  console.log(player);
   return (
     <li className="flex items-center">
       <div
@@ -62,5 +61,15 @@ function ReadyButton({ self }: { self: string }) {
     gameState.actions.toggleReady(self);
   };
 
-  return <button onClick={handleClick}>{ready ? "..." : "Ready?"}</button>;
+  return (
+    <div className="flex flex-col gap-3 items-center">
+      <button
+        className="w-32 bg-gray-800 hover:bg-gray-950 text-white py-3 px-5 text-base font-medium rounded-md transition-colors duration-300 text-nowrap"
+        onClick={handleClick}
+      >
+        {ready ? "..." : "Ready?"}
+      </button>
+      {ready && <p>Game begins when all players are ready...</p>}
+    </div>
+  );
 }

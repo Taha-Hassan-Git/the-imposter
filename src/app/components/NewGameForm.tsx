@@ -18,6 +18,13 @@ const categories: Array<Category> = ["films", "animals", "countries", "sports"];
 export default function NewGameForm() {
   const [formData, setFormData] = useState<FormData>(defaultFormData);
   const [showJoinExisting, setShowJoinExisting] = useState(false);
+  function createOrJoinRoom() {
+    if (showJoinExisting) {
+      // join room
+    } else {
+      // create room
+    }
+  }
   return (
     <form className="flex flex-col gap-5" id="game-form">
       <div className="flex-col">
@@ -67,12 +74,12 @@ export default function NewGameForm() {
           <input
             className="w-full p-2.5 text-base border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             type="text"
-            // value={formData.roomId}
           />
         </div>
       )}
       <div className="self-center">
         <Link
+          onClick={createOrJoinRoom}
           suppressHydrationWarning
           href={{
             pathname: `/game/${formData.roomId}`,

@@ -18,7 +18,11 @@ export const avatarColors: AvatarColor[] = [
   "purple",
   "pink",
 ];
-type GameInfo = { roomId: string; players: Player[]; category: Category };
+export type GameInfo = {
+  roomId: string;
+  players: Player[];
+  category: Category;
+};
 type GameError = { state: "error" };
 export type GameWaiting = {
   state: "waiting";
@@ -43,6 +47,7 @@ export function GameProvider({
   const [gameState, setGameState] = useState<GameState>(() =>
     getInitialGameState({ playerName, category, roomId })
   );
+
   function getInitialGameState({
     roomId,
     playerName,
