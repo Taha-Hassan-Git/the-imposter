@@ -5,7 +5,6 @@ import { generateRoomId } from "./utils/generateRoomId";
 
 export default function Home() {
   async function createOrJoinRoom(formData: FormData) {
-    "use server";
     const playerName = formData.get("name");
     let roomId = formData.get("roomId");
     let category = formData.get("category");
