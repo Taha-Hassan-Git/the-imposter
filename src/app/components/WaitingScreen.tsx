@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { GameWaiting, Player, useGameState } from "../hooks/useGameState";
+import { GameInfo, Player, useGameState } from "../hooks/useGameState";
 
 export function WaitingScreen({
   gameState,
   self,
 }: {
-  gameState: GameWaiting;
+  gameState: GameInfo;
   self: string;
 }) {
   return (
@@ -13,7 +13,7 @@ export function WaitingScreen({
       <div className="bg-white rounded-lg shadow-md p-8 min-w-[360px]">
         <h2 className="text-2xl font-bold mb-4 text-center">Players</h2>
         <ul className="space-y-3">
-          {gameState.info.players.map((player: Player) => (
+          {gameState.players.map((player: Player) => (
             <PlayerListItem key={player.name} player={player} />
           ))}
         </ul>
@@ -54,11 +54,10 @@ function PlayerListItem({ player }: { player: Player }) {
 
 function ReadyButton({ self }: { self: string }) {
   const [ready, setReady] = useState(false);
-  const gameState = useGameState() as GameWaiting;
-
+  const { dispatch } = useGameState();
   const handleClick = () => {
     setReady(!ready);
-    gameState.actions.toggleReady(self);
+    dispatch({ type: "toggle-ready", payload: { name: self } });
   };
 
   return (

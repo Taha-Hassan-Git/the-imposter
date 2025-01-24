@@ -1,5 +1,5 @@
 import type * as Party from "partykit/server";
-import { GameInfo } from "../src/app/hooks/useGameState";
+import { Action, GameInfo } from "../src/app/hooks/useGameState";
 import { Category } from "../src/app/components/NewGameForm";
 
 interface GameFormInfo {
@@ -18,6 +18,7 @@ export default class Server implements Party.Server {
       const game = (await req.json()) as GameFormInfo;
       // set up the new game
       this.game = {
+        state: "waiting",
         roomId: game.roomId,
         players: [
           { name: game.playerName, score: 0, ready: false, avatarColor: "red" },
@@ -42,11 +43,9 @@ export default class Server implements Party.Server {
   async onMessage(message: string) {
     if (!this.game) return;
     console.log("Received message:", message);
-    // const event = JSON.parse(message);
-
-    // const handleEvent = (event: any) => {
-    //   switch (event.type) { et.
-    // };
+    const action = JSON.parse(message) as Action;
+    this.game = gameUpdater(action, this.game);
+    this.party.broadcast(JSON.stringify(this.game));
   }
 
   async saveGame() {
@@ -57,6 +56,35 @@ export default class Server implements Party.Server {
 
   async onStart() {
     this.game = await this.party.storage.get<GameInfo>("game");
+  }
+}
+
+function gameUpdater(action: Action, state: GameInfo) {
+  const newState = { ...state };
+  switch (action.type) {
+    case "player-joined":
+      newState.players.push({
+        name: action.payload.name,
+        score: 0,
+        ready: false,
+        avatarColor: "red",
+      });
+      return newState;
+    case "player-left":
+      newState.players = newState.players.filter(
+        (player) => player.name !== action.payload.name
+      );
+      return newState;
+    case "toggle-ready":
+      newState.players = newState.players.map((player) => {
+        if (player.name === action.payload.name) {
+          player.ready = !player.ready;
+        }
+        return player;
+      });
+      return newState;
+    default:
+      break;
   }
 }
 

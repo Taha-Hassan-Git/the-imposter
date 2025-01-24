@@ -1,7 +1,21 @@
 import { createContext, useContext, useState } from "react";
 import { Category } from "../components/NewGameForm";
+import usePartySocket from "partysocket/react";
+import { PARTYKIT_HOST } from "../env";
 
-const gameContext = createContext<GameState>({ state: "error" });
+export type Action =
+  | { type: "toggle-ready"; payload: { name: string } }
+  | { type: "player-joined"; payload: { name: string } }
+  | { type: "player-left"; payload: { name: string } };
+
+interface GameContext {
+  gameState: GameState;
+  dispatch: (action: Action) => void;
+}
+const gameContext = createContext<GameContext>({
+  gameState: { state: "error" },
+  dispatch: () => {},
+});
 
 export type Player = {
   name: string;
@@ -18,20 +32,16 @@ export const avatarColors: AvatarColor[] = [
   "purple",
   "pink",
 ];
-export type GameInfo = {
+export interface GameInfo {
+  state: "waiting" | "playing" | "voting";
   roomId: string;
   players: Player[];
   category: Category;
-};
-type GameError = { state: "error" };
-export type GameWaiting = {
-  state: "waiting";
-  info: GameInfo;
-  actions: { toggleReady: (playerName: string) => void };
-};
-type GamePlaying = { state: "playing"; info: GameInfo };
-type GameVoting = { state: "voting"; info: GameInfo };
-export type GameState = GameError | GameWaiting | GamePlaying | GameVoting;
+}
+
+export type GameError = { state: "error" };
+
+export type GameState = GameInfo | GameError;
 
 export function GameProvider({
   children,
@@ -63,55 +73,50 @@ export function GameProvider({
     const randomColorIndex = Math.floor(Math.random() * avatarColors.length);
     return {
       state: "waiting",
-      info: {
-        roomId,
-        players: [
-          {
-            name: playerName,
-            score: 0,
-            ready: false,
-            avatarColor: avatarColors[randomColorIndex],
-          },
-        ],
-        category: category as Category,
-      },
-      actions: {
-        toggleReady: (playerName: string) => {
-          setGameState((prev) => {
-            if (prev.state !== "waiting") return prev;
-
-            // copy the old state
-            const newState = { ...prev };
-
-            // find the player
-            const newPlayers = newState.info.players.map((player) => {
-              if (player.name === playerName) {
-                return { ...player, ready: !player.ready };
-              }
-              return { ...player };
-            });
-
-            return {
-              ...newState,
-              info: { ...newState.info, players: newPlayers },
-            };
-          });
+      roomId,
+      players: [
+        {
+          name: playerName,
+          score: 0,
+          ready: false,
+          avatarColor: avatarColors[randomColorIndex],
         },
-      },
+      ],
+      category: category as Category,
     };
   }
+
+  const socket = usePartySocket({
+    host: PARTYKIT_HOST,
+    room: roomId,
+    onMessage(event) {
+      const message = JSON.parse(event.data) as GameInfo;
+      if (message) {
+        console.log("message", message);
+        setGameState(message);
+      }
+    },
+  });
+
+  const dispatch = (action: Action) => {
+    console.log("dispatch", action);
+    socket.send(JSON.stringify(action));
+  };
+
   return (
-    <gameContext.Provider value={gameState}>{children}</gameContext.Provider>
+    <gameContext.Provider value={{ gameState, dispatch }}>
+      {children}
+    </gameContext.Provider>
   );
 }
 
 export function getPlayer(players: Player[], name: string) {
   return players.find((player) => player.name === name);
 }
-export function useGameState(): GameState {
+export function useGameState(): GameContext {
   const context = useContext(gameContext);
   if (context === undefined) {
-    throw new Error("useCountState must be used within a CountProvider");
+    throw new Error("useGameState must be used within the GameProvider");
   }
   return context;
 }

@@ -23,7 +23,7 @@ export default function GameContainer({ roomId }: { roomId: string }) {
 }
 
 function Game({ playerName }: { playerName: string | null }) {
-  const gameState = useGameState();
+  const { gameState } = useGameState();
   return (
     <>
       {gameState.state === "error" ? (
