@@ -13,6 +13,7 @@ const defaultGameFormData: GameFormData = {
 };
 
 const categories: Array<Category> = ["films", "animals", "countries", "sports"];
+
 export default function NewGameForm() {
   const [gameFormData, setGameFormData] =
     useState<GameFormData>(defaultGameFormData);
