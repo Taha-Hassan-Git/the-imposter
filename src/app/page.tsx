@@ -12,7 +12,7 @@ export default function Home() {
 
     if (!roomId) {
       roomId = generateRoomId();
-      console.log("Creating room", roomId);
+      console.log("Creating room", { roomId, playerName, category });
       await fetch(`${PARTYKIT_URL}/party/${roomId}`, {
         method: "POST",
         body: JSON.stringify({ playerName, category, roomId }),
