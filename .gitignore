@@ -3,6 +3,8 @@
 # dependencies
 /node_modules
 /.partykit
+/party/node_modules
+/party/.vscode
 /.pnp
 package-lock.json
 .pnp.*
