@@ -19,7 +19,7 @@ export default function NewGameForm() {
   const [gameFormData, setGameFormData] =
     useState<GameFormData>(defaultGameFormData);
   const [showJoinExisting, setShowJoinExisting] = useState(false);
-  console.log("Sending request to", `${PARTYKIT_URL}/party/roomid`);
+
   return (
     <div className="flex flex-col gap-5 min-w-[350px]" id="game-form">
       <button
