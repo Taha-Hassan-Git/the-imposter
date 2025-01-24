@@ -1,6 +1,12 @@
 import type * as Party from "partykit/server";
 import { GameInfo } from "../src/app/hooks/useGameState";
+import { Category } from "../src/app/components/NewGameForm";
 
+interface GameFormInfo {
+  playerName: string;
+  roomId: string;
+  category: Category;
+}
 export default class Server implements Party.Server {
   constructor(readonly party: Party.Party) {}
 
@@ -9,8 +15,15 @@ export default class Server implements Party.Server {
   async onRequest(req: Party.Request) {
     // store the game info if it's a POST request
     if (req.method === "POST") {
-      const game = (await req.json()) as GameInfo;
-      this.game = { ...game };
+      const game = (await req.json()) as GameFormInfo;
+      // set up the new game
+      this.game = {
+        roomId: game.roomId,
+        players: [
+          { name: game.playerName, score: 0, ready: false, avatarColor: "red" },
+        ],
+        category: game.category,
+      };
       this.saveGame();
     }
 
