@@ -8,7 +8,7 @@ export default function GameContainer({ roomId }: { roomId: string }) {
   const searchParams = useSearchParams();
   const playerName = searchParams.get("playerName");
   const category = searchParams.get("category");
-
+  console.log("game container, roomid: ", roomId);
   return (
     <div className="flex flex-col w-full items-center">
       <GameProvider

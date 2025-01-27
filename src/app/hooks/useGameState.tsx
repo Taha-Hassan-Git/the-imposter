@@ -85,7 +85,10 @@ export function GameProvider({
       category: category as Category,
     };
   }
-
+  console.log("game provider host and room", {
+    host: PARTYKIT_HOST,
+    room: roomId,
+  });
   const socket = usePartySocket({
     host: PARTYKIT_HOST,
     room: roomId,
