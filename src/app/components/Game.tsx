@@ -1,14 +1,18 @@
 "use client";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { GameProvider, useGameState } from "../hooks/useGameState";
 import { WaitingScreen } from "./WaitingScreen";
 import { Category } from "./NewGameForm";
 
-export default function GameContainer({ roomId }: { roomId: string }) {
+const ROUTE = "/game/";
+export default function GameContainer() {
+  const path = usePathname();
   const searchParams = useSearchParams();
   const playerName = searchParams.get("playerName");
   const category = searchParams.get("category");
-  console.log("game container, roomid: ", roomId);
+
+  const roomId = path.slice(ROUTE.length);
+  console.log("room id from path", roomId);
   return (
     <div className="flex flex-col w-full items-center">
       <GameProvider
