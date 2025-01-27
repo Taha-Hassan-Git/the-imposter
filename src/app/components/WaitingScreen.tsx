@@ -9,11 +9,10 @@ export function WaitingScreen({
   self: string;
 }) {
   const { dispatch } = useGameState();
+  // only runs once when the component mounts
+
   useEffect(() => {
     dispatch({ type: "player-joined", payload: { name: self } });
-    return () => {
-      dispatch({ type: "player-left", payload: { name: self } });
-    };
   }, [dispatch, self]);
   return (
     <div className="flex flex-col gap-5 p-5 items-center">
