@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useCallback, useContext, useState } from "react";
 import { Category } from "../components/NewGameForm";
 import usePartySocket from "partysocket/react";
 import { PARTYKIT_HOST } from "../env";
@@ -85,10 +85,7 @@ export function GameProvider({
       category: category as Category,
     };
   }
-  console.log("game provider host and room", {
-    host: PARTYKIT_HOST,
-    room: roomId,
-  });
+
   const socket = usePartySocket({
     host: PARTYKIT_HOST,
     room: roomId,
@@ -101,10 +98,14 @@ export function GameProvider({
     },
   });
 
-  const dispatch = (action: Action) => {
-    console.log("dispatch", action);
-    socket.send(JSON.stringify(action));
-  };
+  // memoise this function
+  const dispatch = useCallback(
+    (action: Action) => {
+      console.log("sending action", action);
+      socket.send(JSON.stringify(action));
+    },
+    [socket]
+  );
 
   return (
     <gameContext.Provider value={{ gameState, dispatch }}>

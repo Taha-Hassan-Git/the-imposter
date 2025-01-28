@@ -3,6 +3,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { GameProvider, useGameState } from "../hooks/useGameState";
 import { WaitingScreen } from "./WaitingScreen";
 import { Category } from "./NewGameForm";
+import { useEffect } from "react";
 
 const ROUTE = "/game/";
 export default function GameContainer() {
@@ -12,7 +13,7 @@ export default function GameContainer() {
   const category = searchParams.get("category");
 
   const roomId = path.slice(ROUTE.length);
-  console.log("room id from path", roomId);
+
   return (
     <div className="flex flex-col w-full items-center">
       <GameProvider
@@ -27,7 +28,15 @@ export default function GameContainer() {
 }
 
 function Game({ playerName }: { playerName: string | null }) {
-  const { gameState } = useGameState();
+  const { gameState, dispatch } = useGameState();
+
+  useEffect(() => {
+    if (!playerName) {
+      return;
+    }
+    console.log("player joined", playerName);
+    dispatch({ type: "player-joined", payload: { name: playerName } });
+  }, [playerName, dispatch]);
   return (
     <>
       {gameState.state === "error" ? (

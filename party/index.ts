@@ -63,6 +63,12 @@ function gameUpdater(action: Action, state: GameInfo) {
   const newState = { ...state };
   switch (action.type) {
     case "player-joined":
+      // check if the player is already in the game
+      if (
+        newState.players.some((player) => player.name === action.payload.name)
+      ) {
+        return newState;
+      }
       newState.players.push({
         name: action.payload.name,
         score: 0,

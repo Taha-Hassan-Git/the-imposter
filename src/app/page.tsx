@@ -12,7 +12,6 @@ export default function Home() {
 
     if (!roomId) {
       roomId = generateRoomId();
-      console.log("Creating room", roomId);
       await fetch(`${PARTYKIT_URL}/party/${roomId}`, {
         method: "POST",
         body: JSON.stringify({ playerName, category, roomId }),
@@ -21,6 +20,7 @@ export default function Home() {
         },
       });
     } else {
+      console.log("joining room", roomId);
       const res = await fetch(`${PARTYKIT_URL}/party/${roomId}`, {
         method: "GET",
         headers: {

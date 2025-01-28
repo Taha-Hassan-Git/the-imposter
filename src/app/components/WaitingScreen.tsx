@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { GameInfo, Player, useGameState } from "../hooks/useGameState";
 
 export function WaitingScreen({
@@ -8,12 +8,6 @@ export function WaitingScreen({
   gameState: GameInfo;
   self: string;
 }) {
-  const { dispatch } = useGameState();
-  // only runs once when the component mounts
-
-  useEffect(() => {
-    dispatch({ type: "player-joined", payload: { name: self } });
-  }, [dispatch, self]);
   return (
     <div className="flex flex-col gap-5 p-5 items-center">
       <div className="bg-white rounded-lg shadow-md p-8 min-w-[360px]">
