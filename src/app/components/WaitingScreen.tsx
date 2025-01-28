@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { GameInfo, Player, useGameState } from "../hooks/useGameState";
 
 export function WaitingScreen({
@@ -8,6 +8,17 @@ export function WaitingScreen({
   gameState: GameInfo;
   self: string;
 }) {
+  const { dispatch } = useGameState();
+
+  useEffect(() => {
+    const avatarColor = gameState.players.find(
+      (p) => p.name === self
+    )?.avatarColor;
+    dispatch({
+      type: "player-joined",
+      payload: { name: self, avatarColor: avatarColor || "red" },
+    });
+  }, [dispatch, gameState.players, self]);
   return (
     <div className="flex flex-col gap-5 p-5 items-center">
       <div className="bg-white rounded-lg shadow-md p-8 min-w-[360px]">

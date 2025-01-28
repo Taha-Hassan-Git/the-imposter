@@ -13,10 +13,10 @@ export default class Server implements Party.Server {
   game: GameInfo | undefined;
 
   async onRequest(req: Party.Request) {
-    // store the game info if it's a POST request
+    // Set up a new game if one doesn't exist
+    console.log("Request method:", req.method);
     if (req.method === "POST") {
       const game = (await req.json()) as GameFormInfo;
-      // set up the new game
       this.game = {
         state: "waiting",
         roomId: game.roomId,
@@ -40,6 +40,20 @@ export default class Server implements Party.Server {
     return new Response("Not found", { status: 404 });
   }
 
+  async onConnect(connection: Party.Connection) {
+    console.log("Player joined:", connection);
+    if (!this.game) return;
+    const action: Action = {
+      type: "player-joined",
+      payload: {
+        name: connection.id,
+        avatarColor: "red",
+      },
+    };
+    this.game = gameUpdater(action, this.game);
+    this.party.broadcast(JSON.stringify(this.game));
+  }
+
   async onMessage(message: string) {
     if (!this.game) return;
     console.log("Received message:", message);
@@ -57,10 +71,22 @@ export default class Server implements Party.Server {
   async onStart() {
     this.game = await this.party.storage.get<GameInfo>("game");
   }
+
+  async onClose(connection: Party.Connection) {
+    console.log("Player left:", connection);
+    if (!this.game) return;
+    const action: Action = {
+      type: "player-left",
+      payload: { name: connection.id },
+    };
+    this.game = gameUpdater(action, this.game);
+    this.party.broadcast(JSON.stringify(this.game));
+  }
 }
 
 function gameUpdater(action: Action, state: GameInfo) {
   const newState = { ...state };
+
   switch (action.type) {
     case "player-joined":
       // check if the player is already in the game
@@ -73,10 +99,11 @@ function gameUpdater(action: Action, state: GameInfo) {
         name: action.payload.name,
         score: 0,
         ready: false,
-        avatarColor: "red",
+        avatarColor: action.payload.avatarColor,
       });
       return newState;
     case "player-left":
+      console.log("Player left:", action.payload.name);
       newState.players = newState.players.filter(
         (player) => player.name !== action.payload.name
       );

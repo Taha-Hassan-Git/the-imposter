@@ -20,7 +20,6 @@ export default function Home() {
         },
       });
     } else {
-      console.log("joining room", roomId);
       const res = await fetch(`${PARTYKIT_URL}/party/${roomId}`, {
         method: "GET",
         headers: {
