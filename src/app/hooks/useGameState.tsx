@@ -24,15 +24,14 @@ export type Player = {
   ready: boolean;
   avatarColor: AvatarColor;
 };
-type AvatarColor = "red" | "blue" | "green" | "yellow" | "purple" | "pink";
-export const avatarColors: AvatarColor[] = [
-  "red",
-  "blue",
-  "green",
-  "yellow",
-  "purple",
-  "pink",
-];
+export type AvatarColor =
+  | "red"
+  | "blue"
+  | "green"
+  | "yellow"
+  | "purple"
+  | "pink";
+
 export interface GameInfo {
   state: "waiting" | "playing" | "voting";
   roomId: string;

@@ -1,5 +1,5 @@
 import type * as Party from "partykit/server";
-import { Action, GameInfo } from "../src/app/hooks/useGameState";
+import { Action, AvatarColor, GameInfo } from "../src/app/hooks/useGameState";
 import { Category } from "../src/app/components/NewGameForm";
 
 interface GameFormInfo {
@@ -7,6 +7,14 @@ interface GameFormInfo {
   roomId: string;
   category: Category;
 }
+export const avatarColors: AvatarColor[] = [
+  "red",
+  "blue",
+  "green",
+  "yellow",
+  "purple",
+  "pink",
+];
 export default class Server implements Party.Server {
   constructor(readonly party: Party.Room) {}
 
@@ -17,12 +25,18 @@ export default class Server implements Party.Server {
     if (req.method === "POST") {
       const game = (await req.json()) as GameFormInfo;
       // set up the new game
+
       this.game = {
         state: "waiting",
         roomId: game.roomId,
         round: 1,
         players: [
-          { name: game.playerName, score: 0, ready: false, avatarColor: "red" },
+          {
+            name: game.playerName,
+            score: 0,
+            ready: false,
+            avatarColor: assignUnusedAvatarColor(),
+          },
         ],
         category: game.category,
       };
@@ -91,11 +105,12 @@ function gameUpdater(action: Action, state: GameInfo) {
         // do nothing if the player already exists or the game is not in the waiting state
         return newState;
       }
+
       newState.players.push({
         name: action.payload.name,
         score: 0,
         ready: false,
-        avatarColor: "red",
+        avatarColor: assignUnusedAvatarColor(newState),
       });
       return newState;
     case "player-left":
@@ -128,6 +143,22 @@ function gameUpdater(action: Action, state: GameInfo) {
     default:
       break;
   }
+}
+
+function assignUnusedAvatarColor(game?: GameInfo) {
+  if (!game) {
+    const randomColor =
+      avatarColors[Math.floor(Math.random() * avatarColors.length)];
+    return randomColor;
+  }
+  const usedColors = game.players.map((player) => player.avatarColor);
+  // remove used colors from the list of available colors
+  const availableColors = avatarColors.filter(
+    (color) => !usedColors.includes(color)
+  );
+  const randomColor =
+    availableColors[Math.floor(Math.random() * availableColors.length)];
+  return randomColor;
 }
 
 Server satisfies Party.Worker;
