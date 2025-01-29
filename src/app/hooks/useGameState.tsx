@@ -37,6 +37,7 @@ export interface GameInfo {
   state: "waiting" | "playing" | "voting";
   roomId: string;
   players: Player[];
+  round: number;
   category: Category;
 }
 

@@ -20,6 +20,7 @@ export default class Server implements Party.Server {
       this.game = {
         state: "waiting",
         roomId: game.roomId,
+        round: 1,
         players: [
           { name: game.playerName, score: 0, ready: false, avatarColor: "red" },
         ],
@@ -123,7 +124,6 @@ function gameUpdater(action: Action, state: GameInfo) {
       ) {
         newState.state = "playing";
       }
-      console.log(newState.state);
       return newState;
     default:
       break;

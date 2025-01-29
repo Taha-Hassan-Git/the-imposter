@@ -1,13 +1,8 @@
 import { useState } from "react";
 import { GameInfo, Player, useGameState } from "../hooks/useGameState";
 
-export function WaitingScreen({
-  gameState,
-  self,
-}: {
-  gameState: GameInfo;
-  self: string;
-}) {
+export function WaitingScreen({ self }: { self: string }) {
+  const { gameState } = useGameState() as { gameState: GameInfo };
   return (
     <div className="flex flex-col gap-5 p-5 items-center">
       <div className="bg-white rounded-lg shadow-md p-8 min-w-[360px]">
