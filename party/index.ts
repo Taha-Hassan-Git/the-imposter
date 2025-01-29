@@ -96,13 +96,6 @@ function gameUpdater(action: Action, state: GameInfo) {
         ready: false,
         avatarColor: "red",
       });
-      // check if more than 3 players are in the game and all players are ready, if so, start the game
-      if (
-        newState.players.length >= 3 &&
-        newState.players.every((player) => player.ready)
-      ) {
-        newState.state = "playing";
-      }
       return newState;
     case "player-left":
       newState.players = newState.players.filter(
@@ -123,6 +116,14 @@ function gameUpdater(action: Action, state: GameInfo) {
         }
         return player;
       });
+      // check if more than 3 players are in the game and all players are ready, if so, start the game
+      if (
+        newState.players.length >= 3 &&
+        newState.players.every((player) => player.ready)
+      ) {
+        newState.state = "playing";
+      }
+      console.log(newState.state);
       return newState;
     default:
       break;
