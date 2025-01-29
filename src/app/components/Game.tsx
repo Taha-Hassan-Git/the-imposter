@@ -3,6 +3,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { GameProvider, useGameState } from "../hooks/useGameState";
 import { Category } from "./NewGameForm";
 import PlayingScreen from "./PlayingScreen";
+import { WaitingScreen } from "./WaitingScreen";
 
 const ROUTE = "/game/";
 export default function GameContainer() {
@@ -34,8 +35,7 @@ function Game({ playerName }: { playerName: string | null }) {
       {gameState.state === "error" ? (
         <ErrorScreen />
       ) : gameState.state === "waiting" ? (
-        // <WaitingScreen self={playerName as string} />
-        <PlayingScreen />
+        <WaitingScreen self={playerName as string} />
       ) : gameState.state === "playing" ? (
         <PlayingScreen />
       ) : gameState.state === "voting" ? (

@@ -1,5 +1,10 @@
 import type * as Party from "partykit/server";
-import { Action, AvatarColor, GameInfo } from "../src/app/hooks/useGameState";
+import {
+  Action,
+  answersObject,
+  AvatarColor,
+  GameInfo,
+} from "../src/app/hooks/useGameState";
 import { Category } from "../src/app/components/NewGameForm";
 
 interface GameFormInfo {
@@ -25,19 +30,22 @@ export default class Server implements Party.Server {
     if (req.method === "POST") {
       const game = (await req.json()) as GameFormInfo;
       // set up the new game
-
+      const avatarColor = assignUnusedAvatarColor();
+      const answer = getUnusedAnswer(game.category);
       this.game = {
         state: "waiting",
         roomId: game.roomId,
         round: 1,
+        answer,
         players: [
           {
             name: game.playerName,
             score: 0,
             ready: false,
-            avatarColor: assignUnusedAvatarColor(),
+            avatarColor,
           },
         ],
+        prevAnswers: [],
         category: game.category,
       };
       this.saveGame();
@@ -143,6 +151,18 @@ function gameUpdater(action: Action, state: GameInfo) {
     default:
       break;
   }
+}
+
+function getUnusedAnswer(category: Category, game?: GameInfo) {
+  const array = answersObject[category];
+  if (!game) {
+    return array[Math.floor(Math.random() * array.length)];
+  }
+  const usedAnswers = game.prevAnswers;
+  const availableAnswers = array.filter(
+    (answer) => !usedAnswers.includes(answer)
+  );
+  return availableAnswers[Math.floor(Math.random() * availableAnswers.length)];
 }
 
 function assignUnusedAvatarColor(game?: GameInfo) {

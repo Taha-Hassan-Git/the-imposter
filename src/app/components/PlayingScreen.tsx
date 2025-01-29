@@ -1,6 +1,7 @@
 import { useGameState, GameInfo, Player } from "../hooks/useGameState";
 
 const PlayingScreen = () => {
+  const { gameState } = useGameState() as { gameState: GameInfo };
   return (
     <div className="flex flex-col gap-5 p-5 items-center">
       <div className="flex gap-5 justify-between">
@@ -9,7 +10,9 @@ const PlayingScreen = () => {
       </div>
       <div>
         <h2 className="text-2xl font-bold mb-4 text-center">Game</h2>
-        <div className="bg-white rounded-lg shadow-md p-8 min-w-[360px]"></div>
+        <div className="bg-white rounded-lg shadow-md p-8 min-w-[360px]">
+          {gameState.answer}
+        </div>
       </div>
     </div>
   );
