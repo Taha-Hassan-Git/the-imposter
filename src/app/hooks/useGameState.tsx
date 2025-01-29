@@ -23,6 +23,7 @@ export type Player = {
   score: number;
   ready: boolean;
   avatarColor: AvatarColor;
+  imposter: boolean;
 };
 export type AvatarColor =
   | "red"

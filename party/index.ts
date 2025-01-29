@@ -43,6 +43,7 @@ export default class Server implements Party.Server {
             score: 0,
             ready: false,
             avatarColor,
+            imposter: false,
           },
         ],
         prevAnswers: [],
@@ -119,6 +120,7 @@ function gameUpdater(action: Action, state: GameInfo) {
         score: 0,
         ready: false,
         avatarColor: assignUnusedAvatarColor(newState),
+        imposter: false,
       });
       return newState;
     case "player-left":
@@ -145,12 +147,21 @@ function gameUpdater(action: Action, state: GameInfo) {
         newState.players.length >= 3 &&
         newState.players.every((player) => player.ready)
       ) {
+        const newPlayers = assignImposter(newState);
+        newState.players = newPlayers;
         newState.state = "playing";
       }
       return newState;
     default:
       break;
   }
+}
+
+function assignImposter(game: GameInfo) {
+  const newPlayers = [...game.players];
+  const randomIndex = Math.floor(Math.random() * newPlayers.length);
+  newPlayers[randomIndex].imposter = true;
+  return newPlayers;
 }
 
 function getUnusedAnswer(category: Category, game?: GameInfo) {
