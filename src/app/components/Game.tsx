@@ -3,7 +3,6 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { GameProvider, useGameState } from "../hooks/useGameState";
 import { WaitingScreen } from "./WaitingScreen";
 import { Category } from "./NewGameForm";
-import { useEffect } from "react";
 
 const ROUTE = "/game/";
 export default function GameContainer() {
@@ -28,15 +27,8 @@ export default function GameContainer() {
 }
 
 function Game({ playerName }: { playerName: string | null }) {
-  const { gameState, dispatch } = useGameState();
+  const { gameState } = useGameState();
 
-  useEffect(() => {
-    if (!playerName) {
-      return;
-    }
-    console.log("player joined", playerName);
-    dispatch({ type: "player-joined", payload: { name: playerName } });
-  }, [playerName, dispatch]);
   return (
     <>
       {gameState.state === "error" ? (

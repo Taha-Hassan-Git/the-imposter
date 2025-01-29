@@ -37,12 +37,31 @@ export default class Server implements Party.Server {
     }
 
     // return 404 if the game info is not found
-    return new Response("Not found", { status: 404 });
+    return new Response("Not found", {
+      status: 404,
+    });
   }
 
+  async onConnect(connection: Party.Connection) {
+    console.log("player joined", connection.id);
+    if (!this.game) return;
+    this.game = gameUpdater(
+      { type: "player-joined", payload: { name: connection.id } },
+      this.game
+    );
+    this.party.broadcast(JSON.stringify(this.game));
+  }
+  async onClose(connection: Party.Connection) {
+    console.log("player left", connection.id);
+    if (!this.game) return;
+    this.game = gameUpdater(
+      { type: "player-left", payload: { name: connection.id } },
+      this.game
+    );
+    this.party.broadcast(JSON.stringify(this.game));
+  }
   async onMessage(message: string) {
     if (!this.game) return;
-    console.log("Received message:", message);
     const action = JSON.parse(message) as Action;
     this.game = gameUpdater(action, this.game);
     this.party.broadcast(JSON.stringify(this.game));
@@ -63,10 +82,12 @@ function gameUpdater(action: Action, state: GameInfo) {
   const newState = { ...state };
   switch (action.type) {
     case "player-joined":
-      // check if the player is already in the game
-      if (
-        newState.players.some((player) => player.name === action.payload.name)
-      ) {
+      const playerExists = newState.players.some(
+        (player) => player.name === action.payload.name
+      );
+      const isWaiting = newState.state === "waiting";
+      if (playerExists || !isWaiting) {
+        // do nothing if the player already exists or the game is not in the waiting state
         return newState;
       }
       newState.players.push({
@@ -75,11 +96,25 @@ function gameUpdater(action: Action, state: GameInfo) {
         ready: false,
         avatarColor: "red",
       });
+      // check if more than 3 players are in the game and all players are ready, if so, start the game
+      if (
+        newState.players.length >= 3 &&
+        newState.players.every((player) => player.ready)
+      ) {
+        newState.state = "playing";
+      }
       return newState;
     case "player-left":
       newState.players = newState.players.filter(
         (player) => player.name !== action.payload.name
       );
+      // if there are less than 3 players, go back to the waiting state
+      if (newState.players.length < 3) {
+        newState.state = "waiting";
+        newState.players.forEach((player) => {
+          player.ready = false;
+        });
+      }
       return newState;
     case "toggle-ready":
       newState.players = newState.players.map((player) => {

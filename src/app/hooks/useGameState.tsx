@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useState } from "react";
 import { Category } from "../components/NewGameForm";
 import usePartySocket from "partysocket/react";
 import { PARTYKIT_HOST } from "../env";
+import { generatePlayerName } from "../utils/generatePlayerName";
 
 export type Action =
   | { type: "toggle-ready"; payload: { name: string } }
@@ -46,7 +47,6 @@ export type GameState = GameInfo | GameError;
 export function GameProvider({
   children,
   playerName,
-  category,
   roomId,
 }: {
   children: React.ReactNode;
@@ -54,41 +54,12 @@ export function GameProvider({
   category: Category | null;
   roomId: string;
 }) {
-  const [gameState, setGameState] = useState<GameState>(() =>
-    getInitialGameState({ playerName, category, roomId })
-  );
-
-  function getInitialGameState({
-    roomId,
-    playerName,
-    category,
-  }: {
-    roomId: string;
-    playerName: string | null;
-    category: Category | null;
-  }): GameState {
-    if (!playerName || !category) {
-      return { state: "error" };
-    }
-    const randomColorIndex = Math.floor(Math.random() * avatarColors.length);
-    return {
-      state: "waiting",
-      roomId,
-      players: [
-        {
-          name: playerName,
-          score: 0,
-          ready: false,
-          avatarColor: avatarColors[randomColorIndex],
-        },
-      ],
-      category: category as Category,
-    };
-  }
+  const [gameState, setGameState] = useState<GameState>({ state: "error" });
 
   const socket = usePartySocket({
     host: PARTYKIT_HOST,
     room: roomId,
+    id: playerName || generatePlayerName(),
     onMessage(event) {
       const message = JSON.parse(event.data) as GameInfo;
       if (message) {
