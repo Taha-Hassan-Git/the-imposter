@@ -1,8 +1,7 @@
 import type * as Party from "partykit/server";
-
+import { GameManager } from "../game-logic/GameManager";
+import { Action, GameInfo } from "../game-logic/types";
 import { Category } from "../src/app/components/NewGameForm";
-import { GameInfo, Action } from "../game-logic/types";
-import { initialiseGame, gameUpdater } from "../game-logic/game-logic";
 
 export interface GameFormInfo {
   playerName: string;
@@ -13,65 +12,71 @@ export interface GameFormInfo {
 export default class Server implements Party.Server {
   constructor(readonly party: Party.Room) {}
 
-  game: GameInfo | undefined;
+  gameManager: GameManager | undefined;
 
   async onRequest(req: Party.Request) {
-    // store the game info if it's a POST request
     if (req.method === "POST") {
-      const game = (await req.json()) as GameFormInfo;
-      // set up the new game
-
-      this.game = initialiseGame(game);
-      this.saveGame();
+      const formInfo = (await req.json()) as GameFormInfo;
+      this.gameManager = GameManager.createNew(formInfo);
+      await this.saveGame();
     }
 
-    // return the game info
-    if (this.game) {
-      return new Response(JSON.stringify(this.game), {
+    if (this.gameManager) {
+      return new Response(JSON.stringify(this.gameManager.getState()), {
         status: 200,
         headers: { "Content-Type": "application/json" },
       });
     }
 
-    // return 404 if the game info is not found
-    return new Response("Not found", {
-      status: 404,
-    });
+    return new Response("Not found", { status: 404 });
   }
 
   async onConnect(connection: Party.Connection) {
     console.log("player joined", connection.id);
-    if (!this.game) return;
-    this.game = gameUpdater(
-      { type: "player-joined", payload: { name: connection.id } },
-      this.game
-    );
-    this.party.broadcast(JSON.stringify(this.game));
+    if (!this.gameManager) return;
+
+    this.gameManager.handleAction({
+      type: "player-joined",
+      payload: { name: connection.id },
+    });
+
+    this.party.broadcast(JSON.stringify(this.gameManager.getState()));
   }
+
   async onClose(connection: Party.Connection) {
     console.log("player left", connection.id);
-    if (!this.game) return;
-    this.game = gameUpdater(
-      { type: "player-left", payload: { name: connection.id } },
-      this.game
-    );
-    this.party.broadcast(JSON.stringify(this.game));
+    if (!this.gameManager) return;
+
+    this.gameManager.handleAction({
+      type: "player-left",
+      payload: { name: connection.id },
+    });
+
+    this.party.broadcast(JSON.stringify(this.gameManager.getState()));
   }
+
   async onMessage(message: string) {
-    if (!this.game) return;
+    if (!this.gameManager) return;
+
     const action = JSON.parse(message) as Action;
-    this.game = gameUpdater(action, this.game);
-    this.party.broadcast(JSON.stringify(this.game));
+    this.gameManager.handleAction(action);
+    this.party.broadcast(JSON.stringify(this.gameManager.getState()));
   }
 
   async saveGame() {
-    if (this.game) {
-      await this.party.storage.put<GameInfo>("game", this.game);
+    if (this.gameManager) {
+      await this.party.storage.put<GameInfo>(
+        "game",
+        this.gameManager.getState()
+      );
     }
   }
 
   async onStart() {
-    this.game = await this.party.storage.get<GameInfo>("game");
+    const savedGame = await this.party.storage.get<GameInfo>("game");
+    if (savedGame) {
+      this.gameManager = new GameManager(savedGame);
+    }
   }
 }
 
