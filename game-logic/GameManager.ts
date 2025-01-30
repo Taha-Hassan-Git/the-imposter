@@ -39,6 +39,7 @@ export class GameManager {
 					ready: false,
 					avatarColor,
 					imposter: false,
+					votes: [],
 				},
 			],
 			prevAnswers: [],
@@ -70,7 +71,25 @@ export class GameManager {
 				this.handleToggleReady(action.payload.name)
 				break
 			}
+			case 'player-voted': {
+				this.handlePlayerVoted(action.payload.name, action.payload.vote)
+				break
+			}
 		}
+	}
+
+	private handlePlayerVoted(playerName: string, vote: string): void {
+		const player = this.game.players.find((player) => player.name === playerName)
+		const votedForPlayer = this.game.players.find((player) => player.name === vote)
+
+		if (!player || !votedForPlayer || player.name === vote) return
+
+		this.game.players = this.game.players
+			.map((player) => (player.name === playerName ? { ...player, ready: true } : player))
+			.map((player) =>
+				player.name === vote ? { ...player, votes: [...player.votes, playerName] } : player
+			)
+		this.tryAdvanceGameState()
 	}
 
 	private handlePlayerJoined(playerName: string): void {
@@ -87,6 +106,7 @@ export class GameManager {
 			ready: false,
 			avatarColor: GameManager.assignUnusedAvatarColor(this.game),
 			imposter: false,
+			votes: [],
 		}
 
 		this.game.players = [...this.game.players, newPlayer]

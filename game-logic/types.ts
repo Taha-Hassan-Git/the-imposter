@@ -4,6 +4,7 @@ export type Action =
 	| { type: 'toggle-ready'; payload: { name: string } }
 	| { type: 'player-joined'; payload: { name: string } }
 	| { type: 'player-left'; payload: { name: string } }
+	| { type: 'player-voted'; payload: { name: string; vote: string } }
 
 export const avatarColors: AvatarColor[] = ['red', 'blue', 'green', 'yellow', 'purple', 'pink']
 
@@ -13,6 +14,7 @@ export type Player = {
 	ready: boolean
 	avatarColor: AvatarColor
 	imposter: boolean
+	votes: string[]
 }
 export type AvatarColor = 'red' | 'blue' | 'green' | 'yellow' | 'purple' | 'pink'
 
