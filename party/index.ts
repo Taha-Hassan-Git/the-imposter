@@ -1,5 +1,12 @@
 import type * as Party from "partykit/server";
-import { Action, GameInfo } from "../src/app/hooks/useGameState";
+import {
+  Action,
+  answersObject,
+  AvatarColor,
+  GameInfo,
+  gameStatesInSequence,
+  Player,
+} from "../src/app/hooks/useGameState";
 import { Category } from "../src/app/components/NewGameForm";
 
 interface GameFormInfo {
@@ -7,6 +14,14 @@ interface GameFormInfo {
   roomId: string;
   category: Category;
 }
+export const avatarColors: AvatarColor[] = [
+  "red",
+  "blue",
+  "green",
+  "yellow",
+  "purple",
+  "pink",
+];
 export default class Server implements Party.Server {
   constructor(readonly party: Party.Room) {}
 
@@ -17,12 +32,23 @@ export default class Server implements Party.Server {
     if (req.method === "POST") {
       const game = (await req.json()) as GameFormInfo;
       // set up the new game
+      const avatarColor = assignUnusedAvatarColor();
+      const answer = getUnusedAnswer(game.category);
       this.game = {
         state: "waiting",
         roomId: game.roomId,
+        round: 1,
+        answer,
         players: [
-          { name: game.playerName, score: 0, ready: false, avatarColor: "red" },
+          {
+            name: game.playerName,
+            score: 0,
+            ready: false,
+            avatarColor,
+            imposter: false,
+          },
         ],
+        prevAnswers: [],
         category: game.category,
       };
       this.saveGame();
@@ -90,11 +116,13 @@ function gameUpdater(action: Action, state: GameInfo) {
         // do nothing if the player already exists or the game is not in the waiting state
         return newState;
       }
+
       newState.players.push({
         name: action.payload.name,
         score: 0,
         ready: false,
-        avatarColor: "red",
+        avatarColor: assignUnusedAvatarColor(newState),
+        imposter: false,
       });
       return newState;
     case "player-left":
@@ -116,18 +144,69 @@ function gameUpdater(action: Action, state: GameInfo) {
         }
         return player;
       });
-      // check if more than 3 players are in the game and all players are ready, if so, start the game
-      if (
-        newState.players.length >= 3 &&
-        newState.players.every((player) => player.ready)
-      ) {
-        newState.state = "playing";
-      }
-      console.log(newState.state);
-      return newState;
+      const maybeAdvancedState = advanceGameState(newState);
+      console.log(maybeAdvancedState);
+      return maybeAdvancedState;
     default:
       break;
   }
+}
+
+function advanceGameState(game: GameInfo) {
+  const moreThanthreePlayers = game.players.length >= 3;
+  const allPlayersReady = game.players.every((player) => player.ready);
+  if (moreThanthreePlayers && allPlayersReady) {
+    const playersWithImposter = assignImposter(game);
+    const newPlayers = setAllPlayersUnready(playersWithImposter);
+    game.players = newPlayers;
+    game.state = gameStatesInSequence[
+      gameStatesInSequence.indexOf(game.state) + 1
+    ] as GameInfo["state"];
+    return game;
+  }
+  return game;
+}
+
+function assignImposter(game: GameInfo) {
+  const newPlayers = [...game.players];
+  const randomIndex = Math.floor(Math.random() * newPlayers.length);
+  newPlayers[randomIndex].imposter = true;
+  return newPlayers;
+}
+
+function setAllPlayersUnready(players: Player[]) {
+  return players.map((player) => {
+    player.ready = false;
+    return player;
+  });
+}
+
+function getUnusedAnswer(category: Category, game?: GameInfo) {
+  const array = answersObject[category];
+  if (!game) {
+    return array[Math.floor(Math.random() * array.length)];
+  }
+  const usedAnswers = game.prevAnswers;
+  const availableAnswers = array.filter(
+    (answer) => !usedAnswers.includes(answer)
+  );
+  return availableAnswers[Math.floor(Math.random() * availableAnswers.length)];
+}
+
+function assignUnusedAvatarColor(game?: GameInfo) {
+  if (!game) {
+    const randomColor =
+      avatarColors[Math.floor(Math.random() * avatarColors.length)];
+    return randomColor;
+  }
+  const usedColors = game.players.map((player) => player.avatarColor);
+  // remove used colors from the list of available colors
+  const availableColors = avatarColors.filter(
+    (color) => !usedColors.includes(color)
+  );
+  const randomColor =
+    availableColors[Math.floor(Math.random() * availableColors.length)];
+  return randomColor;
 }
 
 Server satisfies Party.Worker;
