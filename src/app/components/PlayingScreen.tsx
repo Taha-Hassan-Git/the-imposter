@@ -1,4 +1,5 @@
-import { useGameState, GameInfo, Player } from "../hooks/useGameState";
+import { GameInfo, Player } from "../../../game-logic/types";
+import { useGameState } from "../hooks/useGameState";
 
 const PlayingScreen = ({ self }: { self: string }) => {
   const { gameState } = useGameState() as { gameState: GameInfo };

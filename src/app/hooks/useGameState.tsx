@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useState } from "react";
 import { Category } from "../components/NewGameForm";
 import { PARTYKIT_HOST } from "../env";
 import { generatePlayerName } from "../utils/generatePlayerName";
-import { GameState, GameInfo, Action, Player } from "../../../game-logic/types";
+import { GameState, Action, Player, GameInfo } from "../../../game-logic/types";
 import usePartySocket from "partysocket/react";
 
 interface GameContext {
