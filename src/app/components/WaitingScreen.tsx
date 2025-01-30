@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { GameInfo, Player, useGameState } from "../hooks/useGameState";
+import { useGameState } from "../hooks/useGameState";
+import { GameInfo, Player } from "../../../game-logic/types";
 
 export function WaitingScreen({ self }: { self: string }) {
   const { gameState } = useGameState() as { gameState: GameInfo };
