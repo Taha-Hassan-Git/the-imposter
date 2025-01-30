@@ -1,5 +1,5 @@
-import GameContainer from "../../components/Game";
+import GameContainer from '../../components/Game'
 
 export default async function Page() {
-  return <GameContainer />;
+	return <GameContainer />
 }
