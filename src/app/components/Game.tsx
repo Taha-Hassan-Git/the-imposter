@@ -3,6 +3,7 @@ import { usePathname, useSearchParams } from 'next/navigation'
 import { GameProvider, useGameState } from '../hooks/useGameState'
 import { Category } from './NewGameForm'
 import PlayingScreen from './PlayingScreen'
+import { VotingScreen } from './VotingScreen'
 import { WaitingScreen } from './WaitingScreen'
 
 const ROUTE = '/game/'
@@ -35,7 +36,7 @@ function Game({ playerName }: { playerName: string | null }) {
 			) : gameState.state === 'playing' ? (
 				<PlayingScreen self={playerName as string} />
 			) : gameState.state === 'voting' ? (
-				<VotingScreen />
+				<VotingScreen playerName={playerName as string} />
 			) : null}
 		</>
 	)
@@ -43,8 +44,4 @@ function Game({ playerName }: { playerName: string | null }) {
 
 function ErrorScreen() {
 	return <div>Error Screen</div>
-}
-
-function VotingScreen() {
-	return <div>Voting Screen</div>
 }
