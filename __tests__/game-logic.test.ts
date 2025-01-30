@@ -113,7 +113,7 @@ describe("When in the waiting state...", () => {
 
   it("starts a game if there are enough players", () => {
     // Add players until we reach minimum (3)
-    for (let i = 1; i < 3; i++) {
+    for (let i = 1; i < gameManager.getMinPlayers(); i++) {
       gameManager.handleAction({
         type: "player-joined",
         payload: { name: `test${i + 1}` },

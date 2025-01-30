@@ -52,6 +52,10 @@ export class GameManager {
     return this.game;
   }
 
+  getMinPlayers(): number {
+    return GameManager.MIN_PLAYERS;
+  }
+
   handleAction(action: Action): void {
     switch (action.type) {
       case "player-joined": {
