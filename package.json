@@ -12,6 +12,7 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
+    "classnames": "^2.5.1",
     "next": "15.1.4",
     "partysocket": "1.0.3",
     "react": "^19.0.0",

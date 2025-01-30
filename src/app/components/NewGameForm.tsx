@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { generatePlayerName } from "../utils/generatePlayerName";
+import { Button } from "./Button";
 
 export type GameFormData = { category: Category; roomId: RoomId; name: string };
 export type Category = "films" | "animals" | "countries" | "sports";
@@ -21,16 +22,26 @@ export default function NewGameForm() {
 
   return (
     <div className="flex flex-col gap-5 min-w-[350px]" id="game-form">
-      <button
-        type="button"
-        onClick={(e) => {
-          e.preventDefault();
-          setShowJoinExisting((prev) => !prev);
-        }}
-        className="self-center"
-      >
-        {showJoinExisting ? "Create new room?" : "Join existing room?"}
-      </button>
+      <div className="flex gap-5">
+        <Button
+          variant="secondary"
+          disabled={showJoinExisting}
+          onClick={() => {
+            setShowJoinExisting(true);
+          }}
+        >
+          Join existing room
+        </Button>
+        <Button
+          variant="secondary"
+          disabled={!showJoinExisting}
+          onClick={() => {
+            setShowJoinExisting(false);
+          }}
+        >
+          Create new room
+        </Button>
+      </div>
       <div className="flex-col">
         <label htmlFor="category" className="block mb-1 font-medium">
           Category:
@@ -90,14 +101,9 @@ export default function NewGameForm() {
         </div>
       )}
       <div className="self-center">
-        <button
-          suppressHydrationWarning
-          type="submit"
-          className="w-full bg-gray-800 hover:bg-gray-950 text-white py-3 px-5 text-base font-medium rounded-md transition-colors duration-300 text-nowrap"
-          id="new-room-btn"
-        >
+        <Button type="submit">
           {showJoinExisting ? "Join Room" : "Create Room"}
-        </button>
+        </Button>
       </div>
     </div>
   );

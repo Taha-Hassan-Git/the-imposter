@@ -1,5 +1,6 @@
 import { GameInfo, Player } from "../../../game-logic/types";
 import { useGameState } from "../hooks/useGameState";
+import { Button } from "./Button";
 
 const PlayingScreen = ({ self }: { self: string }) => {
   const { gameState } = useGameState() as { gameState: GameInfo };
@@ -26,13 +27,13 @@ function ReadyToVoteBox({ player }: { player: Player }) {
   return (
     <div className="bg-white rounded-lg shadow-md p-8 min-w-[360px]">
       <h2 className="text-2xl font-bold mb-4 text-center">Ready to Vote?</h2>
-      <p className="text-gray-500 text-xl">Click the button below to vote</p>
-      <button
+      <p className="text-gray-500 text-xl">Click the button below</p>
+      <Button
         onClick={toggleReady}
-        className="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg mt-4"
+        variant={player.ready ? "disabled" : "primary"}
       >
-        Vote
-      </button>
+        {player.ready ? "..." : "Ready"}
+      </Button>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useGameState } from "../hooks/useGameState";
 import { GameInfo, Player } from "../../../game-logic/types";
+import { Button } from "./Button";
 
 export function WaitingScreen({ self }: { self: string }) {
   const { gameState } = useGameState() as { gameState: GameInfo };
@@ -58,12 +59,9 @@ function ReadyButton({ self }: { self: string }) {
 
   return (
     <div className="flex flex-col gap-3 items-center">
-      <button
-        className="w-32 bg-gray-800 hover:bg-gray-950 text-white py-3 px-5 text-base font-medium rounded-md transition-colors duration-300 text-nowrap"
-        onClick={handleClick}
-      >
+      <Button variant={ready ? "disabled" : "primary"} onClick={handleClick}>
         {ready ? "..." : "Ready?"}
-      </button>
+      </Button>
       {ready && <p>Game begins when all players are ready...</p>}
     </div>
   );
