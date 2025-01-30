@@ -27,6 +27,7 @@ function PlayerListItem({ player, self }: { player: Player; self: string }) {
 	return (
 		<li className="flex items-center justify-between">
 			<Button
+				disabled={player.name === self || player.votes.includes(self)}
 				onClick={handleVote}
 				variant="secondary"
 				className="flex items-center bg-transparent hover:bg-gray-100 w-[80%]"

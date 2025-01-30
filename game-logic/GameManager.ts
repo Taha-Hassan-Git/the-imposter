@@ -83,12 +83,26 @@ export class GameManager {
 		const votedForPlayer = this.game.players.find((player) => player.name === vote)
 
 		if (!player || !votedForPlayer || player.name === vote) return
+		if (votedForPlayer.votes.includes(playerName)) return
 
+		// if player has already voted for someone else, remove that vote
+		this.game.players = this.game.players.map((player) => {
+			if (player.votes.includes(playerName)) {
+				return {
+					...player,
+					votes: player.votes.filter((vote) => vote !== playerName),
+				}
+			}
+			return player
+		})
+
+		// add vote to player
 		this.game.players = this.game.players
 			.map((player) => (player.name === playerName ? { ...player, ready: true } : player))
 			.map((player) =>
 				player.name === vote ? { ...player, votes: [...player.votes, playerName] } : player
 			)
+
 		this.tryAdvanceGameState()
 	}
 

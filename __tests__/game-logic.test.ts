@@ -297,6 +297,31 @@ describe('When in the voting state...', () => {
 		expect(player2?.votes).toContain(playerName)
 	})
 
+	it('does not allow a player to vote more than once', () => {
+		const gameManager = new GameManager(votingGame)
+		gameManager.handleAction({
+			type: 'player-voted',
+			payload: { name: playerName, vote: player2Name },
+		})
+		gameManager.handleAction({
+			type: 'player-voted',
+			payload: { name: playerName, vote: player2Name },
+		})
+
+		const updatedGame = gameManager.getState()
+		const player2 = updatedGame.players.find((player) => player.name === player2Name)!
+		expect(player2.votes.length).toBe(1)
+		gameManager.handleAction({
+			type: 'player-voted',
+			payload: { name: playerName, vote: 'test3' },
+		})
+		const updatedGame2 = gameManager.getState()
+		const player3 = updatedGame2.players.find((player) => player.name === 'test3')!
+		const newPlayer2 = updatedGame2.players.find((player) => player.name === player2Name)!
+		expect(player3.votes.length).toBe(1)
+		expect(newPlayer2.votes.length).toBe(0)
+	})
+
 	it('moves to the results state when all players have voted', () => {
 		const gameManager = new GameManager(votingGame)
 		gameManager.handleAction({
