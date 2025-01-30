@@ -25,7 +25,7 @@ type SubmitButtonProps = ButtonBaseProps & {
 type ButtonProps = RegularButtonProps | SubmitButtonProps
 
 // Base styles for all buttons
-const baseStyles = 'px-4 py-2 rounded-md font-medium transition-colors'
+const baseStyles = 'px-4 py-4 rounded-md font-medium transition-colors'
 
 // Variant-specific styles
 const variantStyles: Record<ButtonVariant, string> = {
