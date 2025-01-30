@@ -9,15 +9,40 @@ const PlayingScreen = ({ self }: { self: string }) => {
         <GameInfoPanel />
         <ScorePanel />
       </div>
-      <div>
-        <h2 className="text-2xl font-bold mb-4 text-center">Game</h2>
-        <div className="bg-white rounded-lg shadow-md p-8 min-w-[360px]">
-          {player.imposter ? "You are the imposter" : gameState.answer}
-        </div>
+      <div className="flex flex-col gap-5">
+        <AnswerBox player={player} />
+        <ReadyToVoteBox player={player} />
       </div>
     </div>
   );
 };
+function ReadyToVoteBox({ player }: { player: Player }) {
+  const { dispatch } = useGameState();
+
+  function toggleReady() {
+    dispatch({ type: "toggle-ready", payload: { name: player.name } });
+  }
+  return (
+    <div className="bg-white rounded-lg shadow-md p-8 min-w-[360px]">
+      <h2 className="text-2xl font-bold mb-4 text-center">Ready to Vote?</h2>
+      <p className="text-gray-500 text-xl">Click the button below to vote</p>
+      <button
+        onClick={toggleReady}
+        className="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg mt-4"
+      >
+        Vote
+      </button>
+    </div>
+  );
+}
+function AnswerBox({ player }: { player: Player }) {
+  const { gameState } = useGameState() as { gameState: GameInfo };
+  return (
+    <div className="bg-white rounded-lg shadow-md p-8 min-w-[360px]">
+      {player.imposter ? "You are the imposter" : gameState.answer}
+    </div>
+  );
+}
 function GameInfoPanel() {
   // contains round and category info
   const { gameState } = useGameState() as { gameState: GameInfo };

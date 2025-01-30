@@ -33,8 +33,15 @@ export type AvatarColor =
   | "purple"
   | "pink";
 
+export const gameStatesInSequence = [
+  "waiting",
+  "playing",
+  "voting",
+  "results",
+] as const;
+
 export interface GameInfo {
-  state: "waiting" | "playing" | "voting";
+  state: (typeof gameStatesInSequence)[number];
   roomId: string;
   players: Player[];
   round: number;

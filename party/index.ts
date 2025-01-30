@@ -4,6 +4,8 @@ import {
   answersObject,
   AvatarColor,
   GameInfo,
+  gameStatesInSequence,
+  Player,
 } from "../src/app/hooks/useGameState";
 import { Category } from "../src/app/components/NewGameForm";
 
@@ -142,19 +144,27 @@ function gameUpdater(action: Action, state: GameInfo) {
         }
         return player;
       });
-      // check if more than 3 players are in the game and all players are ready, if so, start the game
-      if (
-        newState.players.length >= 3 &&
-        newState.players.every((player) => player.ready)
-      ) {
-        const newPlayers = assignImposter(newState);
-        newState.players = newPlayers;
-        newState.state = "playing";
-      }
-      return newState;
+      const maybeAdvancedState = advanceGameState(newState);
+      console.log(maybeAdvancedState);
+      return maybeAdvancedState;
     default:
       break;
   }
+}
+
+function advanceGameState(game: GameInfo) {
+  const moreThanthreePlayers = game.players.length >= 3;
+  const allPlayersReady = game.players.every((player) => player.ready);
+  if (moreThanthreePlayers && allPlayersReady) {
+    const playersWithImposter = assignImposter(game);
+    const newPlayers = setAllPlayersUnready(playersWithImposter);
+    game.players = newPlayers;
+    game.state = gameStatesInSequence[
+      gameStatesInSequence.indexOf(game.state) + 1
+    ] as GameInfo["state"];
+    return game;
+  }
+  return game;
 }
 
 function assignImposter(game: GameInfo) {
@@ -162,6 +172,13 @@ function assignImposter(game: GameInfo) {
   const randomIndex = Math.floor(Math.random() * newPlayers.length);
   newPlayers[randomIndex].imposter = true;
   return newPlayers;
+}
+
+function setAllPlayersUnready(players: Player[]) {
+  return players.map((player) => {
+    player.ready = false;
+    return player;
+  });
 }
 
 function getUnusedAnswer(category: Category, game?: GameInfo) {
