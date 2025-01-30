@@ -9,54 +9,75 @@ import {
   avatarColors,
 } from "./types";
 
-export function gameUpdater(action: Action, state: GameInfo) {
-  const newState = { ...state };
+export const MIN_PLAYERS = 3;
+
+export function gameUpdater(action: Action, state: GameInfo): GameInfo {
   switch (action.type) {
-    case "player-joined":
-      const playerExists = newState.players.some(
+    case "player-joined": {
+      const playerExists = state.players.some(
         (player) => player.name === action.payload.name
       );
-      const isWaiting = newState.state === "waiting";
+      const isWaiting = state.state === "waiting";
+
       if (playerExists || !isWaiting) {
-        // do nothing if the player already exists or the game is not in the waiting state
-        return newState;
+        return state;
       }
 
-      newState.players.push({
+      const newPlayer = {
         name: action.payload.name,
         score: 0,
         ready: false,
-        avatarColor: assignUnusedAvatarColor(newState),
+        avatarColor: assignUnusedAvatarColor(state),
         imposter: false,
-      });
-      return newState;
-    case "player-left":
-      newState.players = newState.players.filter(
+      };
+
+      return {
+        ...state,
+        players: [...state.players, newPlayer],
+      };
+    }
+
+    case "player-left": {
+      const updatedPlayers = state.players.filter(
         (player) => player.name !== action.payload.name
       );
-      // if there are less than 3 players, go back to the waiting state
-      if (newState.players.length < 3) {
-        newState.state = "waiting";
-        newState.players.forEach((player) => {
-          player.ready = false;
-        });
+
+      if (updatedPlayers.length < 3) {
+        return {
+          ...state,
+          state: "waiting",
+          players: updatedPlayers.map((player) => ({
+            ...player,
+            ready: false,
+          })),
+        };
       }
-      return newState;
-    case "toggle-ready":
-      newState.players = newState.players.map((player) => {
-        if (player.name === action.payload.name) {
-          player.ready = !player.ready;
-        }
-        return player;
-      });
-      const maybeAdvancedState = advanceGameState(newState);
-      console.log(maybeAdvancedState);
-      return maybeAdvancedState;
+
+      return {
+        ...state,
+        players: updatedPlayers,
+      };
+    }
+
+    case "toggle-ready": {
+      const updatedPlayers = state.players.map((player) =>
+        player.name === action.payload.name
+          ? { ...player, ready: !player.ready }
+          : player
+      );
+
+      const updatedState = {
+        ...state,
+        players: updatedPlayers,
+      };
+
+      return advanceGameState(updatedState);
+    }
+
     default:
-      break;
+      return state;
   }
 }
-
 export function initialiseGame(formInfo: GameFormInfo) {
   const avatarColor = assignUnusedAvatarColor();
   const answer = getUnusedAnswer(formInfo.category);
@@ -80,9 +101,9 @@ export function initialiseGame(formInfo: GameFormInfo) {
 }
 
 export function advanceGameState(game: GameInfo) {
-  const moreThanthreePlayers = game.players.length >= 3;
+  const moreThanMinimum = game.players.length >= MIN_PLAYERS;
   const allPlayersReady = game.players.every((player) => player.ready);
-  if (moreThanthreePlayers && allPlayersReady) {
+  if (moreThanMinimum && allPlayersReady) {
     const playersWithImposter = assignImposter(game);
     const newPlayers = setAllPlayersUnready(playersWithImposter);
     game.players = newPlayers;
