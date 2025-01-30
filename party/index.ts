@@ -46,13 +46,21 @@ export default class Server implements Party.Server {
   async onClose(connection: Party.Connection) {
     console.log("player left", connection.id);
     if (!this.gameManager) return;
-
-    this.gameManager.handleAction({
-      type: "player-left",
-      payload: { name: connection.id },
-    });
-
-    this.party.broadcast(JSON.stringify(this.gameManager.getState()));
+    // wait for 20 seconds then check if player rejoined
+    setTimeout(() => {
+      const connectionsArray = [];
+      for (const c of this.party.getConnections()) {
+        connectionsArray.push(c.id);
+      }
+      const leftGame = !connectionsArray.includes(connection.id);
+      if (leftGame) {
+        this.gameManager?.handleAction({
+          type: "player-left",
+          payload: { name: connection.id },
+        });
+        this.party.broadcast(JSON.stringify(this.gameManager?.getState()));
+      }
+    }, 20000);
   }
 
   async onMessage(message: string) {
