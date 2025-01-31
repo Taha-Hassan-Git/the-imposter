@@ -177,6 +177,13 @@ export class GameManager {
 				player.score += 1
 			}
 		})
+
+		const mostVotedPlayer = this.game.players.reduce((acc, player) =>
+			player.votes.length > acc.votes.length ? player : acc
+		)
+		if (mostVotedPlayer.name !== imposter.name) {
+			imposter.score += 3
+		}
 	}
 
 	private assignImposter(): void {

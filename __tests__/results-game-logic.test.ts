@@ -56,16 +56,19 @@ describe('When in the results state...', () => {
 		})
 		gameManager.handleAction({
 			type: 'player-voted',
-			payload: { name: player3Name, vote: player2Name },
+			payload: { name: player3Name, vote: player1Name },
 		})
-
 		const updatedGame = gameManager.getState()
 		const updatedPlayer1 = updatedGame.players.find((player) => player.name === player1Name)!
-		const updatedPlayer2 = updatedGame.players.find((player) => player.name === player2Name)!
 		const updatedPlayer3 = updatedGame.players.find((player) => player.name === player3Name)!
 
-		expect(updatedPlayer2.score).toBe(0)
-		expect(updatedPlayer3.score).toBe(1)
+		expect(updatedPlayer3.score).toBe(0)
 		expect(updatedPlayer1.score).toBe(1)
+	})
+	it('awards 3 points to the imposter if more players voted for someone else', () => {
+		const gameManager = new GameManager(votingGame)
+		const updatedGame = gameManager.getState()
+		const updatedPlayer2 = updatedGame.players.find((player) => player.name === player2Name)!
+		expect(updatedPlayer2.score).toBe(3)
 	})
 })
