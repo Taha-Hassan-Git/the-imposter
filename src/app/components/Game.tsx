@@ -26,7 +26,6 @@ export default function GameContainer() {
 
 function Game({ playerName }: { playerName: string | null }) {
 	const { gameState } = useGameState()
-
 	return (
 		<>
 			{gameState.state === 'error' ? (
@@ -37,9 +36,15 @@ function Game({ playerName }: { playerName: string | null }) {
 				<PlayingScreen self={playerName as string} />
 			) : gameState.state === 'voting' ? (
 				<VotingScreen playerName={playerName as string} />
-			) : null}
+			) : (
+				<ResultsScreen />
+			)}
 		</>
 	)
+}
+
+function ResultsScreen() {
+	return <div>Results Screen</div>
 }
 
 function ErrorScreen() {
