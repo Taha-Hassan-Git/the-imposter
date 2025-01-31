@@ -23,43 +23,7 @@ export function GameProvider({
 	category: Category | null
 	roomId: string
 }) {
-	const player2Name = 'test2'
-	const testPlayer = 'test'
-	const resultsGame: GameInfo = {
-		state: 'results',
-		roomId,
-		round: 1,
-		answer: 'Titanic',
-		players: [
-			{
-				name: testPlayer,
-				score: 0,
-				ready: false,
-				avatarColor: 'red',
-				imposter: false,
-				votes: [player2Name],
-			},
-			{
-				name: player2Name,
-				score: 0,
-				ready: false,
-				avatarColor: 'blue',
-				imposter: true,
-				votes: [testPlayer],
-			},
-			{
-				name: 'test3',
-				score: 0,
-				ready: false,
-				avatarColor: 'green',
-				imposter: false,
-				votes: [testPlayer],
-			},
-		],
-		prevAnswers: [],
-		category: 'films',
-	}
-	const [gameState, setGameState] = useState<GameState>(resultsGame)
+	const [gameState, setGameState] = useState<GameState>({ state: 'error' })
 
 	const socket = usePartySocket({
 		host: PARTYKIT_HOST,
