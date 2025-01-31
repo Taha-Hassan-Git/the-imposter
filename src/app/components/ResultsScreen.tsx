@@ -20,7 +20,7 @@ export function ResultsScreen({ playerName }: { playerName: string }) {
 function ResultsPanel() {
 	const { gameState } = useGameState() as { gameState: GameInfo }
 	const imposter = gameState.players.find((player) => player.imposter)
-	const players = gameState.players
+
 	return (
 		<div className="bg-white rounded-lg shadow-md p-8 min-w-[360px]">
 			<h2 className="text-2xl font-bold mb-4 text-center">Results</h2>
