@@ -3,6 +3,7 @@ import { usePathname, useSearchParams } from 'next/navigation'
 import { GameProvider, useGameState } from '../hooks/useGameState'
 import { Category } from './NewGameForm'
 import PlayingScreen from './PlayingScreen'
+import { ResultsScreen } from './ResultsScreen'
 import { VotingScreen } from './VotingScreen'
 import { WaitingScreen } from './WaitingScreen'
 
@@ -26,7 +27,6 @@ export default function GameContainer() {
 
 function Game({ playerName }: { playerName: string | null }) {
 	const { gameState } = useGameState()
-
 	return (
 		<>
 			{gameState.state === 'error' ? (
@@ -37,7 +37,9 @@ function Game({ playerName }: { playerName: string | null }) {
 				<PlayingScreen self={playerName as string} />
 			) : gameState.state === 'voting' ? (
 				<VotingScreen playerName={playerName as string} />
-			) : null}
+			) : (
+				<ResultsScreen playerName={playerName as string} />
+			)}
 		</>
 	)
 }

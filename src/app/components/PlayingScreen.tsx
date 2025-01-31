@@ -57,7 +57,7 @@ function GameInfoPanel() {
 		</div>
 	)
 }
-function ScorePanel() {
+export function ScorePanel() {
 	const { gameState } = useGameState() as { gameState: GameInfo }
 	return (
 		<div className="bg-white rounded-lg shadow-md p-8 man-w-[160px]">

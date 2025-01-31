@@ -81,21 +81,15 @@ export class GameManager {
 	private handlePlayerVoted(playerName: string, vote: string): void {
 		const player = this.game.players.find((player) => player.name === playerName)
 		const votedForPlayer = this.game.players.find((player) => player.name === vote)
-
 		if (!player || !votedForPlayer || player.name === vote) return
-		if (votedForPlayer.votes.includes(playerName)) return
 
 		// if player has already voted for someone else, remove that vote
 		this.game.players = this.game.players.map((player) => {
 			if (player.votes.includes(playerName)) {
-				return {
-					...player,
-					votes: player.votes.filter((vote) => vote !== playerName),
-				}
+				player.votes = player.votes.filter((voter) => voter !== playerName)
 			}
 			return player
 		})
-
 		// add vote to player
 		this.game.players = this.game.players
 			.map((player) => (player.name === playerName ? { ...player, ready: true } : player))
@@ -154,7 +148,9 @@ export class GameManager {
 		const allPlayersReady = this.game.players.every((player) => player.ready)
 
 		if (moreThanMinimum && allPlayersReady) {
-			this.assignImposter()
+			if (this.game.state === 'waiting') {
+				this.assignImposter()
+			}
 			this.setAllPlayersUnready()
 			this.advanceToNextState()
 		}
@@ -162,7 +158,32 @@ export class GameManager {
 
 	private advanceToNextState(): void {
 		const currentStateIndex = gameStatesInSequence.indexOf(this.game.state)
-		this.game.state = gameStatesInSequence[currentStateIndex + 1]
+		const nextState = gameStatesInSequence[currentStateIndex + 1]
+		this.game.state = nextState
+		if (nextState === 'results') {
+			this.awardPoints()
+			this.game.prevAnswers = [...this.game.prevAnswers, this.game.answer]
+			this.game.answer = GameManager.getUnusedAnswer(this.game.category, this.game)
+		}
+	}
+	private awardPoints(): void {
+		const imposter = this.game.players.find((player) => player.imposter)
+
+		if (!imposter) return
+
+		imposter.votes.forEach((voter) => {
+			const player = this.game.players.find((player) => player.name === voter)
+			if (player) {
+				player.score += 1
+			}
+		})
+
+		const mostVotedPlayer = this.game.players.reduce((acc, player) =>
+			player.votes.length > acc.votes.length ? player : acc
+		)
+		if (mostVotedPlayer.name !== imposter.name) {
+			imposter.score += 3
+		}
 	}
 
 	private assignImposter(): void {

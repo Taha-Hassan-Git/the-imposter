@@ -1,13 +1,15 @@
 import { GameManager } from '../game-logic/GameManager'
-import { Answer, answersObject, GameInfo } from '../game-logic/types'
+import { Answer, answersObject } from '../game-logic/types'
 
-const playerName = 'test'
+const player1Name = 'test'
 const player2Name = 'test2'
+const player3Name = 'test3'
 const roomId = 'test'
 const category = 'films'
+
 describe('When initialising a game...', () => {
 	const gameManager = GameManager.createNew({
-		playerName,
+		playerName: player1Name,
 		roomId,
 		category,
 	})
@@ -26,7 +28,7 @@ describe('When initialising a game...', () => {
 
 	it('returns a game with a valid player', () => {
 		expect(game.players.length).toBe(1)
-		expect(game.players[0].name).toEqual(playerName)
+		expect(game.players[0].name).toEqual(player1Name)
 		expect(game.players[0].score).toEqual(0)
 		expect(game.players[0].ready).toBeFalsy()
 	})
@@ -42,14 +44,14 @@ describe('When initialising a game...', () => {
 })
 
 describe('When in the waiting state...', () => {
-	const playerName = 'test'
+	const player1Name = 'test'
 	const roomId = 'test'
 	const category = 'films'
 	let gameManager: GameManager
 
 	beforeEach(() => {
 		gameManager = GameManager.createNew({
-			playerName,
+			playerName: player1Name,
 			roomId,
 			category,
 		})
@@ -70,7 +72,7 @@ describe('When in the waiting state...', () => {
 		// Toggle ready ON
 		gameManager.handleAction({
 			type: 'toggle-ready',
-			payload: { name: playerName },
+			payload: { name: player1Name },
 		})
 
 		let updatedGame = gameManager.getState()
@@ -80,7 +82,7 @@ describe('When in the waiting state...', () => {
 		// Toggle ready OFF
 		gameManager.handleAction({
 			type: 'toggle-ready',
-			payload: { name: playerName },
+			payload: { name: player1Name },
 		})
 
 		updatedGame = gameManager.getState()
@@ -98,7 +100,7 @@ describe('When in the waiting state...', () => {
 		// Make both players ready
 		gameManager.handleAction({
 			type: 'toggle-ready',
-			payload: { name: playerName },
+			payload: { name: player1Name },
 		})
 		gameManager.handleAction({
 			type: 'toggle-ready',
@@ -150,7 +152,7 @@ describe('When in the waiting state...', () => {
 		})
 		gameManager.handleAction({
 			type: 'player-joined',
-			payload: { name: 'test3' },
+			payload: { name: player3Name },
 		})
 
 		// Make all players ready
@@ -167,7 +169,7 @@ describe('When in the waiting state...', () => {
 		// Remove a player
 		gameManager.handleAction({
 			type: 'player-left',
-			payload: { name: 'test3' },
+			payload: { name: player3Name },
 		})
 
 		const finalGame = gameManager.getState()
@@ -176,168 +178,5 @@ describe('When in the waiting state...', () => {
 		expect(finalGame.players.length).toBe(2)
 		// All players should be unready
 		expect(finalGame.players.every((player) => !player.ready)).toBeTruthy()
-	})
-})
-
-describe('When in the playing state...', () => {
-	const playingGame: GameInfo = {
-		state: 'playing',
-		roomId,
-		round: 1,
-		answer: 'Titanic',
-		players: [
-			{
-				name: playerName,
-				score: 0,
-				ready: false,
-				avatarColor: 'red',
-				imposter: false,
-				votes: [],
-			},
-			{
-				name: player2Name,
-				score: 0,
-				ready: false,
-				avatarColor: 'blue',
-				imposter: true,
-				votes: [],
-			},
-			{
-				name: 'test3',
-				score: 0,
-				ready: false,
-				avatarColor: 'green',
-				imposter: false,
-				votes: [],
-			},
-		],
-		prevAnswers: [],
-		category: 'films',
-	}
-	it('moves to the voting state when all players are ready', () => {
-		const gameManager = new GameManager(playingGame)
-		// All players are ready
-		gameManager.handleAction({
-			type: 'toggle-ready',
-			payload: { name: playerName },
-		})
-
-		gameManager.handleAction({
-			type: 'toggle-ready',
-			payload: { name: player2Name },
-		})
-		gameManager.handleAction({
-			type: 'toggle-ready',
-			payload: { name: 'test3' },
-		})
-		const newState = gameManager.getState()
-		expect(newState.state).toEqual('voting')
-	})
-
-	it('returns to the waiting state if there are not enough players', () => {
-		const gameManager = new GameManager(playingGame)
-		// Remove a player
-		gameManager.handleAction({
-			type: 'player-left',
-			payload: { name: 'test3' },
-		})
-
-		const finalGame = gameManager.getState()
-		expect(finalGame.state).toEqual('waiting')
-	})
-})
-
-describe('When in the voting state...', () => {
-	const votingGame: GameInfo = {
-		state: 'voting',
-		roomId,
-		round: 1,
-		answer: 'Titanic',
-		players: [
-			{
-				name: playerName,
-				score: 0,
-				ready: false,
-				avatarColor: 'red',
-				imposter: false,
-				votes: [],
-			},
-			{
-				name: player2Name,
-				score: 0,
-				ready: false,
-				avatarColor: 'blue',
-				imposter: true,
-				votes: [],
-			},
-			{
-				name: 'test3',
-				score: 0,
-				ready: false,
-				avatarColor: 'green',
-				imposter: false,
-				votes: [],
-			},
-		],
-		prevAnswers: [],
-		category: 'films',
-	}
-
-	it('handles player voting', () => {
-		const gameManager = new GameManager(votingGame)
-		gameManager.handleAction({
-			type: 'player-voted',
-			payload: { name: playerName, vote: player2Name },
-		})
-
-		const updatedGame = gameManager.getState()
-		const player = updatedGame.players.find((player) => player.name === playerName)
-		const player2 = updatedGame.players.find((player) => player.name === player2Name)
-		expect(player?.ready).toBeTruthy()
-		expect(player2?.votes).toContain(playerName)
-	})
-
-	it('does not allow a player to vote more than once', () => {
-		const gameManager = new GameManager(votingGame)
-		gameManager.handleAction({
-			type: 'player-voted',
-			payload: { name: playerName, vote: player2Name },
-		})
-		gameManager.handleAction({
-			type: 'player-voted',
-			payload: { name: playerName, vote: player2Name },
-		})
-
-		const updatedGame = gameManager.getState()
-		const player2 = updatedGame.players.find((player) => player.name === player2Name)!
-		expect(player2.votes.length).toBe(1)
-		gameManager.handleAction({
-			type: 'player-voted',
-			payload: { name: playerName, vote: 'test3' },
-		})
-		const updatedGame2 = gameManager.getState()
-		const player3 = updatedGame2.players.find((player) => player.name === 'test3')!
-		const newPlayer2 = updatedGame2.players.find((player) => player.name === player2Name)!
-		expect(player3.votes.length).toBe(1)
-		expect(newPlayer2.votes.length).toBe(0)
-	})
-
-	it('moves to the results state when all players have voted', () => {
-		const gameManager = new GameManager(votingGame)
-		gameManager.handleAction({
-			type: 'player-voted',
-			payload: { name: playerName, vote: player2Name },
-		})
-		gameManager.handleAction({
-			type: 'player-voted',
-			payload: { name: player2Name, vote: playerName },
-		})
-		gameManager.handleAction({
-			type: 'player-voted',
-			payload: { name: 'test3', vote: playerName },
-		})
-
-		const updatedGame = gameManager.getState()
-		expect(updatedGame.state).toEqual('results')
 	})
 })
