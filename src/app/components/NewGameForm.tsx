@@ -63,7 +63,6 @@ export default function NewGameForm() {
 					label={'Room Id:'}
 					value={gameFormData.roomId}
 					handleChange={(e) => {
-						console.log(e.target.value)
 						setGameFormData((prev) => {
 							return { ...prev, roomId: e.target.value }
 						})

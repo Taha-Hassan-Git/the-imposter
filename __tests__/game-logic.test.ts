@@ -364,6 +364,7 @@ describe('When in the results state...', () => {
 		})
 
 		const updatedGame = gameManager.getState()
+
 		const updatedPlayer1 = updatedGame.players.find((player) => player.name === player1Name)!
 		const updatedPlayer2 = updatedGame.players.find((player) => player.name === player2Name)!
 		const updatedPlayer3 = updatedGame.players.find((player) => player.name === player3Name)!
@@ -374,5 +375,60 @@ describe('When in the results state...', () => {
 		expect(updatedPlayer1.score).toBe(1)
 		expect(updatedPlayer2.score).toBe(3)
 		expect(updatedPlayer3.score).toBe(0)
+	})
+})
+
+describe('When starting a new round...', () => {
+	const resultsGame: GameInfo = {
+		state: 'results',
+		roomId: 'test',
+		round: 1,
+		answer: 'Titanic',
+		players: [
+			{
+				name: 'test',
+				score: 1,
+				ready: false,
+				avatarColor: 'red',
+				imposter: false,
+				votes: [],
+			},
+			{
+				name: 'test2',
+				score: 3,
+				ready: false,
+				avatarColor: 'blue',
+				imposter: true,
+				votes: [],
+			},
+			{
+				name: 'test3',
+				score: 0,
+				ready: false,
+				avatarColor: 'green',
+				imposter: false,
+				votes: [],
+			},
+		],
+		prevAnswers: [],
+		category: 'films',
+	}
+	beforeEach(() => {
+		gameManager = new GameManager(resultsGame)
+	})
+
+	it('starts a new round with a new answer', () => {
+		gameManager.getState().players.forEach((player) => {
+			gameManager.handleAction({
+				type: 'toggle-ready',
+				payload: { name: player.name },
+			})
+		})
+		const updatedGame = gameManager.getState()
+
+		expect(updatedGame.round).toBe(2)
+		expect(updatedGame.state).toBe('playing')
+		expect(updatedGame.answer).not.toEqual(resultsGame.answer)
+		expect(updatedGame.prevAnswers).toContain(resultsGame.answer)
 	})
 })

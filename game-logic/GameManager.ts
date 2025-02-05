@@ -7,13 +7,19 @@ import {
 	AvatarColor,
 	avatarColors,
 	GameInfo,
-	gameStatesInSequence,
 	Player,
+	StateNames,
 } from './types'
 
 export class GameManager {
 	private static readonly MIN_PLAYERS = 3
 	private game: GameInfo
+	private readonly STATE_TRANSITIONS: Record<StateNames, StateNames> = {
+		waiting: 'playing',
+		playing: 'voting',
+		voting: 'results',
+		results: 'playing',
+	} as const
 
 	constructor(gameInfo?: GameInfo) {
 		if (gameInfo) {
@@ -162,17 +168,26 @@ export class GameManager {
 	}
 
 	private advanceToNextState(): void {
-		const currentStateIndex = gameStatesInSequence.indexOf(this.game.state)
-		const nextState = gameStatesInSequence[currentStateIndex + 1]
+		const prevState = this.game.state
+		const nextState = this.STATE_TRANSITIONS[prevState]
 		this.game = { ...this.game, state: nextState }
 		if (nextState === 'results') {
 			this.awardPoints()
 		}
-		if (nextState === 'waiting') {
-			const newPrevAnswers = [...this.game.prevAnswers, this.game.answer]
-			const newAnswer = GameManager.getUnusedAnswer(this.game.category, this.game)
-			const newRound = this.game.round + 1
-			this.game = { ...this.game, prevAnswers: newPrevAnswers, answer: newAnswer, round: newRound }
+		if (this.isNewRound(prevState, nextState)) {
+			this.startNewRound()
+		}
+	}
+	private isNewRound(prevState: StateNames, nextState: StateNames): boolean {
+		return prevState === 'results' && nextState === 'playing'
+	}
+
+	private startNewRound(): void {
+		this.game = {
+			...this.game,
+			prevAnswers: [...this.game.prevAnswers, this.game.answer],
+			answer: GameManager.getUnusedAnswer(this.game.category, this.game),
+			round: this.game.round + 1,
 		}
 	}
 	private awardPoints(): void {
