@@ -189,6 +189,7 @@ export class GameManager {
 			answer: GameManager.getUnusedAnswer(this.game.category, this.game),
 			round: this.game.round + 1,
 		}
+		this.assignImposter()
 	}
 	private awardPoints(): void {
 		const imposter = this.game.players.find((player) => player.imposter)
