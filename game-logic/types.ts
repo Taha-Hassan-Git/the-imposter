@@ -18,10 +18,10 @@ export type Player = {
 }
 export type AvatarColor = 'red' | 'blue' | 'green' | 'yellow' | 'purple' | 'pink'
 
-export const gameStatesInSequence = ['waiting', 'playing', 'voting', 'results'] as const
+export type StateNames = 'waiting' | 'playing' | 'voting' | 'results'
 
 export interface GameInfo {
-	state: (typeof gameStatesInSequence)[number]
+	state: StateNames
 	roomId: string
 	players: Player[]
 	round: number
