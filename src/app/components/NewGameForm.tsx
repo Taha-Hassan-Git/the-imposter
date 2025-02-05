@@ -44,24 +44,22 @@ export default function NewGameForm() {
 	return (
 		<div className="flex flex-col gap-5 bg-white rounded-lg shadow-md mt-5 w-full max-w-[500px]">
 			<div className="flex mt-0 w-full">
-				<button
-					className={` flex-1 px-2 py-4 rounded-tl-md font-medium transition-colors ${!showJoinExisting ? 'text-gray-400 bg-gray-100' : ''}`}
+				<Button
+					variant={showJoinExisting ? 'secondary' : 'disabled'}
+					className="flex-1 px-2 rounded-tl-md rounded-r-none rounded-none bg-gray-100 disabled:bg-white disabled:text-gray-800"
 					disabled={showJoinExisting}
-					onClick={() => {
-						setShowJoinExisting(true)
-					}}
+					onClick={() => setShowJoinExisting(true)}
 				>
 					Join existing room
-				</button>
-				<button
-					className={` flex-1 px-2 py-4 rounded-tr-md font-medium transition-colors ${showJoinExisting ? 'text-gray-400 bg-gray-100' : ''}`}
+				</Button>
+				<Button
+					variant={!showJoinExisting ? 'secondary' : 'disabled'}
+					className="flex-1 px-2 rounded-tr-md rounded-l-none rounded-none bg-gray-100 disabled:bg-white disabled:text-gray-800"
 					disabled={!showJoinExisting}
-					onClick={() => {
-						setShowJoinExisting(false)
-					}}
+					onClick={() => setShowJoinExisting(false)}
 				>
 					Create new room
-				</button>
+				</Button>
 			</div>
 			<div className="p-8 flex flex-col gap-5">
 				{!showJoinExisting && (
