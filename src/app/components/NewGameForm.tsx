@@ -18,59 +18,82 @@ const categories: Array<Category> = ['films', 'animals', 'countries', 'sports']
 
 export default function NewGameForm() {
 	const [gameFormData, setGameFormData] = useState<GameFormData>(defaultGameFormData)
-	const [showJoinExisting, setShowJoinExisting] = useState(false)
-
-	return (
-		<div className="flex flex-col gap-5 min-w-[350px]" id="game-form">
-			<div className="flex gap-5">
+	const [showJoinExisting, setShowJoinExisting] = useState<boolean | undefined>(undefined)
+	if (showJoinExisting === undefined) {
+		return (
+			<div className="flex flex-col gap-5 bg-white rounded-lg shadow-md p-8 mt-5 w-full max-w-[500px]">
 				<Button
 					variant="secondary"
-					disabled={showJoinExisting}
-					onClick={() => {
-						setShowJoinExisting(true)
-					}}
-				>
-					Join existing room
-				</Button>
-				<Button
-					variant="secondary"
-					disabled={!showJoinExisting}
 					onClick={() => {
 						setShowJoinExisting(false)
 					}}
 				>
 					Create new room
 				</Button>
+				<Button
+					variant="secondary"
+					onClick={() => {
+						setShowJoinExisting(true)
+					}}
+				>
+					Join existing room
+				</Button>
 			</div>
-			{!showJoinExisting && (
-				<SelectCategories gameFormData={gameFormData} setGameFormData={setGameFormData} />
-			)}
-			<Input
-				name={'name'}
-				type={'text'}
-				label={'Your Name:'}
-				value={gameFormData.name}
-				handleChange={(e) => {
-					setGameFormData((prev) => {
-						return { ...prev, name: e.target.value }
-					})
-				}}
-			/>
-			{showJoinExisting && (
+		)
+	}
+	return (
+		<div className="flex flex-col gap-5 bg-white rounded-lg shadow-md mt-5 w-full max-w-[500px]">
+			<div className="flex mt-0 w-full">
+				<button
+					className={` flex-1 px-2 py-4 rounded-tl-md font-medium transition-colors ${!showJoinExisting ? 'text-gray-400 bg-gray-100' : ''}`}
+					disabled={showJoinExisting}
+					onClick={() => {
+						setShowJoinExisting(true)
+					}}
+				>
+					Join existing room
+				</button>
+				<button
+					className={` flex-1 px-2 py-4 rounded-tr-md font-medium transition-colors ${showJoinExisting ? 'text-gray-400 bg-gray-100' : ''}`}
+					disabled={!showJoinExisting}
+					onClick={() => {
+						setShowJoinExisting(false)
+					}}
+				>
+					Create new room
+				</button>
+			</div>
+			<div className="p-8 flex flex-col gap-5">
+				{!showJoinExisting && (
+					<SelectCategories gameFormData={gameFormData} setGameFormData={setGameFormData} />
+				)}
 				<Input
-					name={'roomId'}
+					name={'name'}
 					type={'text'}
-					label={'Room Id:'}
-					value={gameFormData.roomId}
+					label={'Your Name:'}
+					value={gameFormData.name}
 					handleChange={(e) => {
 						setGameFormData((prev) => {
-							return { ...prev, roomId: e.target.value }
+							return { ...prev, name: e.target.value }
 						})
 					}}
 				/>
-			)}
-			<div className="self-center">
-				<Button type="submit">{showJoinExisting ? 'Join Room' : 'Create Room'}</Button>
+				{showJoinExisting && (
+					<Input
+						name={'roomId'}
+						type={'text'}
+						label={'Room Id:'}
+						value={gameFormData.roomId}
+						handleChange={(e) => {
+							setGameFormData((prev) => {
+								return { ...prev, roomId: e.target.value }
+							})
+						}}
+					/>
+				)}
+				<div className="self-center">
+					<Button type="submit">{showJoinExisting ? 'Join Room' : 'Create Room'}</Button>
+				</div>
 			</div>
 		</div>
 	)

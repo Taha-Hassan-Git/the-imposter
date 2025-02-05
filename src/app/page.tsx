@@ -33,10 +33,8 @@ export default function Home() {
 		redirect(`/game/${roomId}?playerName=${playerName}&category=${category}`)
 	}
 	return (
-		<div className="max-w-md bg-white rounded-lg shadow-md p-8 mt-5">
-			<form action={createOrJoinRoom}>
-				<NewGameForm />
-			</form>
-		</div>
+		<form action={createOrJoinRoom}>
+			<NewGameForm />
+		</form>
 	)
 }
