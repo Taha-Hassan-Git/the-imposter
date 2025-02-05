@@ -1,6 +1,6 @@
 'use client'
 import { useSearchParams } from 'next/navigation'
-import { Dispatch, SetStateAction, Suspense, useEffect, useState } from 'react'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { generatePlayerName } from '../utils/generatePlayerName'
 import { generateRoomId } from '../utils/generateRoomId'
 import { Button } from './Button'
@@ -48,97 +48,93 @@ export default function NewGameForm() {
 
 	if (showJoinExisting === undefined) {
 		return (
-			<Suspense>
-				<div className="flex flex-col gap-5 bg-white rounded-lg shadow-md p-8 mt-5 w-full max-w-[500px]">
-					<Button
-						variant="secondary"
-						onClick={() => {
-							setShowJoinExisting(false)
-						}}
-					>
-						Create new room
-					</Button>
-					<Button
-						variant="secondary"
-						onClick={() => {
-							setShowJoinExisting(true)
-						}}
-					>
-						Join existing room
-					</Button>
+			<div className="flex flex-col gap-5 bg-white rounded-lg shadow-md p-8 mt-5 w-full max-w-[500px]">
+				<Button
+					variant="secondary"
+					onClick={() => {
+						setShowJoinExisting(false)
+					}}
+				>
+					Create new room
+				</Button>
+				<Button
+					variant="secondary"
+					onClick={() => {
+						setShowJoinExisting(true)
+					}}
+				>
+					Join existing room
+				</Button>
 
-					{
-						//disappears after 5 seconds
-						showErrorMessage && <p className="text-red-600 text-center">{errorMessage}</p>
-					}
-				</div>
-			</Suspense>
+				{
+					//disappears after 5 seconds
+					showErrorMessage && <p className="text-red-600 text-center">{errorMessage}</p>
+				}
+			</div>
 		)
 	}
 	return (
-		<Suspense>
-			<div className="flex flex-col gap-5 bg-white rounded-lg shadow-md mt-5 w-full max-w-[500px]">
-				<div className="flex mt-0 w-full">
-					<Button
-						variant={showJoinExisting ? 'secondary' : 'disabled'}
-						className="flex-1 px-2 rounded-tl-md rounded-r-none rounded-none bg-gray-100 disabled:bg-white disabled:text-gray-800"
-						disabled={showJoinExisting}
-						onClick={() => setShowJoinExisting(true)}
-					>
-						Join existing room
-					</Button>
-					<Button
-						variant={!showJoinExisting ? 'secondary' : 'disabled'}
-						className="flex-1 px-2 rounded-tr-md rounded-l-none rounded-none bg-gray-100 disabled:bg-white disabled:text-gray-800"
-						disabled={!showJoinExisting}
-						onClick={() => setShowJoinExisting(false)}
-					>
-						Create new room
-					</Button>
-				</div>
-				<div className="p-8 flex flex-col gap-5">
-					{showJoinExisting ? (
-						<Input
-							name={'roomId'}
-							type={'text'}
-							label={'Room Id:'}
-							value={gameFormData.roomId}
-							placeholder={placeHolders.roomId}
-							handleChange={(e) => {
-								setGameFormData((prev) => {
-									return { ...prev, roomId: e.target.value }
-								})
-							}}
-						/>
-					) : (
-						<SelectCategories gameFormData={gameFormData} setGameFormData={setGameFormData} />
-					)}
-
+		<div className="flex flex-col gap-5 bg-white rounded-lg shadow-md mt-5 w-full max-w-[500px]">
+			<div className="flex mt-0 w-full">
+				<Button
+					variant={showJoinExisting ? 'secondary' : 'disabled'}
+					className="flex-1 px-2 rounded-tl-md rounded-r-none rounded-none bg-gray-100 disabled:bg-white disabled:text-gray-800"
+					disabled={showJoinExisting}
+					onClick={() => setShowJoinExisting(true)}
+				>
+					Join existing room
+				</Button>
+				<Button
+					variant={!showJoinExisting ? 'secondary' : 'disabled'}
+					className="flex-1 px-2 rounded-tr-md rounded-l-none rounded-none bg-gray-100 disabled:bg-white disabled:text-gray-800"
+					disabled={!showJoinExisting}
+					onClick={() => setShowJoinExisting(false)}
+				>
+					Create new room
+				</Button>
+			</div>
+			<div className="p-8 flex flex-col gap-5">
+				{showJoinExisting ? (
 					<Input
-						name={'name'}
+						name={'roomId'}
 						type={'text'}
-						label={'Your Name:'}
-						placeholder={placeHolders.name}
-						value={gameFormData.name}
+						label={'Room Id:'}
+						value={gameFormData.roomId}
+						placeholder={placeHolders.roomId}
 						handleChange={(e) => {
 							setGameFormData((prev) => {
-								return { ...prev, name: e.target.value }
+								return { ...prev, roomId: e.target.value }
 							})
 						}}
 					/>
+				) : (
+					<SelectCategories gameFormData={gameFormData} setGameFormData={setGameFormData} />
+				)}
 
-					<div className="self-center">
-						<Button
-							disabled={isSubmitDisabled}
-							className="disabled:bg-gray-300 disabled:text-gray-800"
-							type="submit"
-						>
-							{showJoinExisting ? 'Join Room' : 'Create Room'}
-						</Button>
-					</div>
+				<Input
+					name={'name'}
+					type={'text'}
+					label={'Your Name:'}
+					placeholder={placeHolders.name}
+					value={gameFormData.name}
+					handleChange={(e) => {
+						setGameFormData((prev) => {
+							return { ...prev, name: e.target.value }
+						})
+					}}
+				/>
+
+				<div className="self-center">
+					<Button
+						disabled={isSubmitDisabled}
+						className="disabled:bg-gray-300 disabled:text-gray-800"
+						type="submit"
+					>
+						{showJoinExisting ? 'Join Room' : 'Create Room'}
+					</Button>
 				</div>
 			</div>
-		</Suspense>
+		</div>
 	)
 }
 

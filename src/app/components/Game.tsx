@@ -15,7 +15,6 @@ export default function GameContainer() {
 	const playerName = searchParams.get('playerName')
 	const category = searchParams.get('category')
 
-
 	return (
 		<div className="flex flex-col w-full items-center">
 			<GameProvider playerName={playerName} category={category as Category} roomId={roomId}>
