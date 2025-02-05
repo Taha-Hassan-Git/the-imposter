@@ -33,8 +33,10 @@ export default function Home() {
 		redirect(`/game/${roomId}?playerName=${playerName}&category=${category}`)
 	}
 	return (
-		<form action={createOrJoinRoom}>
-			<NewGameForm />
-		</form>
+		<div className="w-full">
+			<form className="w-full flex justify-center items-center" action={createOrJoinRoom}>
+				<NewGameForm />
+			</form>
+		</div>
 	)
 }
