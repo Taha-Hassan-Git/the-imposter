@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { GameInfo, Player } from '../../../game-logic/types'
+import { Action, GameInfo, Player } from '../../../game-logic/types'
 import { useGameState } from '../hooks/useGameState'
 import { Button } from './Button'
 
@@ -17,6 +17,15 @@ export function WaitingScreen({ self }: { self: string }) {
 			</div>
 			<div>
 				<ReadyButton self={self} />
+			</div>
+
+			<div className="text-gray-500">
+				<p>
+					You are in room: <span className="font-bold">{gameState.roomId}</span>
+				</p>
+				<p>
+					The category is: <span className="font-bold">{gameState.category}</span>
+				</p>
 			</div>
 		</div>
 	)
@@ -51,18 +60,25 @@ function PlayerListItem({ player }: { player: Player }) {
 
 function ReadyButton({ self }: { self: string }) {
 	const [ready, setReady] = useState(false)
-	const { dispatch } = useGameState()
+	const { dispatch, gameState } = useGameState() as {
+		dispatch: (a: Action) => void
+		gameState: GameInfo
+	}
 	const handleClick = () => {
 		setReady(!ready)
 		dispatch({ type: 'toggle-ready', payload: { name: self } })
 	}
+	const message =
+		gameState.players.length < 2
+			? 'Waiting for more players...'
+			: 'Game begins when all players are ready...'
 
 	return (
 		<div className="flex flex-col gap-3 items-center">
 			<Button variant={ready ? 'disabled' : 'primary'} onClick={handleClick}>
 				{ready ? '...' : 'Ready?'}
 			</Button>
-			{ready && <p>Game begins when all players are ready...</p>}
+			{ready && <p>{message}</p>}
 		</div>
 	)
 }
