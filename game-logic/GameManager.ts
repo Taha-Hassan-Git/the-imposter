@@ -156,8 +156,8 @@ export class GameManager {
 			if (this.game.state === 'waiting') {
 				this.assignImposter()
 			}
-			this.resetAllPlayers()
 			this.advanceToNextState()
+			this.resetAllPlayers()
 		}
 	}
 
@@ -177,13 +177,13 @@ export class GameManager {
 	}
 	private awardPoints(): void {
 		const imposter = this.game.players.find((player) => player.imposter)
-
 		const mostVotedPlayer = this.game.players.reduce((acc, player) =>
 			player.votes.length > acc.votes.length ? player : acc
 		)
 
 		if (!imposter) return
 
+		// award points to players that guessed the imposter correctly
 		let newPlayers = this.game.players.map((player) => {
 			if (imposter.votes.includes(player.name)) {
 				return { ...player, score: player.score + 1 }
@@ -191,9 +191,10 @@ export class GameManager {
 			return player
 		})
 
+		// award points to the imposter for evading detection
 		if (mostVotedPlayer.name !== imposter.name) {
 			newPlayers = newPlayers.map((player) => {
-				if (player.name === mostVotedPlayer.name) {
+				if (player.name === imposter.name) {
 					return { ...player, score: player.score + 3 }
 				}
 				return player
