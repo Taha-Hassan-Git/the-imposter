@@ -1,6 +1,6 @@
 'use client'
 import { useSearchParams } from 'next/navigation'
-import { Dispatch, SetStateAction, useState } from 'react'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { generatePlayerName } from '../utils/generatePlayerName'
 import { generateRoomId } from '../utils/generateRoomId'
 import { Button } from './Button'
@@ -34,6 +34,17 @@ export default function NewGameForm() {
 	const isSubmitDisabled = showJoinExisting
 		? !gameFormData.roomId || !gameFormData.name
 		: !gameFormData.name
+
+	useEffect(() => {
+		const roomId = searchParams.get('roomId')
+
+		if (roomId) {
+			setGameFormData((prev) => {
+				return { ...prev, roomId }
+			})
+			setShowJoinExisting(true)
+		}
+	}, [searchParams])
 
 	if (showJoinExisting === undefined) {
 		return (

@@ -1,7 +1,13 @@
 import { useState } from 'react'
+import QRCode from 'react-qr-code'
 import { Action, GameInfo, Player } from '../../../game-logic/types'
 import { useGameState } from '../hooks/useGameState'
 import { Button } from './Button'
+
+const URL =
+	process.env.NEXT_PUBLIC_VERCEL_ENV === 'production'
+		? 'https://the-imposter.vercel.app/'
+		: 'http://localhost:3000'
 
 export function WaitingScreen({ self }: { self: string }) {
 	const { gameState } = useGameState() as { gameState: GameInfo }
@@ -25,6 +31,11 @@ export function WaitingScreen({ self }: { self: string }) {
 				</p>
 				<p>
 					The category is: <span className="font-bold">{gameState.category}</span>
+				</p>
+
+				<p>
+					Share this link with your friends to invite them to the game:
+					<QRCode value={URL + `?roomId=${gameState.roomId}`} />
 				</p>
 			</div>
 		</div>
