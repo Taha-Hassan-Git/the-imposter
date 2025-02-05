@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation'
+import { Suspense } from 'react'
 import NewGameForm from './components/NewGameForm'
 import { PARTYKIT_URL } from './env'
 import { generateRoomId } from './utils/generateRoomId'
@@ -20,22 +21,28 @@ export default function Home() {
 				},
 			})
 		} else {
-			console.log('joining room', roomId)
-			const res = await fetch(`${PARTYKIT_URL}/party/${roomId}`, {
-				method: 'GET',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			})
-			const data = await res.json()
-			category = data.category
+			try {
+				const res = await fetch(`${PARTYKIT_URL}/party/${roomId}`, {
+					method: 'GET',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+				})
+				const data = await res.json()
+				category = data.category
+			} catch (error) {
+				console.error(`Error fetching room ${roomId}`, error)
+				redirect('/?error=Room+not+found')
+			}
 		}
 		redirect(`/game/${roomId}?playerName=${playerName}&category=${category}`)
 	}
 	return (
-		<div className="max-w-md bg-white rounded-lg shadow-md p-8 mt-5">
-			<form action={createOrJoinRoom}>
-				<NewGameForm />
+		<div className="w-full">
+			<form className="w-full flex justify-center items-center" action={createOrJoinRoom}>
+				<Suspense fallback={<div>Loading...</div>}>
+					<NewGameForm />
+				</Suspense>
 			</form>
 		</div>
 	)

@@ -10,11 +10,10 @@ import { WaitingScreen } from './WaitingScreen'
 const ROUTE = '/game/'
 export default function GameContainer() {
 	const path = usePathname()
+	const roomId = path.slice(ROUTE.length)
 	const searchParams = useSearchParams()
 	const playerName = searchParams.get('playerName')
 	const category = searchParams.get('category')
-
-	const roomId = path.slice(ROUTE.length)
 
 	return (
 		<div className="flex flex-col w-full items-center">
