@@ -127,14 +127,16 @@ export class GameManager {
 		const updatedPlayers = this.game.players.filter((player) => player.name !== playerName)
 
 		if (updatedPlayers.length < GameManager.MIN_PLAYERS) {
-			this.game.state = 'waiting'
-			this.game.players = updatedPlayers.map((player) => ({
-				...player,
-				ready: false,
-			}))
+			this.game = {
+				...this.game,
+				state: 'waiting',
+				players: updatedPlayers.map((player) => ({
+					...player,
+					ready: false,
+				})),
+			}
 			return
 		}
-
 		this.game = { ...this.game, players: updatedPlayers }
 	}
 
