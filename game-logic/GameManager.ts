@@ -84,19 +84,20 @@ export class GameManager {
 		if (!player || !votedForPlayer || player.name === vote) return
 
 		// if player has already voted for someone else, remove that vote
-		this.game.players = this.game.players.map((player) => {
+		let newPlayers = this.game.players.map((player) => {
 			if (player.votes.includes(playerName)) {
 				player.votes = player.votes.filter((voter) => voter !== playerName)
 			}
 			return player
 		})
 		// add vote to player
-		this.game.players = this.game.players
+		newPlayers = newPlayers
 			.map((player) => (player.name === playerName ? { ...player, ready: true } : player))
 			.map((player) =>
 				player.name === vote ? { ...player, votes: [...player.votes, playerName] } : player
 			)
 
+		this.game = { ...this.game, players: newPlayers }
 		this.tryAdvanceGameState()
 	}
 
@@ -117,7 +118,9 @@ export class GameManager {
 			votes: [],
 		}
 
-		this.game.players = [...this.game.players, newPlayer]
+		const newPlayers = [...this.game.players, newPlayer]
+
+		this.game = { ...this.game, players: newPlayers }
 	}
 
 	private handlePlayerLeft(playerName: string): void {
@@ -132,14 +135,14 @@ export class GameManager {
 			return
 		}
 
-		this.game.players = updatedPlayers
+		this.game = { ...this.game, players: updatedPlayers }
 	}
 
 	private handleToggleReady(playerName: string): void {
-		this.game.players = this.game.players.map((player) =>
+		const newPlayers = this.game.players.map((player) =>
 			player.name === playerName ? { ...player, ready: !player.ready } : player
 		)
-
+		this.game = { ...this.game, players: newPlayers }
 		this.tryAdvanceGameState()
 	}
 
@@ -151,7 +154,7 @@ export class GameManager {
 			if (this.game.state === 'waiting') {
 				this.assignImposter()
 			}
-			this.setAllPlayersUnready()
+			this.resetAllPlayers()
 			this.advanceToNextState()
 		}
 	}
@@ -159,46 +162,60 @@ export class GameManager {
 	private advanceToNextState(): void {
 		const currentStateIndex = gameStatesInSequence.indexOf(this.game.state)
 		const nextState = gameStatesInSequence[currentStateIndex + 1]
-		this.game.state = nextState
+		this.game = { ...this.game, state: nextState }
 		if (nextState === 'results') {
 			this.awardPoints()
-			this.game.prevAnswers = [...this.game.prevAnswers, this.game.answer]
-			this.game.answer = GameManager.getUnusedAnswer(this.game.category, this.game)
+		}
+		if (nextState === 'waiting') {
+			const newPrevAnswers = [...this.game.prevAnswers, this.game.answer]
+			const newAnswer = GameManager.getUnusedAnswer(this.game.category, this.game)
+			const newRound = this.game.round + 1
+			this.game = { ...this.game, prevAnswers: newPrevAnswers, answer: newAnswer, round: newRound }
 		}
 	}
 	private awardPoints(): void {
 		const imposter = this.game.players.find((player) => player.imposter)
 
-		if (!imposter) return
-
-		imposter.votes.forEach((voter) => {
-			const player = this.game.players.find((player) => player.name === voter)
-			if (player) {
-				player.score += 1
-			}
-		})
-
 		const mostVotedPlayer = this.game.players.reduce((acc, player) =>
 			player.votes.length > acc.votes.length ? player : acc
 		)
+
+		if (!imposter) return
+
+		let newPlayers = this.game.players.map((player) => {
+			if (imposter.votes.includes(player.name)) {
+				return { ...player, score: player.score + 1 }
+			}
+			return player
+		})
+
 		if (mostVotedPlayer.name !== imposter.name) {
-			imposter.score += 3
+			newPlayers = newPlayers.map((player) => {
+				if (player.name === mostVotedPlayer.name) {
+					return { ...player, score: player.score + 3 }
+				}
+				return player
+			})
 		}
+		this.game = { ...this.game, players: newPlayers }
 	}
 
 	private assignImposter(): void {
 		const randomIndex = Math.floor(Math.random() * this.game.players.length)
-		this.game.players = this.game.players.map((player, index) => ({
+		const newPlayers = this.game.players.map((player, index) => ({
 			...player,
 			imposter: index === randomIndex,
 		}))
+		this.game = { ...this.game, players: newPlayers }
 	}
 
-	private setAllPlayersUnready(): void {
-		this.game.players = this.game.players.map((player) => ({
+	private resetAllPlayers(): void {
+		const newPlayers = this.game.players.map((player) => ({
 			...player,
 			ready: false,
+			votes: [],
 		}))
+		this.game = { ...this.game, players: newPlayers }
 	}
 
 	private static assignUnusedAvatarColor(game?: GameInfo): AvatarColor {
