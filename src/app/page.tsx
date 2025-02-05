@@ -20,15 +20,19 @@ export default function Home() {
 				},
 			})
 		} else {
-			console.log('joining room', roomId)
-			const res = await fetch(`${PARTYKIT_URL}/party/${roomId}`, {
-				method: 'GET',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			})
-			const data = await res.json()
-			category = data.category
+			try {
+				const res = await fetch(`${PARTYKIT_URL}/party/${roomId}`, {
+					method: 'GET',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+				})
+				const data = await res.json()
+				category = data.category
+			} catch (error) {
+				console.error(`Error fetching room ${roomId}`, error)
+				redirect('/?error=Room+not+found')
+			}
 		}
 		redirect(`/game/${roomId}?playerName=${playerName}&category=${category}`)
 	}

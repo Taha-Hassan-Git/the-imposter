@@ -1,6 +1,8 @@
 'use client'
+import { useSearchParams } from 'next/navigation'
 import { Dispatch, SetStateAction, useState } from 'react'
 import { generatePlayerName } from '../utils/generatePlayerName'
+import { generateRoomId } from '../utils/generateRoomId'
 import { Button } from './Button'
 import { Input } from './Input'
 
@@ -10,15 +12,29 @@ type RoomId = string | null
 
 const defaultGameFormData: GameFormData = {
 	category: 'films',
-	name: generatePlayerName(),
+	name: '',
 	roomId: null,
 }
 
 const categories: Array<Category> = ['films', 'animals', 'countries', 'sports']
 
+const placeHolders = {
+	roomId: generateRoomId(),
+	name: generatePlayerName(),
+}
 export default function NewGameForm() {
+	const searchParams = useSearchParams()
+	const errorMessage = searchParams.get('error')
+	const [showErrorMessage, setShowErrorMessage] = useState<boolean>(true)
+	setTimeout(() => {
+		setShowErrorMessage(false)
+	}, 5000)
 	const [gameFormData, setGameFormData] = useState<GameFormData>(defaultGameFormData)
 	const [showJoinExisting, setShowJoinExisting] = useState<boolean | undefined>(undefined)
+	const isSubmitDisabled = showJoinExisting
+		? !gameFormData.roomId || !gameFormData.name
+		: !gameFormData.name
+
 	if (showJoinExisting === undefined) {
 		return (
 			<div className="flex flex-col gap-5 bg-white rounded-lg shadow-md p-8 mt-5 w-full max-w-[500px]">
@@ -38,6 +54,11 @@ export default function NewGameForm() {
 				>
 					Join existing room
 				</Button>
+
+				{
+					//disappears after 5 seconds
+					showErrorMessage && <p className="text-red-600 text-center">{errorMessage}</p>
+				}
 			</div>
 		)
 	}
@@ -62,13 +83,28 @@ export default function NewGameForm() {
 				</Button>
 			</div>
 			<div className="p-8 flex flex-col gap-5">
-				{!showJoinExisting && (
+				{showJoinExisting ? (
+					<Input
+						name={'roomId'}
+						type={'text'}
+						label={'Room Id:'}
+						value={gameFormData.roomId}
+						placeholder={placeHolders.roomId}
+						handleChange={(e) => {
+							setGameFormData((prev) => {
+								return { ...prev, roomId: e.target.value }
+							})
+						}}
+					/>
+				) : (
 					<SelectCategories gameFormData={gameFormData} setGameFormData={setGameFormData} />
 				)}
+
 				<Input
 					name={'name'}
 					type={'text'}
 					label={'Your Name:'}
+					placeholder={placeHolders.name}
 					value={gameFormData.name}
 					handleChange={(e) => {
 						setGameFormData((prev) => {
@@ -76,21 +112,15 @@ export default function NewGameForm() {
 						})
 					}}
 				/>
-				{showJoinExisting && (
-					<Input
-						name={'roomId'}
-						type={'text'}
-						label={'Room Id:'}
-						value={gameFormData.roomId}
-						handleChange={(e) => {
-							setGameFormData((prev) => {
-								return { ...prev, roomId: e.target.value }
-							})
-						}}
-					/>
-				)}
+
 				<div className="self-center">
-					<Button type="submit">{showJoinExisting ? 'Join Room' : 'Create Room'}</Button>
+					<Button
+						disabled={isSubmitDisabled}
+						className="disabled:bg-gray-300 disabled:text-gray-800"
+						type="submit"
+					>
+						{showJoinExisting ? 'Join Room' : 'Create Room'}
+					</Button>
 				</div>
 			</div>
 		</div>

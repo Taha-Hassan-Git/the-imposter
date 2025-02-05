@@ -5,6 +5,7 @@ interface InputProps {
 	type: HTMLInputTypeAttribute
 	label: string
 	value: string | null
+	placeholder?: string
 	handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void
 }
 export function Input(props: InputProps) {
@@ -12,6 +13,7 @@ export function Input(props: InputProps) {
 		<div>
 			<label htmlFor={props.name}>{props.label}</label>
 			<input
+				placeholder={props.placeholder || undefined}
 				name={props.name}
 				id={props.name}
 				type={props.type}
