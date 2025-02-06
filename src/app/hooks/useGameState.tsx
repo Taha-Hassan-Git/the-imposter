@@ -10,7 +10,7 @@ interface GameContext {
 	dispatch: (action: Action) => void
 }
 const gameContext = createContext<GameContext>({
-	gameState: { state: 'error' },
+	gameState: { state: 'loading' },
 	dispatch: () => {},
 })
 export function GameProvider({
@@ -23,7 +23,7 @@ export function GameProvider({
 	category: Category | null
 	roomId: string
 }) {
-	const [gameState, setGameState] = useState<GameState>({ state: 'error' })
+	const [gameState, setGameState] = useState<GameState>({ state: 'loading' })
 
 	const socket = usePartySocket({
 		host: PARTYKIT_HOST,
