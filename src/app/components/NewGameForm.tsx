@@ -48,7 +48,7 @@ export default function NewGameForm() {
 
 	if (showJoinExisting === undefined) {
 		return (
-			<div className="flex flex-col gap-5 bg-white rounded-lg shadow-md p-8 mt-5 w-full max-w-[500px]">
+			<div className="flex flex-col gap-5 bg-white rounded-lg shadow-md p-8 mt-5 w-full">
 				<Button
 					variant="secondary"
 					onClick={() => {
@@ -74,7 +74,7 @@ export default function NewGameForm() {
 		)
 	}
 	return (
-		<div className="flex flex-col gap-5 bg-white rounded-lg shadow-md mt-5 w-full max-w-[500px]">
+		<div className="flex flex-col gap-5 bg-white rounded-lg shadow-md mt-5 w-full">
 			<div className="flex mt-0 w-full">
 				<Button
 					variant={showJoinExisting ? 'secondary' : 'disabled'}
