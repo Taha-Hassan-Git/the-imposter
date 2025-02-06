@@ -67,9 +67,7 @@ export const animalAnswers = [
 	'Panda',
 	'Monkey',
 	'Rhino',
-	'Penguin',
-	'Polar Bear',
-	'Panda',
+	'Wolf',
 ] as const
 
 export type AnimalAnswer = (typeof animalAnswers)[number]
@@ -90,6 +88,7 @@ export const countryAnswers = [
 	'Spain',
 	'UK',
 	'USA',
+	'South Africa',
 ] as const
 
 export type CountryAnswer = (typeof countryAnswers)[number]
@@ -111,8 +110,6 @@ export const sportsAnswers = [
 	'Skateboarding',
 	'Surfing',
 	'Wrestling',
-	'Sailing',
-	'Diving',
 ] as const
 
 export const answersObject: Record<Category, Answer[]> = {
