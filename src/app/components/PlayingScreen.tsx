@@ -1,18 +1,16 @@
 import { filmAnswers, GameInfo, Player } from '../../../game-logic/types'
 import { useGameState } from '../hooks/useGameState'
 import { Button } from './Button'
+import { PlayerInitialsIcon } from './PlayerInitialsIcon'
 
-const PlayingScreen = () => {
-	const self = 'player2'
+const PlayingScreen = ({ self }: { self: string }) => {
 	const { gameState } = useGameState() as { gameState: GameInfo }
 	const player = gameState.players.find((player) => player.name === self)!
 	console.log(player)
 	return (
 		<div className="flex flex-col gap-5 p-1 items-center w-full mt-1">
 			<AnswerBox player={player} />
-			<div className="flex gap-5 w-full">
-				<ReadyToVoteBox player={player} />
-			</div>
+			<ReadyToVoteBox player={player} />
 			<div className="flex flex-col gap-5 w-full"></div>
 		</div>
 	)
@@ -24,11 +22,36 @@ function ReadyToVoteBox({ player }: { player: Player }) {
 		dispatch({ type: 'toggle-ready', payload: { name: player.name } })
 	}
 	return (
-		<div className="bg-white rounded-lg shadow-md p-8 flex flex-col items-center justify-center gap-5 flex-1">
+		<div className="bg-white rounded-lg shadow-md p-8 flex flex-col items-center justify-center gap-5 w-full">
+			<Presence />
 			<h2 className="text-xl font-bold mb-4 text-center">Ready to Vote?</h2>
 			<Button onClick={toggleReady} variant={player.ready ? 'disabled' : 'primary'}>
 				{player.ready ? '...' : 'Ready'}
 			</Button>
+		</div>
+	)
+}
+
+function Presence() {
+	const { gameState } = useGameState() as { gameState: GameInfo }
+
+	return (
+		<div className="flex self-start w-full overflow-hidden">
+			{gameState.players
+				.sort((a, b) => {
+					if (a.ready && !b.ready) return -1
+					if (!a.ready && b.ready) return 1
+					return 0
+				})
+				.map((player, i) => (
+					<div
+						style={{ transform: `translateX(-${i * 12}px)`, zIndex: gameState.players.length - i }}
+						key={player.name}
+						className="flex items-center gap-2"
+					>
+						<PlayerInitialsIcon player={player} />
+					</div>
+				))}
 		</div>
 	)
 }
