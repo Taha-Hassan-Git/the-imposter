@@ -1,7 +1,6 @@
-import { Action, GameInfo } from '../../../game-logic/types'
+import { Action, GameInfo, Player } from '../../../game-logic/types'
 import { useGameState } from '../hooks/useGameState'
 import { Button } from './Button'
-import { ScorePanel } from './PlayingScreen'
 
 export function ResultsScreen({ playerName }: { playerName: string }) {
 	return (
@@ -49,5 +48,45 @@ function NextRoundButton({ playerName }: { playerName: string }) {
 				{player.ready ? '...' : 'Next round'}
 			</Button>
 		</div>
+	)
+}
+
+function ScorePanel() {
+	const { gameState } = useGameState() as { gameState: GameInfo }
+	return (
+		<div className="bg-white rounded-lg shadow-md p-8 flex-1">
+			<h2 className="text-2xl font-bold mb-4 text-center">Scores</h2>
+			<p>Round: {gameState.round}</p>
+			<ul className="space-y-3">
+				{gameState.players.map((player) => (
+					<PlayerScoreItem key={player.name} player={player} />
+				))}
+			</ul>
+		</div>
+	)
+}
+
+function PlayerScoreItem({ player }: { player: Player }) {
+	// Get player initials
+	const initials = player.name
+		.split(' ')
+		.map((word) => word[0])
+		.join('')
+		.toUpperCase()
+		.slice(0, 2)
+
+	return (
+		<li className="group flex items-center justify-between py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors">
+			<div className="flex items-center space-x-4">
+				<div
+					className="w-10 h-10 rounded-full flex items-center justify-center text-white font-medium shadow-sm"
+					style={{ backgroundColor: player.avatarColor, opacity: player.ready ? 0.7 : 0.5 }}
+				>
+					{initials}
+				</div>
+				<span className="font-semibold text-gray-900">{player.name}</span>
+			</div>
+			<span className="text-2xl font-bold text-gray-700 tabular-nums">{player.score}</span>
+		</li>
 	)
 }
