@@ -1,7 +1,6 @@
 'use client'
 import { useSearchParams } from 'next/navigation'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import { generatePlayerName } from '../utils/generatePlayerName'
 import { generateRoomId } from '../utils/generateRoomId'
 import { Button } from './Button'
 import { Input } from './Input'
@@ -18,10 +17,8 @@ const defaultGameFormData: GameFormData = {
 
 const categories: Array<Category> = ['films', 'animals', 'countries', 'sports']
 
-const placeHolders = {
-	roomId: generateRoomId(),
-	name: generatePlayerName(),
-}
+const placeHolderRoomId = generateRoomId()
+
 export default function NewGameForm() {
 	const searchParams = useSearchParams()
 	const errorMessage = searchParams.get('error')
@@ -100,7 +97,7 @@ export default function NewGameForm() {
 						type={'text'}
 						label={'Room Id:'}
 						value={gameFormData.roomId}
-						placeholder={placeHolders.roomId}
+						placeholder={placeHolderRoomId}
 						handleChange={(e) => {
 							setGameFormData((prev) => {
 								return { ...prev, roomId: e.target.value }
@@ -115,7 +112,7 @@ export default function NewGameForm() {
 					name={'name'}
 					type={'text'}
 					label={'Your Name:'}
-					placeholder={placeHolders.name}
+					placeholder={"...what's your name?"}
 					value={gameFormData.name}
 					handleChange={(e) => {
 						setGameFormData((prev) => {

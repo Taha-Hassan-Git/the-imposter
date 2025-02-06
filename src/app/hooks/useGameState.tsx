@@ -3,7 +3,6 @@ import { createContext, useCallback, useContext, useState } from 'react'
 import { Action, GameInfo, GameState, Player } from '../../../game-logic/types'
 import { Category } from '../components/NewGameForm'
 import { PARTYKIT_HOST } from '../env'
-import { generatePlayerName } from '../utils/generatePlayerName'
 
 interface GameContext {
 	gameState: GameState
@@ -62,7 +61,7 @@ export function GameProvider({
 	const socket = usePartySocket({
 		host: PARTYKIT_HOST,
 		room: roomId,
-		id: playerName || generatePlayerName(),
+		id: playerName || 'PLAYER',
 		onMessage(event) {
 			const message = JSON.parse(event.data) as GameInfo
 			if (message) {
