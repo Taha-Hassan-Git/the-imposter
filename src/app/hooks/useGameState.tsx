@@ -23,7 +23,41 @@ export function GameProvider({
 	category: Category | null
 	roomId: string
 }) {
-	const [gameState, setGameState] = useState<GameState>({ state: 'loading' })
+	const playingGame: GameInfo = {
+		state: 'playing',
+		roomId,
+		round: 1,
+		answer: 'Fight Club',
+		players: [
+			{
+				name: 'player1',
+				score: 0,
+				ready: false,
+				avatarColor: 'red',
+				imposter: false,
+				votes: [],
+			},
+			{
+				name: 'player2',
+				score: 0,
+				ready: false,
+				avatarColor: 'blue',
+				imposter: true,
+				votes: [],
+			},
+			{
+				name: 'player3',
+				score: 0,
+				ready: false,
+				avatarColor: 'green',
+				imposter: false,
+				votes: [],
+			},
+		],
+		prevAnswers: [],
+		category: 'films',
+	}
+	const [gameState, setGameState] = useState<GameState>(playingGame)
 
 	const socket = usePartySocket({
 		host: PARTYKIT_HOST,

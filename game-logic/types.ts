@@ -33,22 +33,20 @@ export interface GameInfo {
 export const filmAnswers = [
 	'Titanic',
 	'The Godfather',
-	'Shawshank Redemption',
-	'The Dark Knight',
+	'Inception',
+	'Monsters Inc.',
 	'Star Wars',
 	'Pulp Fiction',
-	'The Lord of the Rings',
+	'Fight Club',
 	'Forrest Gump',
 	'The Matrix',
 	'Jurassic Park',
 	'The Lion King',
 	'Terminator',
 	'The Avengers',
-	'The Silence of the Lambs',
+	'Avatar',
 	'The Shining',
 	'Harry Potter',
-	'The Sixth Sense',
-	'The Terminator',
 ] as const
 
 export type FilmAnswer = (typeof filmAnswers)[number]
