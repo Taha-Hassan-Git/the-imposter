@@ -128,6 +128,6 @@ export type SportsAnswer = (typeof sportsAnswers)[number]
 
 export type Answer = FilmAnswer | AnimalAnswer | CountryAnswer | SportsAnswer
 
-export type GameError = { state: 'error' }
+export type GameError = { state: 'loading' }
 
 export type GameState = GameInfo | GameError

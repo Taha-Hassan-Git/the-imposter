@@ -299,7 +299,7 @@ describe('When in the voting state...', () => {
 	})
 
 	it('does not allow a player to vote more than once, and allows players to switch votes', () => {
-		const gameManager = new GameManager(votingGame)
+		gameManager = new GameManager(votingGame)
 
 		gameManager.handleAction({
 			type: 'player-voted',
@@ -325,7 +325,7 @@ describe('When in the voting state...', () => {
 	})
 
 	it('moves to the results state when all players have voted', () => {
-		const gameManager = new GameManager(votingGame)
+		gameManager = new GameManager(votingGame)
 		gameManager.handleAction({
 			type: 'player-voted',
 			payload: { name: player1Name, vote: player2Name },

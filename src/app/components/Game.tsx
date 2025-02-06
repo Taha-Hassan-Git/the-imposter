@@ -28,8 +28,8 @@ function Game({ playerName }: { playerName: string | null }) {
 	const { gameState } = useGameState()
 	return (
 		<>
-			{gameState.state === 'error' ? (
-				<ErrorScreen />
+			{gameState.state === 'loading' ? (
+				<LoadingScreen />
 			) : gameState.state === 'waiting' ? (
 				<WaitingScreen self={playerName as string} />
 			) : gameState.state === 'playing' ? (
@@ -43,6 +43,6 @@ function Game({ playerName }: { playerName: string | null }) {
 	)
 }
 
-function ErrorScreen() {
-	return <div>Error Screen</div>
+export function LoadingScreen() {
+	return <div>Loading... </div>
 }

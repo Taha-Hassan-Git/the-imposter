@@ -1,5 +1,4 @@
 import { redirect } from 'next/navigation'
-import { Suspense } from 'react'
 import NewGameForm from './components/NewGameForm'
 import { PARTYKIT_URL } from './env'
 import { generateRoomId } from './utils/generateRoomId'
@@ -40,9 +39,7 @@ export default function Home() {
 	return (
 		<div className="w-full">
 			<form className="w-full flex justify-center items-center" action={createOrJoinRoom}>
-				<Suspense fallback={<div>Loading...</div>}>
-					<NewGameForm />
-				</Suspense>
+				<NewGameForm />
 			</form>
 		</div>
 	)
