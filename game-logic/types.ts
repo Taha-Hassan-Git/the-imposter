@@ -6,7 +6,30 @@ export type Action =
 	| { type: 'player-left'; payload: { name: string } }
 	| { type: 'player-voted'; payload: { name: string; vote: string } }
 
-export const avatarColors: AvatarColor[] = ['red', 'blue', 'green', 'yellow', 'purple', 'pink']
+// nice pastel colours
+export const avatarColors = [
+	'#FFC0CB',
+	'#FFB6C1',
+	'#FF69B4',
+	'#FF1493',
+	'#DB7093',
+	'#C71585',
+	'#FFA07A',
+	'#FA8072',
+	'#E9967A',
+	'#F08080',
+	'#CD5C5C',
+	'#DC143C',
+	'#B22222',
+	'#8B0000',
+	'#FF0000',
+	'#FF6347',
+	'#FF4500',
+	'#FF8C00',
+	'#FFA500',
+	'#FFD700',
+	'#FFFF00',
+] as const
 
 export type Player = {
 	name: string
@@ -16,7 +39,7 @@ export type Player = {
 	imposter: boolean
 	votes: string[]
 }
-export type AvatarColor = 'red' | 'blue' | 'green' | 'yellow' | 'purple' | 'pink'
+export type AvatarColor = (typeof avatarColors)[number]
 
 export type StateNames = 'waiting' | 'playing' | 'voting' | 'results'
 

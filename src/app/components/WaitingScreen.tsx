@@ -7,36 +7,37 @@ import { Button } from './Button'
 const URL =
 	process.env.NEXT_PUBLIC_VERCEL_ENV === 'production'
 		? 'https://the-imposter.vercel.app/'
-		: 'http://localhost:3000'
+		: 'http://192.168.1.119:3000'
 
 export function WaitingScreen({ self }: { self: string }) {
 	const { gameState } = useGameState() as { gameState: GameInfo }
 	return (
-		<div className="flex flex-col gap-5 p-5 items-center">
-			<div className="bg-white rounded-lg shadow-md p-8 min-w-[360px]">
-				<h2 className="text-2xl font-bold mb-4 text-center">Players</h2>
-				<ul className="space-y-3">
-					{gameState.players.map((player: Player) => (
-						<PlayerListItem key={player.name} player={player} />
-					))}
-				</ul>
+		<div className="flex flex-col gap-5 p-5 items- w-full">
+			<div className="bg-white rounded-lg shadow-md p-4 w-full">
+				<div className="max-h-[280px] overflow-y-scroll">
+					<div className="justify-between flex items-center align-middle mb-2">
+						<h2 className="text-2xl font-bold text-left">Players</h2>
+						<div className="flex items-center justify-center bg-gray-100 rounded-full px-3 py-1">
+							<p>{gameState.category[0].toUpperCase() + gameState.category.slice(1)}</p>
+						</div>
+					</div>
+					<div className="border-b mb-4"></div>
+					<ul className="space-y-3">
+						{gameState.players.map((player: Player) => (
+							<PlayerListItem key={player.name} player={player} />
+						))}
+					</ul>
+				</div>
+				<div className="mt-4 w-full">
+					<ReadyButton self={self} />
+				</div>
 			</div>
-			<div>
-				<ReadyButton self={self} />
-			</div>
-
-			<div className="text-gray-500">
-				<p>
-					You are in room: <span className="font-bold">{gameState.roomId}</span>
-				</p>
-				<p>
-					The category is: <span className="font-bold">{gameState.category}</span>
-				</p>
-
-				<p>
-					Share this link with your friends to invite them to the game:
-					<QRCode value={URL + `?roomId=${gameState.roomId}`} />
-				</p>
+			<div className="text-gray-500 flex flex-col text-sm items-center bg-white rounded-lg shadow-md p-4 w-full">
+				<p>Invite others with this link:</p>
+				<div className="bg-gray-100 p-4 border rounded-lg mt-4">
+					<QRCode size={120} value={URL + `?roomId=${gameState.roomId}`} />
+				</div>
+				<p>Room ID: {gameState.roomId}</p>
 			</div>
 		</div>
 	)
@@ -70,26 +71,30 @@ function PlayerListItem({ player }: { player: Player }) {
 }
 
 function ReadyButton({ self }: { self: string }) {
-	const [ready, setReady] = useState(false)
 	const { dispatch, gameState } = useGameState() as {
 		dispatch: (a: Action) => void
 		gameState: GameInfo
 	}
+	const [ready, setReady] = useState(() => {
+		const player = gameState.players.find((p) => p.name === self)
+		console.log(player)
+		return player ? player.ready : false
+	})
+
 	const handleClick = () => {
 		setReady(!ready)
 		dispatch({ type: 'toggle-ready', payload: { name: self } })
 	}
+
 	const message =
-		gameState.players.length < 2
-			? 'Waiting for more players...'
-			: 'Game begins when all players are ready...'
+		gameState.players.length <= 2 ? 'Not enough players to start...' : '...waiting for the others'
 
 	return (
-		<div className="flex flex-col gap-3 items-center">
-			<Button variant={ready ? 'disabled' : 'primary'} onClick={handleClick}>
+		<div className="flex flex-col gap-3 items-center w-full">
+			<Button className="w-full" variant={ready ? 'disabled' : 'primary'} onClick={handleClick}>
 				{ready ? '...' : 'Ready?'}
 			</Button>
-			{ready && <p>{message}</p>}
+			<p>{ready && message}</p>
 		</div>
 	)
 }
