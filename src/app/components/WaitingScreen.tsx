@@ -16,13 +16,21 @@ export function WaitingScreen({ self }: { self: string }) {
 			<div className="bg-white rounded-lg shadow-md p-4 w-full">
 				<div className="max-h-[280px] overflow-y-scroll">
 					<div className="justify-between flex items-center align-middle mb-2">
-						<h2 className="text-2xl font-bold text-left">Players</h2>
-						<div className="flex items-center justify-center bg-gray-100 rounded-full px-3 py-1">
-							<p>{gameState.category[0].toUpperCase() + gameState.category.slice(1)}</p>
+						<div className="flex items-center gap-2">
+							Category:
+							<div className="flex items-center justify-center bg-gray-100 rounded-full px-3 py-1">
+								<p>{gameState.category[0].toUpperCase() + gameState.category.slice(1)}</p>
+							</div>
+						</div>
+						<div className="flex items-center gap-2">
+							Room ID:
+							<div className="flex items-center justify-center bg-gray-100 rounded-full px-3 py-1">
+								<p>{gameState.roomId}</p>
+							</div>
 						</div>
 					</div>
-					<div className="border-b mb-4"></div>
-					<ul className="space-y-3">
+					<div className="border-b mb-2"></div>
+					<ul className="space-y-3 p-4">
 						{gameState.players.map((player: Player) => (
 							<PlayerListItem key={player.name} player={player} />
 						))}
@@ -37,7 +45,6 @@ export function WaitingScreen({ self }: { self: string }) {
 				<div className="bg-gray-100 p-4 border rounded-lg mt-4">
 					<QRCode size={120} value={URL + `?roomId=${gameState.roomId}`} />
 				</div>
-				<p>Room ID: {gameState.roomId}</p>
 			</div>
 		</div>
 	)
