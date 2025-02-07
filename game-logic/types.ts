@@ -8,27 +8,18 @@ export type Action =
 
 // nice pastel colours
 export const avatarColors = [
-	'#FFC0CB',
-	'#FFB6C1',
-	'#FF69B4',
-	'#FF1493',
-	'#DB7093',
-	'#C71585',
 	'#FFA07A',
-	'#FA8072',
-	'#E9967A',
-	'#F08080',
-	'#CD5C5C',
-	'#DC143C',
-	'#B22222',
-	'#8B0000',
-	'#FF0000',
-	'#FF6347',
-	'#FF4500',
-	'#FF8C00',
-	'#FFA500',
 	'#FFD700',
-	'#FFFF00',
+	'#FF69B4',
+	'#F5A7A6',
+	'#F5CF9F',
+	'#F3F5A9',
+	'#FF1493',
+	'#FF6347',
+	'#D5D1E9',
+	'#B5EAD7',
+	'#A2D2FF',
+	'#FFD1DC',
 ] as const
 
 export type Player = {

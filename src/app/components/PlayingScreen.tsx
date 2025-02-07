@@ -32,7 +32,7 @@ function ReadyToVoteBox({ player }: { player: Player }) {
 	)
 }
 
-function Presence() {
+export function Presence() {
 	const { gameState } = useGameState() as { gameState: GameInfo }
 
 	return (
@@ -49,7 +49,7 @@ function Presence() {
 						key={player.name}
 						className="flex items-center gap-2"
 					>
-						<PlayerInitialsIcon player={player} />
+						<PlayerInitialsIcon showReady player={player} />
 					</div>
 				))}
 		</div>
