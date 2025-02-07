@@ -4,7 +4,10 @@ export type Action =
 	| { type: 'toggle-ready'; payload: { name: string } }
 	| { type: 'player-joined'; payload: { name: string } }
 	| { type: 'player-left'; payload: { name: string } }
-	| { type: 'player-voted'; payload: { name: string; vote: string } }
+	| {
+			type: 'player-voted'
+			payload: { name: string; vote: string; guess?: Answer }
+	  }
 
 // nice pastel colours
 export const avatarColors = [
@@ -28,6 +31,7 @@ export type Player = {
 	ready: boolean
 	avatarColor: AvatarColor
 	imposter: boolean
+	guess: Answer | null
 	votes: string[]
 }
 export type AvatarColor = (typeof avatarColors)[number]

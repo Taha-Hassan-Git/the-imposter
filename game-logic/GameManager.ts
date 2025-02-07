@@ -41,6 +41,7 @@ export class GameManager {
 			players: [
 				{
 					name: formInfo.playerName,
+					guess: null,
 					score: 0,
 					ready: false,
 					avatarColor,
@@ -78,13 +79,13 @@ export class GameManager {
 				break
 			}
 			case 'player-voted': {
-				this.handlePlayerVoted(action.payload.name, action.payload.vote)
+				this.handlePlayerVoted(action.payload.name, action.payload.vote, action.payload.guess)
 				break
 			}
 		}
 	}
 
-	private handlePlayerVoted(playerName: string, vote: string): void {
+	private handlePlayerVoted(playerName: string, vote: string, guess?: Answer): void {
 		const player = this.game.players.find((player) => player.name === playerName)
 		const votedForPlayer = this.game.players.find((player) => player.name === vote)
 		if (!player || !votedForPlayer || player.name === vote) return
@@ -98,11 +99,13 @@ export class GameManager {
 		})
 		// add vote to player
 		newPlayers = newPlayers
-			.map((player) => (player.name === playerName ? { ...player, ready: true } : player))
-			.map((player) =>
-				player.name === vote ? { ...player, votes: [...player.votes, playerName] } : player
-			)
+			.map((p) => (p.name === playerName ? { ...p, ready: true } : p))
+			.map((p) => (p.name === vote ? { ...p, votes: [...p.votes, playerName] } : p))
 
+		if (player.imposter && guess) {
+			// add the imposter's guess to the player
+			newPlayers = newPlayers.map((p) => (p.name === playerName ? { ...p, guess } : p))
+		}
 		this.game = { ...this.game, players: newPlayers }
 		this.tryAdvanceGameState()
 	}
@@ -117,6 +120,7 @@ export class GameManager {
 
 		const newPlayer: Player = {
 			name: playerName,
+			guess: null,
 			score: 0,
 			ready: false,
 			avatarColor: GameManager.assignUnusedAvatarColor(this.game),

@@ -30,6 +30,7 @@ export function GameProvider({
 		players: [
 			{
 				name: 'player1Name',
+				guess: null,
 				score: 0,
 				ready: false,
 				avatarColor: avatarColors[0],
@@ -38,6 +39,7 @@ export function GameProvider({
 			},
 			{
 				name: 'Terry',
+				guess: null,
 				score: 0,
 				ready: true,
 				avatarColor: avatarColors[1],
@@ -46,6 +48,7 @@ export function GameProvider({
 			},
 			{
 				name: 'Jospeh',
+				guess: null,
 				score: 0,
 				ready: false,
 				avatarColor: avatarColors[2],

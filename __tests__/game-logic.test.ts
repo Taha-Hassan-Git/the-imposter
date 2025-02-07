@@ -187,6 +187,7 @@ describe('When in the playing state...', () => {
 		players: [
 			{
 				name: player1Name,
+				guess: null,
 				score: 0,
 				ready: false,
 				avatarColor: avatarColors[0],
@@ -195,6 +196,7 @@ describe('When in the playing state...', () => {
 			},
 			{
 				name: player2Name,
+				guess: null,
 				score: 0,
 				ready: false,
 				avatarColor: avatarColors[1],
@@ -203,6 +205,7 @@ describe('When in the playing state...', () => {
 			},
 			{
 				name: player3Name,
+				guess: null,
 				score: 0,
 				ready: false,
 				avatarColor: avatarColors[2],
@@ -255,6 +258,7 @@ const votingGame: GameInfo = {
 	players: [
 		{
 			name: player1Name,
+			guess: null,
 			score: 0,
 			ready: false,
 			avatarColor: avatarColors[0],
@@ -263,6 +267,7 @@ const votingGame: GameInfo = {
 		},
 		{
 			name: player2Name,
+			guess: null,
 			score: 0,
 			ready: false,
 			avatarColor: avatarColors[1],
@@ -271,6 +276,7 @@ const votingGame: GameInfo = {
 		},
 		{
 			name: player3Name,
+			guess: null,
 			score: 0,
 			ready: false,
 			avatarColor: avatarColors[2],
@@ -299,8 +305,6 @@ describe('When in the voting state...', () => {
 	})
 
 	it('does not allow a player to vote more than once, and allows players to switch votes', () => {
-		gameManager = new GameManager(votingGame)
-
 		gameManager.handleAction({
 			type: 'player-voted',
 			payload: { name: player1Name, vote: player2Name },
@@ -324,8 +328,31 @@ describe('When in the voting state...', () => {
 		expect(newPlayer2.votes.length).toBe(0)
 	})
 
+	it('allows the imposter to guess the word', () => {
+		gameManager.handleAction({
+			type: 'player-voted',
+			payload: { name: player2Name, vote: player1Name, guess: 'Titanic' },
+		})
+
+		const updatedGame = gameManager.getState()
+
+		const player2 = updatedGame.players.find((player) => player.name === player2Name)!
+		expect(player2.guess).toBe('Titanic')
+	})
+
+	it('does not allow players to guess the word', () => {
+		gameManager.handleAction({
+			type: 'player-voted',
+			payload: { name: player1Name, vote: player2Name, guess: 'Titanic' },
+		})
+
+		const updatedGame = gameManager.getState()
+
+		const player1 = updatedGame.players.find((player) => player.name === player1Name)!
+		expect(player1.votes).not.toContain('Titanic')
+	})
+
 	it('moves to the results state when all players have voted', () => {
-		gameManager = new GameManager(votingGame)
 		gameManager.handleAction({
 			type: 'player-voted',
 			payload: { name: player1Name, vote: player2Name },
@@ -387,6 +414,7 @@ describe('When starting a new round...', () => {
 		players: [
 			{
 				name: 'test',
+				guess: null,
 				score: 1,
 				ready: false,
 				avatarColor: avatarColors[0],
@@ -395,6 +423,7 @@ describe('When starting a new round...', () => {
 			},
 			{
 				name: 'test2',
+				guess: null,
 				score: 3,
 				ready: false,
 				avatarColor: avatarColors[1],
@@ -403,6 +432,7 @@ describe('When starting a new round...', () => {
 			},
 			{
 				name: 'test3',
+				guess: null,
 				score: 0,
 				ready: false,
 				avatarColor: avatarColors[2],
