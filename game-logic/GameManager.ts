@@ -100,6 +100,7 @@ export class GameManager {
 			p.name === playerName ? { ...p, guess, ready: hasVoted } : p
 		)
 		this.game = { ...this.game, players: newPlayers }
+		this.tryAdvanceGameState()
 	}
 
 	private handlePlayerVoted(playerName: string, vote: string): void {

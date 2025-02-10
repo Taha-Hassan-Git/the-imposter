@@ -382,17 +382,17 @@ describe('When in the voting state...', () => {
 		})
 		gameManager.handleAction({
 			type: 'player-voted',
+			payload: { name: player3Name, vote: player2Name },
+		})
+
+		gameManager.handleAction({
+			type: 'player-voted',
 			payload: { name: player2Name, vote: player1Name },
 		})
 		gameManager.handleAction({
 			type: 'player-guessed',
 			payload: { name: player2Name, guess: 'Titanic' },
 		})
-		gameManager.handleAction({
-			type: 'player-voted',
-			payload: { name: player3Name, vote: player2Name },
-		})
-
 		const updatedGame = gameManager.getState()
 		expect(updatedGame.state).toEqual('results')
 	})
