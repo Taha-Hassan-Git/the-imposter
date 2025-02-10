@@ -4,10 +4,8 @@ export type Action =
 	| { type: 'toggle-ready'; payload: { name: string } }
 	| { type: 'player-joined'; payload: { name: string } }
 	| { type: 'player-left'; payload: { name: string } }
-	| {
-			type: 'player-voted'
-			payload: { name: string; vote: string; guess?: Answer }
-	  }
+	| { type: 'player-voted'; payload: { name: string; vote: string } }
+	| { type: 'player-guessed'; payload: { name: string; guess: Answer } }
 
 // nice pastel colours
 export const avatarColors = [
@@ -82,7 +80,7 @@ export const animalAnswers = [
 	'Polar Bear',
 	'Hippo',
 	'Gorilla',
-	'Panda',
+	'Leopard',
 	'Monkey',
 	'Rhino',
 	'Wolf',

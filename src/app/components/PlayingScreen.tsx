@@ -1,4 +1,4 @@
-import { filmAnswers, GameInfo, Player } from '../../../game-logic/types'
+import { Answer, answersObject, GameInfo, Player } from '../../../game-logic/types'
 import { useGameState } from '../hooks/useGameState'
 import { Button } from './Button'
 import { PlayerInitialsIcon } from './PlayerInitialsIcon'
@@ -6,7 +6,6 @@ import { PlayerInitialsIcon } from './PlayerInitialsIcon'
 const PlayingScreen = ({ self }: { self: string }) => {
 	const { gameState } = useGameState() as { gameState: GameInfo }
 	const player = gameState.players.find((player) => player.name === self)!
-	console.log(player)
 	return (
 		<div className="flex flex-col gap-5 p-1 items-center w-full mt-1">
 			<AnswerBox player={player} />
@@ -61,18 +60,7 @@ function AnswerBox({ player }: { player: Player }) {
 	return (
 		<div className="bg-white rounded-lg shadow-md p-4 w-full">
 			<GameInfoPanel />
-			<div className="grid grid-cols-4 gap-2 text-xs w-full">
-				{filmAnswers.map((answer) => (
-					<div
-						className={`border border-gray-100 shadow-sm rounded-lg
-					   flex justify-center items-center p-4 
-					   aspect-[2/1] text-center leading-none text-nowrap ${answer === gameState.answer && !player.imposter ? 'bg-green-100' : 'bg-slate-50'}`}
-						key={answer}
-					>
-						<p className="font-medium">{answer}</p>
-					</div>
-				))}
-			</div>
+			<AnswerGrid player={player} />
 			<div className="mt-6">
 				{player.imposter ? (
 					<span className="font-bold text-2xl text-red-600">You are the imposter</span>
@@ -82,6 +70,50 @@ function AnswerBox({ player }: { player: Player }) {
 					</div>
 				)}
 			</div>
+		</div>
+	)
+}
+
+export function AnswerGrid({
+	player,
+	hasButtons,
+	onClick,
+}: {
+	player: Player
+	hasButtons?: boolean
+	onClick?: (answer: Answer) => void
+}) {
+	const { gameState } = useGameState() as { gameState: GameInfo }
+	return (
+		<div className="grid grid-cols-4 gap-2 text-xs w-full">
+			{answersObject[gameState.category].map((answer) =>
+				hasButtons ? (
+					<Button
+						key={answer}
+						className="text-center"
+						onClick={onClick ? () => onClick(answer) : undefined}
+						variant={player.guess === answer ? 'primary' : 'secondary'}
+					>
+						{answer}
+					</Button>
+				) : (
+					<AnswerItem key={answer} answer={answer} player={player} />
+				)
+			)}
+		</div>
+	)
+}
+function AnswerItem({ answer, player }: { answer: Answer; player: Player }) {
+	const { gameState } = useGameState() as { gameState: GameInfo }
+
+	return (
+		<div
+			className={`border border-gray-100 shadow-sm rounded-lg
+		   flex justify-center items-center p-4 
+		   aspect-[2/1] text-center leading-none text-nowrap ${answer === gameState.answer && !player.imposter ? 'bg-green-100' : 'bg-slate-50'}`}
+			key={answer}
+		>
+			<p className="font-medium">{answer}</p>
 		</div>
 	)
 }

@@ -1,6 +1,6 @@
 import usePartySocket from 'partysocket/react'
 import { createContext, useCallback, useContext, useState } from 'react'
-import { Action, avatarColors, GameInfo, GameState, Player } from '../../../game-logic/types'
+import { Action, GameInfo, GameState, Player } from '../../../game-logic/types'
 import { Category } from '../components/NewGameForm'
 import { PARTYKIT_HOST } from '../env'
 
@@ -22,44 +22,44 @@ export function GameProvider({
 	category: Category | null
 	roomId: string
 }) {
-	const votingGame: GameInfo = {
-		state: 'voting',
-		roomId,
-		round: 1,
-		answer: 'Titanic',
-		players: [
-			{
-				name: 'player1Name',
-				guess: null,
-				score: 0,
-				ready: false,
-				avatarColor: avatarColors[0],
-				imposter: false,
-				votes: [],
-			},
-			{
-				name: 'Terry',
-				guess: null,
-				score: 0,
-				ready: true,
-				avatarColor: avatarColors[1],
-				imposter: true,
-				votes: [],
-			},
-			{
-				name: 'Jospeh',
-				guess: null,
-				score: 0,
-				ready: false,
-				avatarColor: avatarColors[2],
-				imposter: false,
-				votes: ['Terry'],
-			},
-		],
-		prevAnswers: [],
-		category: 'films',
-	}
-	const [gameState, setGameState] = useState<GameState>(votingGame)
+	// const votingGame: GameInfo = {
+	// 	state: 'voting',
+	// 	roomId,
+	// 	round: 1,
+	// 	answer: 'Titanic',
+	// 	players: [
+	// 		{
+	// 			name: 'player1Name',
+	// 			guess: null,
+	// 			score: 0,
+	// 			ready: false,
+	// 			avatarColor: avatarColors[0],
+	// 			imposter: false,
+	// 			votes: [],
+	// 		},
+	// 		{
+	// 			name: 'Terry',
+	// 			guess: null,
+	// 			score: 0,
+	// 			ready: true,
+	// 			avatarColor: avatarColors[1],
+	// 			imposter: true,
+	// 			votes: [],
+	// 		},
+	// 		{
+	// 			name: 'Jospeh',
+	// 			guess: null,
+	// 			score: 0,
+	// 			ready: false,
+	// 			avatarColor: avatarColors[2],
+	// 			imposter: false,
+	// 			votes: ['Terry'],
+	// 		},
+	// 	],
+	// 	prevAnswers: [],
+	// 	category: 'films',
+	// }
+	const [gameState, setGameState] = useState<GameState>({ state: 'loading' })
 
 	const socket = usePartySocket({
 		host: PARTYKIT_HOST,

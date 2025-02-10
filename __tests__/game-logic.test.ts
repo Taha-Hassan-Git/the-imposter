@@ -330,8 +330,8 @@ describe('When in the voting state...', () => {
 
 	it('allows the imposter to guess the word', () => {
 		gameManager.handleAction({
-			type: 'player-voted',
-			payload: { name: player2Name, vote: player1Name, guess: 'Titanic' },
+			type: 'player-guessed',
+			payload: { name: player2Name, guess: 'Titanic' },
 		})
 
 		const updatedGame = gameManager.getState()
@@ -340,19 +340,42 @@ describe('When in the voting state...', () => {
 		expect(player2.guess).toBe('Titanic')
 	})
 
-	it('does not allow players to guess the word', () => {
+	it('does not set the imposter to ready until they have both voted and guessed', () => {
+		gameManager.handleAction({
+			type: 'player-guessed',
+			payload: { name: player2Name, guess: 'Titanic' },
+		})
+
+		const updatedGame = gameManager.getState()
+
+		const player2 = updatedGame.players.find((player) => player.name === player2Name)!
+
+		expect(player2.ready).toBeFalsy()
+
 		gameManager.handleAction({
 			type: 'player-voted',
-			payload: { name: player1Name, vote: player2Name, guess: 'Titanic' },
+			payload: { name: player2Name, vote: player1Name },
+		})
+
+		const updatedGame2 = gameManager.getState()
+
+		const player2Again = updatedGame2.players.find((player) => player.name === player2Name)!
+		expect(player2Again.ready).toBeTruthy()
+	})
+
+	it('does not allow players to guess the word', () => {
+		gameManager.handleAction({
+			type: 'player-guessed',
+			payload: { name: player1Name, guess: 'Titanic' },
 		})
 
 		const updatedGame = gameManager.getState()
 
 		const player1 = updatedGame.players.find((player) => player.name === player1Name)!
-		expect(player1.votes).not.toContain('Titanic')
+		expect(player1.guess).toBe(null)
 	})
 
-	it('moves to the results state when all players have voted', () => {
+	it('moves to the results state when all players have voted and guessed', () => {
 		gameManager.handleAction({
 			type: 'player-voted',
 			payload: { name: player1Name, vote: player2Name },
@@ -360,6 +383,10 @@ describe('When in the voting state...', () => {
 		gameManager.handleAction({
 			type: 'player-voted',
 			payload: { name: player2Name, vote: player1Name },
+		})
+		gameManager.handleAction({
+			type: 'player-guessed',
+			payload: { name: player2Name, guess: 'Titanic' },
 		})
 		gameManager.handleAction({
 			type: 'player-voted',
@@ -375,7 +402,7 @@ describe('When in the results state...', () => {
 	beforeEach(() => {
 		gameManager = new GameManager(votingGame)
 	})
-	it('awards points to players correctly', () => {
+	it('awards points to players for voting correctly', () => {
 		// player 2 is the imposter
 		gameManager.handleAction({
 			type: 'player-voted',
@@ -384,6 +411,11 @@ describe('When in the results state...', () => {
 		gameManager.handleAction({
 			type: 'player-voted',
 			payload: { name: player2Name, vote: player1Name },
+		})
+		gameManager.handleAction({
+			type: 'player-guessed',
+			// incorrect guess
+			payload: { name: player2Name, guess: 'The Lion King' },
 		})
 		gameManager.handleAction({
 			type: 'player-voted',
@@ -402,6 +434,39 @@ describe('When in the results state...', () => {
 		expect(updatedPlayer1.score).toBe(1)
 		expect(updatedPlayer2.score).toBe(3)
 		expect(updatedPlayer3.score).toBe(0)
+	})
+
+	it('awards points to imposter for guessing correctly', () => {
+		// player 2 is the imposter
+		gameManager.handleAction({
+			type: 'player-voted',
+			payload: { name: player1Name, vote: player2Name },
+		})
+		gameManager.handleAction({
+			type: 'player-voted',
+			payload: { name: player2Name, vote: player1Name },
+		})
+		gameManager.handleAction({
+			type: 'player-guessed',
+			// correct guess
+			payload: { name: player2Name, guess: 'Titanic' },
+		})
+		gameManager.handleAction({
+			type: 'player-voted',
+			payload: { name: player3Name, vote: player2Name },
+		})
+
+		const updatedGame = gameManager.getState()
+
+		const updatedPlayer1 = updatedGame.players.find((player) => player.name === player1Name)!
+		const updatedPlayer2 = updatedGame.players.find((player) => player.name === player2Name)!
+		const updatedPlayer3 = updatedGame.players.find((player) => player.name === player3Name)!
+
+		// players 1 and 3 get 1 point for voting correctly
+		// player 2 gets 2 points for guessing correctly
+		expect(updatedPlayer1.score).toBe(1)
+		expect(updatedPlayer3.score).toBe(1)
+		expect(updatedPlayer2.score).toBe(2)
 	})
 })
 
@@ -460,5 +525,9 @@ describe('When starting a new round...', () => {
 		expect(updatedGame.state).toBe('playing')
 		expect(updatedGame.answer).not.toEqual(resultsGame.answer)
 		expect(updatedGame.prevAnswers).toContain(resultsGame.answer)
+		// scores should be the same
+		expect(updatedGame.players[0].score).toBe(1)
+		expect(updatedGame.players[1].score).toBe(3)
+		expect(updatedGame.players[2].score).toBe(0)
 	})
 })
