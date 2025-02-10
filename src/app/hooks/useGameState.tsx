@@ -22,35 +22,38 @@ export function GameProvider({
 	category: Category | null
 	roomId: string
 }) {
-	// const playingGame: GameInfo = {
-	// 	state: 'playing',
+	// const votingGame: GameInfo = {
+	// 	state: 'voting',
 	// 	roomId,
 	// 	round: 1,
-	// 	answer: 'Fight Club',
+	// 	answer: 'Titanic',
 	// 	players: [
 	// 		{
-	// 			name: 'player1',
+	// 			name: 'player1Name',
+	// 			guess: null,
 	// 			score: 0,
 	// 			ready: false,
-	// 			avatarColor: 'red',
+	// 			avatarColor: avatarColors[0],
 	// 			imposter: false,
 	// 			votes: [],
 	// 		},
 	// 		{
-	// 			name: 'player2',
+	// 			name: 'Terry',
+	// 			guess: null,
 	// 			score: 0,
-	// 			ready: false,
-	// 			avatarColor: 'blue',
+	// 			ready: true,
+	// 			avatarColor: avatarColors[1],
 	// 			imposter: true,
 	// 			votes: [],
 	// 		},
 	// 		{
-	// 			name: 'player3',
+	// 			name: 'Jospeh',
+	// 			guess: null,
 	// 			score: 0,
 	// 			ready: false,
-	// 			avatarColor: 'green',
+	// 			avatarColor: avatarColors[2],
 	// 			imposter: false,
-	// 			votes: [],
+	// 			votes: ['Terry'],
 	// 		},
 	// 	],
 	// 	prevAnswers: [],

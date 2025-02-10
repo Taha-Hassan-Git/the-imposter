@@ -35,9 +35,9 @@ function Game({ playerName }: { playerName: string | null }) {
 			) : gameState.state === 'playing' ? (
 				<PlayingScreen self={playerName as string} />
 			) : gameState.state === 'voting' ? (
-				<VotingScreen playerName={playerName as string} />
+				<VotingScreen self={playerName as string} />
 			) : (
-				<ResultsScreen playerName={playerName as string} />
+				<ResultsScreen self={playerName as string} />
 			)}
 		</>
 	)

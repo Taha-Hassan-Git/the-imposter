@@ -2,7 +2,7 @@ import { Action, GameInfo, Player } from '../../../game-logic/types'
 import { useGameState } from '../hooks/useGameState'
 import { Button } from './Button'
 
-export function ResultsScreen({ playerName }: { playerName: string }) {
+export function ResultsScreen({ self }: { self: string }) {
 	return (
 		<div className="flex flex-col gap-5 p-5 items-center">
 			<div className="flex gap-5 justify-between">
@@ -10,7 +10,7 @@ export function ResultsScreen({ playerName }: { playerName: string }) {
 			</div>
 			<div className="flex flex-col gap-5">
 				<ResultsPanel />
-				<NextRoundButton playerName={playerName} />
+				<NextRoundButton playerName={self} />
 			</div>
 		</div>
 	)

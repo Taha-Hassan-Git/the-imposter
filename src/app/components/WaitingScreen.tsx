@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import QRCode from 'react-qr-code'
 import { Action, GameInfo, Player } from '../../../game-logic/types'
 import { useGameState } from '../hooks/useGameState'
@@ -82,14 +81,9 @@ function ReadyButton({ self }: { self: string }) {
 		dispatch: (a: Action) => void
 		gameState: GameInfo
 	}
-	const [ready, setReady] = useState(() => {
-		const player = gameState.players.find((p) => p.name === self)
-		console.log(player)
-		return player ? player.ready : false
-	})
+	const ready = gameState.players.find((player) => player.name === self)?.ready || false
 
 	const handleClick = () => {
-		setReady(!ready)
 		dispatch({ type: 'toggle-ready', payload: { name: self } })
 	}
 
