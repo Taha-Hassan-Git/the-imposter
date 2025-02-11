@@ -7,12 +7,12 @@ import { PARTYKIT_HOST } from '../env'
 interface GameContext {
 	gameState: GameState
 	dispatch: (action: Action) => void
-	self: Player | null
+	localPlayer: Player | null
 }
 const gameContext = createContext<GameContext>({
 	gameState: { state: 'loading' },
 	dispatch: () => {},
-	self: null,
+	localPlayer: null,
 })
 export function GameProvider({
 	children,
@@ -25,7 +25,7 @@ export function GameProvider({
 	roomId: string
 }) {
 	const [gameState, setGameState] = useState<GameState>({ state: 'loading' })
-	const [self, setSelf] = useState<Player | null>(null)
+	const [localPlayer, setLocalPlayer] = useState<Player | null>(null)
 
 	const socket = usePartySocket({
 		host: PARTYKIT_HOST,
@@ -35,7 +35,7 @@ export function GameProvider({
 			const message = JSON.parse(event.data) as GameInfo
 			if (message) {
 				setGameState(message)
-				setSelf(getPlayer(playerName!, message))
+				setLocalPlayer(getPlayer(playerName!, message))
 			}
 		},
 	})
@@ -54,14 +54,32 @@ export function GameProvider({
 	)
 
 	return (
-		<gameContext.Provider value={{ gameState, dispatch, self }}>{children}</gameContext.Provider>
+		<gameContext.Provider value={{ gameState, dispatch, localPlayer }}>
+			{children}
+		</gameContext.Provider>
 	)
 }
 
-export function useGameState(): GameContext {
-	const context = useContext(gameContext)
-	if (context === undefined) {
+export function useGameState(): GameState {
+	const { gameState } = useContext(gameContext)
+	if (!gameState) {
 		throw new Error('useGameState must be used within the GameProvider')
 	}
-	return context
+	return gameState
+}
+
+export function useActiveGame() {
+	const { gameState, dispatch } = useContext(gameContext)
+	if (gameState.state === 'loading') {
+		throw new Error('Game is still loading')
+	}
+	return { gameState, dispatch }
+}
+
+export function useLocalPlayer() {
+	const { localPlayer } = useContext(gameContext)
+	if (!localPlayer) {
+		throw new Error('Self is not defined')
+	}
+	return localPlayer
 }

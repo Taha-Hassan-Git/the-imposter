@@ -1,5 +1,5 @@
-import { Action, GameInfo, Player } from '../../../game-logic/types'
-import { useGameState } from '../hooks/useGameState'
+import { Player } from '../../../game-logic/types'
+import { useActiveGame, useLocalPlayer } from '../hooks/useGameState'
 import { Button } from './Button'
 
 export function ResultsScreen() {
@@ -17,7 +17,7 @@ export function ResultsScreen() {
 }
 
 function ResultsPanel() {
-	const { gameState } = useGameState() as { gameState: GameInfo }
+	const { gameState } = useActiveGame()
 	const imposter = gameState.players.find((player) => player.imposter)
 
 	return (
@@ -34,26 +34,23 @@ function ResultsPanel() {
 }
 
 function NextRoundButton() {
-	const { dispatch, self } = useGameState() as {
-		gameState: GameInfo
-		dispatch: (v: Action) => void
-		self: Player
-	}
+	const { dispatch } = useActiveGame()
+	const localPlayer = useLocalPlayer()
 	function handleNextRound() {
-		dispatch({ type: 'toggle-ready', payload: { name: self.name } })
+		dispatch({ type: 'toggle-ready', payload: { name: localPlayer.name } })
 	}
 
 	return (
 		<div className="bg-white rounded-lg shadow-md p-8 min-w-[360px]">
-			<Button onClick={handleNextRound} variant={self.ready ? 'disabled' : 'primary'}>
-				{self.ready ? '...' : 'Next round'}
+			<Button onClick={handleNextRound} variant={localPlayer.ready ? 'disabled' : 'primary'}>
+				{localPlayer.ready ? '...' : 'Next round'}
 			</Button>
 		</div>
 	)
 }
 
 function ScorePanel() {
-	const { gameState } = useGameState() as { gameState: GameInfo }
+	const { gameState } = useActiveGame()
 	return (
 		<div className="bg-white rounded-lg shadow-md p-8 flex-1">
 			<h2 className="text-2xl font-bold mb-4 text-center">Scores</h2>

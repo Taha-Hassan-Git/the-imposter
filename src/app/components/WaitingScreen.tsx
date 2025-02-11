@@ -1,6 +1,6 @@
 import QRCode from 'react-qr-code'
-import { Action, GameInfo, Player } from '../../../game-logic/types'
-import { useGameState } from '../hooks/useGameState'
+import { Player } from '../../../game-logic/types'
+import { useActiveGame, useLocalPlayer } from '../hooks/useGameState'
 import { Button } from './Button'
 
 const URL =
@@ -9,7 +9,7 @@ const URL =
 		: 'http://192.168.1.119:3000'
 
 export function WaitingScreen() {
-	const { gameState } = useGameState() as { gameState: GameInfo; self: Player }
+	const { gameState } = useActiveGame()
 	return (
 		<div className="flex flex-col gap-5 p-5 items- w-full">
 			<div className="bg-white rounded-lg shadow-md p-4 w-full">
@@ -77,14 +77,11 @@ function PlayerListItem({ player }: { player: Player }) {
 }
 
 function ReadyButton() {
-	const { dispatch, gameState, self } = useGameState() as {
-		dispatch: (a: Action) => void
-		gameState: GameInfo
-		self: Player
-	}
+	const { dispatch, gameState } = useActiveGame()
+	const localPlayer = useLocalPlayer()
 
 	const handleClick = () => {
-		dispatch({ type: 'toggle-ready', payload: { name: self.name } })
+		dispatch({ type: 'toggle-ready', payload: { name: localPlayer.name } })
 	}
 
 	const message =
@@ -94,12 +91,12 @@ function ReadyButton() {
 		<div className="flex flex-col gap-3 items-center w-full">
 			<Button
 				className="w-full"
-				variant={self.ready ? 'disabled' : 'primary'}
+				variant={localPlayer.ready ? 'disabled' : 'primary'}
 				onClick={handleClick}
 			>
-				{self.ready ? '...' : 'Ready?'}
+				{localPlayer.ready ? '...' : 'Ready?'}
 			</Button>
-			<p>{self.ready && message}</p>
+			<p>{localPlayer.ready && message}</p>
 		</div>
 	)
 }

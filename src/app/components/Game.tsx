@@ -25,7 +25,7 @@ export default function GameContainer() {
 }
 
 function Game() {
-	const { gameState } = useGameState()
+	const gameState = useGameState()
 	return (
 		<>
 			{gameState.state === 'loading' ? (

@@ -1,5 +1,5 @@
-import { Action, Answer, answersObject, GameInfo, Player } from '../../../game-logic/types'
-import { useGameState } from '../hooks/useGameState'
+import { Answer, answersObject } from '../../../game-logic/types'
+import { useActiveGame, useLocalPlayer } from '../hooks/useGameState'
 import { Button } from './Button'
 import { PlayerInitialsIcon } from './PlayerInitialsIcon'
 
@@ -13,24 +13,25 @@ const PlayingScreen = () => {
 	)
 }
 function ReadyToVoteBox() {
-	const { dispatch, self } = useGameState() as { self: Player; dispatch: (a: Action) => void }
+	const { dispatch } = useActiveGame()
+	const localPlayer = useLocalPlayer()
 
 	function toggleReady() {
-		dispatch({ type: 'toggle-ready', payload: { name: self.name } })
+		dispatch({ type: 'toggle-ready', payload: { name: localPlayer.name } })
 	}
 	return (
 		<div className="bg-white rounded-lg shadow-md p-8 flex flex-col items-center justify-center gap-5 w-full">
 			<Presence />
 			<h2 className="text-xl font-bold mb-4 text-center">Ready to Vote?</h2>
-			<Button onClick={toggleReady} variant={self.ready ? 'disabled' : 'primary'}>
-				{self.ready ? '...' : 'Ready'}
+			<Button onClick={toggleReady} variant={localPlayer.ready ? 'disabled' : 'primary'}>
+				{localPlayer.ready ? '...' : 'Ready'}
 			</Button>
 		</div>
 	)
 }
 
 export function Presence() {
-	const { gameState } = useGameState() as { gameState: GameInfo }
+	const { gameState } = useActiveGame()
 
 	return (
 		<div className="flex self-start w-full overflow-hidden">
@@ -53,14 +54,15 @@ export function Presence() {
 	)
 }
 function AnswerBox() {
-	const { gameState, self } = useGameState() as { gameState: GameInfo; self: Player }
+	const { gameState } = useActiveGame()
+	const localPlayer = useLocalPlayer()
 
 	return (
 		<div className="bg-white rounded-lg shadow-md p-4 w-full">
 			<GameInfoPanel />
 			<AnswerGrid />
 			<div className="mt-6">
-				{self.imposter ? (
+				{localPlayer.imposter ? (
 					<span className="font-bold text-2xl text-red-600">You are the imposter</span>
 				) : (
 					<div className="space-x-2">
@@ -79,7 +81,8 @@ export function AnswerGrid({
 	hasButtons?: boolean
 	onClick?: (answer: Answer) => void
 }) {
-	const { gameState, self } = useGameState() as { gameState: GameInfo; self: Player }
+	const { gameState } = useActiveGame()
+	const localPlayer = useLocalPlayer()
 	return (
 		<div className="grid grid-cols-4 gap-2 text-xs w-full">
 			{answersObject[gameState.category].map((answer) =>
@@ -88,7 +91,7 @@ export function AnswerGrid({
 						key={answer}
 						className="text-center"
 						onClick={onClick ? () => onClick(answer) : undefined}
-						variant={self.guess === answer ? 'primary' : 'secondary'}
+						variant={localPlayer.guess === answer ? 'primary' : 'secondary'}
 					>
 						{answer}
 					</Button>
@@ -100,13 +103,14 @@ export function AnswerGrid({
 	)
 }
 function AnswerItem({ answer }: { answer: Answer }) {
-	const { gameState, self } = useGameState() as { gameState: GameInfo; self: Player }
+	const { gameState } = useActiveGame()
+	const localPlayer = useLocalPlayer()
 
 	return (
 		<div
 			className={`border border-gray-100 shadow-sm rounded-lg
 		   flex justify-center items-center p-4 
-		   aspect-[2/1] text-center leading-none text-nowrap ${answer === gameState.answer && !self.imposter ? 'bg-green-100' : 'bg-slate-50'}`}
+		   aspect-[2/1] text-center leading-none text-nowrap ${answer === gameState.answer && !localPlayer.imposter ? 'bg-green-100' : 'bg-slate-50'}`}
 			key={answer}
 		>
 			<p className="font-medium">{answer}</p>
@@ -115,7 +119,7 @@ function AnswerItem({ answer }: { answer: Answer }) {
 }
 function GameInfoPanel() {
 	// contains round and category info
-	const { gameState } = useGameState() as { gameState: GameInfo }
+	const { gameState } = useActiveGame()
 	return (
 		<div className="flex flex-col p-4 font-medium text-sm text-gray-800">
 			<p>Category: {gameState.category}</p>
