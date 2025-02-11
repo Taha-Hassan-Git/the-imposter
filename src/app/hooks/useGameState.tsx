@@ -7,10 +7,12 @@ import { PARTYKIT_HOST } from '../env'
 interface GameContext {
 	gameState: GameState
 	dispatch: (action: Action) => void
+	self: Player | null
 }
 const gameContext = createContext<GameContext>({
 	gameState: { state: 'loading' },
 	dispatch: () => {},
+	self: null,
 })
 export function GameProvider({
 	children,
@@ -22,44 +24,8 @@ export function GameProvider({
 	category: Category | null
 	roomId: string
 }) {
-	// const votingGame: GameInfo = {
-	// 	state: 'voting',
-	// 	roomId,
-	// 	round: 1,
-	// 	answer: 'Titanic',
-	// 	players: [
-	// 		{
-	// 			name: 'player1Name',
-	// 			guess: null,
-	// 			score: 0,
-	// 			ready: false,
-	// 			avatarColor: avatarColors[0],
-	// 			imposter: false,
-	// 			votes: [],
-	// 		},
-	// 		{
-	// 			name: 'Terry',
-	// 			guess: null,
-	// 			score: 0,
-	// 			ready: true,
-	// 			avatarColor: avatarColors[1],
-	// 			imposter: true,
-	// 			votes: [],
-	// 		},
-	// 		{
-	// 			name: 'Jospeh',
-	// 			guess: null,
-	// 			score: 0,
-	// 			ready: false,
-	// 			avatarColor: avatarColors[2],
-	// 			imposter: false,
-	// 			votes: ['Terry'],
-	// 		},
-	// 	],
-	// 	prevAnswers: [],
-	// 	category: 'films',
-	// }
 	const [gameState, setGameState] = useState<GameState>({ state: 'loading' })
+	const [self, setSelf] = useState<Player | null>(null)
 
 	const socket = usePartySocket({
 		host: PARTYKIT_HOST,
@@ -68,11 +34,15 @@ export function GameProvider({
 		onMessage(event) {
 			const message = JSON.parse(event.data) as GameInfo
 			if (message) {
-				console.log('message', message)
 				setGameState(message)
+				setSelf(getPlayer(playerName!, message))
 			}
 		},
 	})
+
+	function getPlayer(name: string, game: GameInfo): Player {
+		return game.players.find((player) => player.name === name)!
+	}
 
 	// memoise this function
 	const dispatch = useCallback(
@@ -83,12 +53,11 @@ export function GameProvider({
 		[socket]
 	)
 
-	return <gameContext.Provider value={{ gameState, dispatch }}>{children}</gameContext.Provider>
+	return (
+		<gameContext.Provider value={{ gameState, dispatch, self }}>{children}</gameContext.Provider>
+	)
 }
 
-export function getPlayer(players: Player[], name: string) {
-	return players.find((player) => player.name === name)
-}
 export function useGameState(): GameContext {
 	const context = useContext(gameContext)
 	if (context === undefined) {

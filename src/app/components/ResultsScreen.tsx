@@ -2,7 +2,7 @@ import { Action, GameInfo, Player } from '../../../game-logic/types'
 import { useGameState } from '../hooks/useGameState'
 import { Button } from './Button'
 
-export function ResultsScreen({ self }: { self: string }) {
+export function ResultsScreen() {
 	return (
 		<div className="flex flex-col gap-5 p-5 items-center">
 			<div className="flex gap-5 justify-between">
@@ -10,7 +10,7 @@ export function ResultsScreen({ self }: { self: string }) {
 			</div>
 			<div className="flex flex-col gap-5">
 				<ResultsPanel />
-				<NextRoundButton playerName={self} />
+				<NextRoundButton />
 			</div>
 		</div>
 	)
@@ -33,19 +33,20 @@ function ResultsPanel() {
 	)
 }
 
-function NextRoundButton({ playerName }: { playerName: string }) {
-	const { gameState, dispatch } = useGameState() as {
+function NextRoundButton() {
+	const { dispatch, self } = useGameState() as {
 		gameState: GameInfo
 		dispatch: (v: Action) => void
+		self: Player
 	}
 	function handleNextRound() {
-		dispatch({ type: 'toggle-ready', payload: { name: playerName } })
+		dispatch({ type: 'toggle-ready', payload: { name: self.name } })
 	}
-	const player = gameState.players.find((player) => player.name === playerName)!
+
 	return (
 		<div className="bg-white rounded-lg shadow-md p-8 min-w-[360px]">
-			<Button onClick={handleNextRound} variant={player.ready ? 'disabled' : 'primary'}>
-				{player.ready ? '...' : 'Next round'}
+			<Button onClick={handleNextRound} variant={self.ready ? 'disabled' : 'primary'}>
+				{self.ready ? '...' : 'Next round'}
 			</Button>
 		</div>
 	)

@@ -1,31 +1,29 @@
-import { Answer, answersObject, GameInfo, Player } from '../../../game-logic/types'
+import { Action, Answer, answersObject, GameInfo, Player } from '../../../game-logic/types'
 import { useGameState } from '../hooks/useGameState'
 import { Button } from './Button'
 import { PlayerInitialsIcon } from './PlayerInitialsIcon'
 
-const PlayingScreen = ({ self }: { self: string }) => {
-	const { gameState } = useGameState() as { gameState: GameInfo }
-	const player = gameState.players.find((player) => player.name === self)!
+const PlayingScreen = () => {
 	return (
 		<div className="flex flex-col gap-5 p-1 items-center w-full mt-1">
-			<AnswerBox player={player} />
-			<ReadyToVoteBox player={player} />
+			<AnswerBox />
+			<ReadyToVoteBox />
 			<div className="flex flex-col gap-5 w-full"></div>
 		</div>
 	)
 }
-function ReadyToVoteBox({ player }: { player: Player }) {
-	const { dispatch } = useGameState()
+function ReadyToVoteBox() {
+	const { dispatch, self } = useGameState() as { self: Player; dispatch: (a: Action) => void }
 
 	function toggleReady() {
-		dispatch({ type: 'toggle-ready', payload: { name: player.name } })
+		dispatch({ type: 'toggle-ready', payload: { name: self.name } })
 	}
 	return (
 		<div className="bg-white rounded-lg shadow-md p-8 flex flex-col items-center justify-center gap-5 w-full">
 			<Presence />
 			<h2 className="text-xl font-bold mb-4 text-center">Ready to Vote?</h2>
-			<Button onClick={toggleReady} variant={player.ready ? 'disabled' : 'primary'}>
-				{player.ready ? '...' : 'Ready'}
+			<Button onClick={toggleReady} variant={self.ready ? 'disabled' : 'primary'}>
+				{self.ready ? '...' : 'Ready'}
 			</Button>
 		</div>
 	)
@@ -54,15 +52,15 @@ export function Presence() {
 		</div>
 	)
 }
-function AnswerBox({ player }: { player: Player }) {
-	const { gameState } = useGameState() as { gameState: GameInfo }
+function AnswerBox() {
+	const { gameState, self } = useGameState() as { gameState: GameInfo; self: Player }
 
 	return (
 		<div className="bg-white rounded-lg shadow-md p-4 w-full">
 			<GameInfoPanel />
-			<AnswerGrid player={player} />
+			<AnswerGrid />
 			<div className="mt-6">
-				{player.imposter ? (
+				{self.imposter ? (
 					<span className="font-bold text-2xl text-red-600">You are the imposter</span>
 				) : (
 					<div className="space-x-2">
@@ -75,15 +73,13 @@ function AnswerBox({ player }: { player: Player }) {
 }
 
 export function AnswerGrid({
-	player,
 	hasButtons,
 	onClick,
 }: {
-	player: Player
 	hasButtons?: boolean
 	onClick?: (answer: Answer) => void
 }) {
-	const { gameState } = useGameState() as { gameState: GameInfo }
+	const { gameState, self } = useGameState() as { gameState: GameInfo; self: Player }
 	return (
 		<div className="grid grid-cols-4 gap-2 text-xs w-full">
 			{answersObject[gameState.category].map((answer) =>
@@ -92,25 +88,25 @@ export function AnswerGrid({
 						key={answer}
 						className="text-center"
 						onClick={onClick ? () => onClick(answer) : undefined}
-						variant={player.guess === answer ? 'primary' : 'secondary'}
+						variant={self.guess === answer ? 'primary' : 'secondary'}
 					>
 						{answer}
 					</Button>
 				) : (
-					<AnswerItem key={answer} answer={answer} player={player} />
+					<AnswerItem key={answer} answer={answer} />
 				)
 			)}
 		</div>
 	)
 }
-function AnswerItem({ answer, player }: { answer: Answer; player: Player }) {
-	const { gameState } = useGameState() as { gameState: GameInfo }
+function AnswerItem({ answer }: { answer: Answer }) {
+	const { gameState, self } = useGameState() as { gameState: GameInfo; self: Player }
 
 	return (
 		<div
 			className={`border border-gray-100 shadow-sm rounded-lg
 		   flex justify-center items-center p-4 
-		   aspect-[2/1] text-center leading-none text-nowrap ${answer === gameState.answer && !player.imposter ? 'bg-green-100' : 'bg-slate-50'}`}
+		   aspect-[2/1] text-center leading-none text-nowrap ${answer === gameState.answer && !self.imposter ? 'bg-green-100' : 'bg-slate-50'}`}
 			key={answer}
 		>
 			<p className="font-medium">{answer}</p>

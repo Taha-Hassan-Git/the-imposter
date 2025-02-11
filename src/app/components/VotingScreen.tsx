@@ -4,8 +4,8 @@ import { Button } from './Button'
 import { PlayerInitialsIcon } from './PlayerInitialsIcon'
 import { AnswerGrid, Presence } from './PlayingScreen'
 
-export function VotingScreen({ self }: { self: string }) {
-	const { gameState } = useGameState() as { gameState: GameInfo }
+export function VotingScreen() {
+	const { gameState, self } = useGameState()
 
 	return (
 		<div className="flex flex-col gap-5 p-5 items-center w-full">
@@ -13,13 +13,13 @@ export function VotingScreen({ self }: { self: string }) {
 				<h2 className="text-md font-bold mb-4 text-center">Who is the imposter?</h2>
 				<ul className="space-y-4">
 					{gameState.players
-						.filter((player) => player.name !== self)
+						.filter((player) => player.name !== self.name)
 						.map((player: Player) => (
-							<PlayerListItem key={player.name} self={self} player={player} />
+							<PlayerListItem key={player.name} player={player} />
 						))}
 				</ul>
 			</div>
-			<ChooseAnswer self={self} />
+			<ChooseAnswer />
 			<div className="w-full bg-white rounded-lg shadow-md p-8 flex flex-col items-center justify-center gap-5">
 				Waiting for all players to vote...
 				<Presence />
@@ -50,7 +50,7 @@ function ChooseAnswer({ self }: { self: string }) {
 	)
 }
 
-function PlayerListItem({ player, self }: { player: Player; self: string }) {
+function PlayerListItem({ player }: { player: Player }) {
 	const { dispatch } = useGameState()
 
 	function handleVote() {
