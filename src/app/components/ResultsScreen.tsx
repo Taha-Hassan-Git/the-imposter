@@ -8,8 +8,8 @@ export function ResultsScreen() {
 	return (
 		<div className="flex flex-col gap-5 items-center w-full">
 			<MessagePanel />
-			<ScorePanel />
 			<NextRoundButton />
+			<ScorePanel />
 		</div>
 	)
 }
@@ -52,16 +52,18 @@ function MessagePanel() {
 
 function YellowMessage({ message }: { message: string }) {
 	return (
-		<Panel className="bg-yellow-50 border-2 border-yellow-200 max-w-[90%] mt-4">{message}</Panel>
+		<Panel className="!bg-yellow-50 border-2 border-yellow-200 max-w-[90%] mt-4">{message}</Panel>
 	)
 }
 
 function RedMessage({ message }: { message: string }) {
-	return <Panel className="bg-red-50 border-2 border-red-200 max-w-[90%] mt-4">{message}</Panel>
+	return <Panel className="!bg-red-50 border-2 border-red-200 max-w-[90%] mt-4">{message}</Panel>
 }
 
 function GreenMessage({ message }: { message: string }) {
-	return <Panel className="bg-green-50 border-2 border-green-200 max-w-[90%] mt-4">{message}</Panel>
+	return (
+		<Panel className="!bg-green-50 border-2 border-green-200 max-w-[90%] mt-4">{message}</Panel>
+	)
 }
 
 function NextRoundButton() {
@@ -87,15 +89,18 @@ function NextRoundButton() {
 function ScorePanel() {
 	const { gameState } = useActiveGame()
 	return (
-		<Panel className="px-2 pb-4 pt-2 max-w-[96%]">
-			<ul className="flex flex-col gap-4">
-				{gameState.players
-					.sort((a, b) => (a.score > b.score ? -1 : 1))
-					.map((player) => (
-						<PlayerScoreItem key={player.name} player={player} />
-					))}
-			</ul>
-		</Panel>
+		<div className="w-full">
+			{/* On mobile, remove the panel styling */}
+			<div className="xs:bg-white xs:p-4 xs:rounded-lg">
+				<ul className="flex flex-col gap-4">
+					{gameState.players
+						.sort((a, b) => (a.score > b.score ? -1 : 1))
+						.map((player) => (
+							<PlayerScoreItem key={player.name} player={player} />
+						))}
+				</ul>
+			</div>
+		</div>
 	)
 }
 
@@ -107,10 +112,10 @@ function PlayerScoreItem({ player }: { player: Player }) {
 	)
 	const isImposter = player.imposter
 	return (
-		<li className="bg-gray-50 px-6 py-4 flex flex-col gap-2 items-start">
+		<li className="bg-white xs:bg-gray-50 px-6 py-4 flex flex-col gap-2 items-start rounded-lg shadow-sm ">
 			<div className="flex items-center justify-between w-full">
 				<div className="flex items-center space-x-2 gap-1">
-					<PlayerInitialsIcon className={'w-14 h-14'} player={player} />
+					<PlayerInitialsIcon className="!w-10 !h-10" player={player} />
 					<div>
 						<p className="text-xl">{player.name}</p>
 						<span className="flex items-center gap-1">
@@ -125,8 +130,8 @@ function PlayerScoreItem({ player }: { player: Player }) {
 				</div>
 				<span className="text-2xl font-bold text-gray-700">
 					{player.score === highestScore ? (
-						<div className="flex flex-col items-center gap-1 w-">
-							<Crown className="w-4 h-4 text-yellow-500" />
+						<div className="flex flex-col items-center gap-1">
+							<Crown className="!w-4 !h-4 text-yellow-500" />
 							<span className="group-hover:underline">{player.score}</span>
 						</div>
 					) : (
@@ -134,7 +139,7 @@ function PlayerScoreItem({ player }: { player: Player }) {
 					)}
 				</span>
 			</div>
-			<div className="flex gap-1 text-sm text-gray-500 border-t w-full mt-1 pt-1">
+			<div className="flex gap-1 text-sm text-gray-500 border-t w-full mt-1 pt-1 items-center">
 				Votes:
 				<div className="flex items-center gap-1">
 					{player.votes.length === 0 ? (
@@ -142,11 +147,11 @@ function PlayerScoreItem({ player }: { player: Player }) {
 					) : (
 						<span>{player.votes.length}</span>
 					)}
-					<span className="flex items-center gap-0">
+					<span className="flex items-center justify-center gap-0">
 						{player.votes.map((vote) => {
 							return (
 								<PlayerInitialsIcon
-									className="w-3 h-3 text-[8px]"
+									className="!w-4 !h-4 text-[8px]"
 									key={vote}
 									player={gameState.players.find((player) => player.name === vote)!}
 								/>
