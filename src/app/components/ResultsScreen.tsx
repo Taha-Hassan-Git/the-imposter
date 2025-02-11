@@ -1,19 +1,24 @@
 import { Player } from '../../../game-logic/types'
 import { useActiveGame, useLocalPlayer } from '../hooks/useGameState'
 import { Button } from './Button'
+import { Panel } from './Panel'
 
 export function ResultsScreen() {
 	return (
-		<div className="flex flex-col gap-5 p-5 items-center">
-			<div className="flex gap-5 justify-between">
-				<ScorePanel />
-			</div>
-			<div className="flex flex-col gap-5">
-				<ResultsPanel />
-				<NextRoundButton />
-			</div>
+		<div className="flex flex-col gap-5 p-5 items-center w-full">
+			<MessagePanel />
+			<ScorePanel />
+			<ResultsPanel />
+			<NextRoundButton />
 		</div>
 	)
+}
+
+function MessagePanel() {
+	const localPlayer = useLocalPlayer()
+	const { gameState } = useActiveGame()
+
+	return <Panel>hello</Panel>
 }
 
 function ResultsPanel() {
@@ -21,15 +26,11 @@ function ResultsPanel() {
 	const imposter = gameState.players.find((player) => player.imposter)
 
 	return (
-		<div className="bg-white rounded-lg shadow-md p-8 min-w-[360px]">
+		<Panel>
 			<h2 className="text-2xl font-bold mb-4 text-center">Results</h2>
 			<p className="text-gray-500 text-xl">The imposter was {imposter?.name}</p>
-			<ul className="space-y-3">
-				{/* {players.map((player: Player) => (
-					<PlayerListItem key={player.name} player={player} />
-				))} */}
-			</ul>
-		</div>
+			<ul className="space-y-3"></ul>
+		</Panel>
 	)
 }
 
@@ -41,18 +42,22 @@ function NextRoundButton() {
 	}
 
 	return (
-		<div className="bg-white rounded-lg shadow-md p-8 min-w-[360px]">
-			<Button onClick={handleNextRound} variant={localPlayer.ready ? 'disabled' : 'primary'}>
+		<Panel>
+			<Button
+				className="w-full"
+				onClick={handleNextRound}
+				variant={localPlayer.ready ? 'disabled' : 'primary'}
+			>
 				{localPlayer.ready ? '...' : 'Next round'}
 			</Button>
-		</div>
+		</Panel>
 	)
 }
 
 function ScorePanel() {
 	const { gameState } = useActiveGame()
 	return (
-		<div className="bg-white rounded-lg shadow-md p-8 flex-1">
+		<Panel>
 			<h2 className="text-2xl font-bold mb-4 text-center">Scores</h2>
 			<p>Round: {gameState.round}</p>
 			<ul className="space-y-3">
@@ -60,7 +65,7 @@ function ScorePanel() {
 					<PlayerScoreItem key={player.name} player={player} />
 				))}
 			</ul>
-		</div>
+		</Panel>
 	)
 }
 
