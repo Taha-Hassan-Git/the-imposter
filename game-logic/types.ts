@@ -44,6 +44,7 @@ export interface GameInfo {
 	answer: Answer
 	prevAnswers: Answer[]
 	category: Category
+	message?: { avoidedDetection: boolean; guessedCorrectly: boolean }
 }
 
 export const filmAnswers = [

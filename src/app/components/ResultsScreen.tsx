@@ -17,8 +17,33 @@ export function ResultsScreen() {
 function MessagePanel() {
 	const localPlayer = useLocalPlayer()
 	const { gameState } = useActiveGame()
-
-	return <Panel>hello</Panel>
+	if (!gameState.message) return null
+	const { avoidedDetection, guessedCorrectly } = gameState.message
+	const imposterName = gameState.players.find((player) => player.imposter)?.name
+	const isImposter = localPlayer.imposter
+	return (
+		<>
+			{isImposter ? (
+				avoidedDetection ? (
+					<Panel className="bg-green-50 border border-green-200">You evaded detection!</Panel>
+				) : guessedCorrectly ? (
+					<Panel className="bg-green-50 border border-green-200">
+						You were caught, but guessed the answer!
+					</Panel>
+				) : (
+					<Panel className="bg-red-50 border border-red-200">You were caught!</Panel>
+				)
+			) : avoidedDetection ? (
+				<Panel className="bg-red-50 border border-red-200">The imposter was {imposterName}</Panel>
+			) : guessedCorrectly ? (
+				<Panel className="bg-red-50 border border-red-200">
+					You got the imposter, but gave away the answer!
+				</Panel>
+			) : (
+				<Panel className="bg-green-50 border border-green-200">You guessed right!</Panel>
+			)}{' '}
+		</>
+	)
 }
 
 function ResultsPanel() {
@@ -56,14 +81,17 @@ function NextRoundButton() {
 
 function ScorePanel() {
 	const { gameState } = useActiveGame()
+	console.log(gameState.players)
 	return (
 		<Panel>
 			<h2 className="text-2xl font-bold mb-4 text-center">Scores</h2>
 			<p>Round: {gameState.round}</p>
 			<ul className="space-y-3">
-				{gameState.players.map((player) => (
-					<PlayerScoreItem key={player.name} player={player} />
-				))}
+				{gameState.players
+					.sort((a, b) => (a.votes.length > b.votes.length ? -1 : 1))
+					.map((player) => (
+						<PlayerScoreItem key={player.name} player={player} />
+					))}
 			</ul>
 		</Panel>
 	)
