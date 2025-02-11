@@ -1,14 +1,14 @@
+import { Crown, VenetianMask } from 'lucide-react'
 import { Player } from '../../../game-logic/types'
 import { useActiveGame, useLocalPlayer } from '../hooks/useGameState'
 import { Button } from './Button'
 import { Panel } from './Panel'
-
+import { PlayerInitialsIcon } from './PlayerInitialsIcon'
 export function ResultsScreen() {
 	return (
-		<div className="flex flex-col gap-5 p-5 items-center w-full">
+		<div className="flex flex-col gap-5 items-center w-full">
 			<MessagePanel />
 			<ScorePanel />
-			<ResultsPanel />
 			<NextRoundButton />
 		</div>
 	)
@@ -24,42 +24,44 @@ function MessagePanel() {
 	const isImposter = localPlayer.imposter
 	const avoidedDetection = mostVotedPlayer.name !== imposter.name
 	const guessedCorrectly = imposter.guess === gameState.answer
+	const votedForImposter = imposter.votes.includes(localPlayer.name)
 	return (
 		<>
 			{isImposter ? (
 				avoidedDetection ? (
-					<Panel className="bg-green-50 border border-green-200">You evaded detection!</Panel>
+					<GreenMessage message={'You evaded detection!'} />
 				) : guessedCorrectly ? (
-					<Panel className="bg-green-50 border border-green-200">
-						You were caught, but guessed the answer!
-					</Panel>
+					<GreenMessage message={'You were caught, but guessed the answer!'} />
 				) : (
-					<Panel className="bg-red-50 border border-red-200">You were caught!</Panel>
+					<RedMessage message={'You were caught!'} />
 				)
 			) : avoidedDetection ? (
-				<Panel className="bg-red-50 border border-red-200">The imposter was {imposter.name}</Panel>
+				votedForImposter ? (
+					<RedMessage message={'They got away! The imposter was ' + imposter.name + '.'} />
+				) : (
+					<YellowMessage message={'You voted for the imposter, but they got away!'} />
+				)
 			) : guessedCorrectly ? (
-				<Panel className="bg-red-50 border border-red-200">
-					You got the imposter, but gave away the answer!
-				</Panel>
+				<YellowMessage message="You got the imposter, but they guessed the answer!" />
 			) : (
-				<Panel className="bg-green-50 border border-green-200">You guessed right!</Panel>
-			)}{' '}
+				<GreenMessage message={'You got them! The imposter was ' + imposter.name + '.'} />
+			)}
 		</>
 	)
 }
 
-function ResultsPanel() {
-	const { gameState } = useActiveGame()
-	const imposter = gameState.players.find((player) => player.imposter)
-
+function YellowMessage({ message }: { message: string }) {
 	return (
-		<Panel>
-			<h2 className="text-2xl font-bold mb-4 text-center">Results</h2>
-			<p className="text-gray-500 text-xl">The imposter was {imposter?.name}</p>
-			<ul className="space-y-3"></ul>
-		</Panel>
+		<Panel className="bg-yellow-50 border-2 border-yellow-200 max-w-[90%] mt-4">{message}</Panel>
 	)
+}
+
+function RedMessage({ message }: { message: string }) {
+	return <Panel className="bg-red-50 border-2 border-red-200 max-w-[90%] mt-4">{message}</Panel>
+}
+
+function GreenMessage({ message }: { message: string }) {
+	return <Panel className="bg-green-50 border-2 border-green-200 max-w-[90%] mt-4">{message}</Panel>
 }
 
 function NextRoundButton() {
@@ -76,7 +78,7 @@ function NextRoundButton() {
 				onClick={handleNextRound}
 				variant={localPlayer.ready ? 'disabled' : 'primary'}
 			>
-				{localPlayer.ready ? '...' : 'Next round'}
+				{localPlayer.ready ? 'waiting...' : 'Begin next round'}
 			</Button>
 		</Panel>
 	)
@@ -84,14 +86,11 @@ function NextRoundButton() {
 
 function ScorePanel() {
 	const { gameState } = useActiveGame()
-	console.log(gameState.players)
 	return (
-		<Panel>
-			<h2 className="text-2xl font-bold mb-4 text-center">Scores</h2>
-			<p>Round: {gameState.round}</p>
-			<ul className="space-y-3">
+		<Panel className="px-2 pb-4 pt-2 max-w-[96%]">
+			<ul className="flex flex-col gap-4">
 				{gameState.players
-					.sort((a, b) => (a.votes.length > b.votes.length ? -1 : 1))
+					.sort((a, b) => (a.score > b.score ? -1 : 1))
 					.map((player) => (
 						<PlayerScoreItem key={player.name} player={player} />
 					))}
@@ -101,26 +100,61 @@ function ScorePanel() {
 }
 
 function PlayerScoreItem({ player }: { player: Player }) {
-	// Get player initials
-	const initials = player.name
-		.split(' ')
-		.map((word) => word[0])
-		.join('')
-		.toUpperCase()
-		.slice(0, 2)
-
+	const { gameState } = useActiveGame()
+	const highestScore = gameState.players.reduce(
+		(acc, player) => (player.score > acc ? player.score : acc),
+		0
+	)
+	const isImposter = player.imposter
 	return (
-		<li className="group flex items-center justify-between py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors">
-			<div className="flex items-center space-x-4">
-				<div
-					className="w-10 h-10 rounded-full flex items-center justify-center text-white font-medium shadow-sm"
-					style={{ backgroundColor: player.avatarColor, opacity: player.ready ? 0.7 : 0.5 }}
-				>
-					{initials}
+		<li className="bg-gray-50 px-6 py-4 flex flex-col gap-2 items-start">
+			<div className="flex items-center justify-between w-full">
+				<div className="flex items-center space-x-2 gap-1">
+					<PlayerInitialsIcon className={'w-14 h-14'} player={player} />
+					<div>
+						<p className="text-xl">{player.name}</p>
+						<span className="flex items-center gap-1">
+							{isImposter && (
+								<>
+									<VenetianMask className="w-5 h-5 text-gray-500" />
+									<p className="text-sm text-gray-500">The imposter</p>
+								</>
+							)}
+						</span>
+					</div>
 				</div>
-				<span className="font-semibold text-gray-900">{player.name}</span>
+				<span className="text-2xl font-bold text-gray-700">
+					{player.score === highestScore ? (
+						<div className="flex flex-col items-center gap-1 w-">
+							<Crown className="w-4 h-4 text-yellow-500" />
+							<span className="group-hover:underline">{player.score}</span>
+						</div>
+					) : (
+						<div className="text-center">{player.score}</div>
+					)}
+				</span>
 			</div>
-			<span className="text-2xl font-bold text-gray-700 tabular-nums">{player.score}</span>
+			<div className="flex gap-1 text-sm text-gray-500 border-t w-full mt-1 pt-1">
+				Votes:
+				<div className="flex items-center gap-1">
+					{player.votes.length === 0 ? (
+						<span className="text-gray-300">None</span>
+					) : (
+						<span>{player.votes.length}</span>
+					)}
+					<span className="flex items-center gap-0">
+						{player.votes.map((vote) => {
+							return (
+								<PlayerInitialsIcon
+									className="w-3 h-3 text-[8px]"
+									key={vote}
+									player={gameState.players.find((player) => player.name === vote)!}
+								/>
+							)
+						})}
+					</span>
+				</div>
+			</div>
 		</li>
 	)
 }

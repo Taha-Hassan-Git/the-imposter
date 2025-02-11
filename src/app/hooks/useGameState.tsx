@@ -1,6 +1,6 @@
 import usePartySocket from 'partysocket/react'
 import { createContext, useCallback, useContext, useState } from 'react'
-import { Action, avatarColors, GameInfo, GameState, Player } from '../../../game-logic/types'
+import { Action, GameInfo, GameState, Player } from '../../../game-logic/types'
 import { Category } from '../components/NewGameForm'
 import { PARTYKIT_HOST } from '../env'
 
@@ -24,54 +24,46 @@ export function GameProvider({
 	category: Category | null
 	roomId: string
 }) {
-	const resultsGame: GameInfo = {
-		state: 'results',
-		roomId: 'test',
-		round: 1,
-		answer: 'Titanic',
-		players: [
-			{
-				name: 'test',
-				guess: null,
-				score: 1,
-				ready: false,
-				avatarColor: avatarColors[0],
-				imposter: false,
-				votes: ['test3', 'test2'],
-			},
-			{
-				name: 'test2',
-				guess: null,
-				score: 3,
-				ready: false,
-				avatarColor: avatarColors[1],
-				imposter: true,
-				votes: ['test'],
-			},
-			{
-				name: 'test3',
-				guess: null,
-				score: 0,
-				ready: false,
-				avatarColor: avatarColors[2],
-				imposter: false,
-				votes: [],
-			},
-		],
-		prevAnswers: [],
-		category: 'films',
-	}
-	const player = {
-		name: 'test',
-		guess: null,
-		score: 1,
-		ready: false,
-		avatarColor: avatarColors[0],
-		imposter: false,
-		votes: [],
-	}
-	const [gameState, setGameState] = useState<GameState>(resultsGame)
-	const [localPlayer, setLocalPlayer] = useState<Player | null>(player)
+	// const resultsGame: GameInfo = {
+	// 	state: 'results',
+	// 	roomId: 'test',
+	// 	round: 1,
+	// 	answer: 'Titanic',
+	// 	players: [
+	// 		{
+	// 			name: 'test',
+	// 			guess: null,
+	// 			score: 1,
+	// 			ready: false,
+	// 			avatarColor: avatarColors[0],
+	// 			imposter: false,
+	// 			votes: ['test2'],
+	// 		},
+	// 		{
+	// 			name: 'test2',
+	// 			guess: 'Titanic',
+	// 			score: 3,
+	// 			ready: false,
+	// 			avatarColor: avatarColors[1],
+	// 			imposter: true,
+	// 			votes: ['test', 'test3'],
+	// 		},
+	// 		{
+	// 			name: 'test3',
+	// 			guess: null,
+	// 			score: 0,
+	// 			ready: false,
+	// 			avatarColor: avatarColors[2],
+	// 			imposter: false,
+	// 			votes: [],
+	// 		},
+	// 	],
+	// 	prevAnswers: [],
+	// 	category: 'films',
+	// }
+	// const player = resultsGame.players[0]
+	const [gameState, setGameState] = useState<GameState>({ state: 'loading' })
+	const [localPlayer, setLocalPlayer] = useState<Player | null>(null)
 
 	const socket = usePartySocket({
 		host: PARTYKIT_HOST,
