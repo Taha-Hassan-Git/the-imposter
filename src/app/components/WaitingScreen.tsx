@@ -1,6 +1,6 @@
 import QRCode from 'react-qr-code'
-import { Action, GameInfo, Player } from '../../../game-logic/types'
-import { useGameState } from '../hooks/useGameState'
+import { Player } from '../../../game-logic/types'
+import { useActiveGame, useLocalPlayer } from '../hooks/useGameState'
 import { Button } from './Button'
 
 const URL =
@@ -8,8 +8,8 @@ const URL =
 		? 'https://the-imposter.vercel.app/'
 		: 'http://192.168.1.119:3000'
 
-export function WaitingScreen({ self }: { self: string }) {
-	const { gameState } = useGameState() as { gameState: GameInfo }
+export function WaitingScreen() {
+	const { gameState } = useActiveGame()
 	return (
 		<div className="flex flex-col gap-5 p-5 items- w-full">
 			<div className="bg-white rounded-lg shadow-md p-4 w-full">
@@ -36,7 +36,7 @@ export function WaitingScreen({ self }: { self: string }) {
 					</ul>
 				</div>
 				<div className="mt-4 w-full">
-					<ReadyButton self={self} />
+					<ReadyButton />
 				</div>
 			</div>
 			<div className="text-gray-500 flex flex-col text-sm items-center bg-white rounded-lg shadow-md p-4 w-full">
@@ -76,15 +76,12 @@ function PlayerListItem({ player }: { player: Player }) {
 	)
 }
 
-function ReadyButton({ self }: { self: string }) {
-	const { dispatch, gameState } = useGameState() as {
-		dispatch: (a: Action) => void
-		gameState: GameInfo
-	}
-	const ready = gameState.players.find((player) => player.name === self)?.ready || false
+function ReadyButton() {
+	const { dispatch, gameState } = useActiveGame()
+	const localPlayer = useLocalPlayer()
 
 	const handleClick = () => {
-		dispatch({ type: 'toggle-ready', payload: { name: self } })
+		dispatch({ type: 'toggle-ready', payload: { name: localPlayer.name } })
 	}
 
 	const message =
@@ -92,10 +89,14 @@ function ReadyButton({ self }: { self: string }) {
 
 	return (
 		<div className="flex flex-col gap-3 items-center w-full">
-			<Button className="w-full" variant={ready ? 'disabled' : 'primary'} onClick={handleClick}>
-				{ready ? '...' : 'Ready?'}
+			<Button
+				className="w-full"
+				variant={localPlayer.ready ? 'disabled' : 'primary'}
+				onClick={handleClick}
+			>
+				{localPlayer.ready ? '...' : 'Ready?'}
 			</Button>
-			<p>{ready && message}</p>
+			<p>{localPlayer.ready && message}</p>
 		</div>
 	)
 }

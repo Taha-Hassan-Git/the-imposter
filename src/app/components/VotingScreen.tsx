@@ -1,11 +1,12 @@
-import { Action, Answer, GameInfo, Player } from '../../../game-logic/types'
-import { useGameState } from '../hooks/useGameState'
+import { Answer, Player } from '../../../game-logic/types'
+import { useActiveGame, useLocalPlayer } from '../hooks/useGameState'
 import { Button } from './Button'
 import { PlayerInitialsIcon } from './PlayerInitialsIcon'
 import { AnswerGrid, Presence } from './PlayingScreen'
 
-export function VotingScreen({ self }: { self: string }) {
-	const { gameState } = useGameState() as { gameState: GameInfo }
+export function VotingScreen() {
+	const { gameState } = useActiveGame()
+	const localPlayer = useLocalPlayer()
 
 	return (
 		<div className="flex flex-col gap-5 p-5 items-center w-full">
@@ -13,13 +14,13 @@ export function VotingScreen({ self }: { self: string }) {
 				<h2 className="text-md font-bold mb-4 text-center">Who is the imposter?</h2>
 				<ul className="space-y-4">
 					{gameState.players
-						.filter((player) => player.name !== self)
+						.filter((player) => player.name !== localPlayer.name)
 						.map((player: Player) => (
-							<PlayerListItem key={player.name} self={self} player={player} />
+							<PlayerListItem key={player.name} player={player} />
 						))}
 				</ul>
 			</div>
-			<ChooseAnswer self={self} />
+			<ChooseAnswer />
 			<div className="w-full bg-white rounded-lg shadow-md p-8 flex flex-col items-center justify-center gap-5">
 				Waiting for all players to vote...
 				<Presence />
@@ -28,39 +29,37 @@ export function VotingScreen({ self }: { self: string }) {
 	)
 }
 
-function ChooseAnswer({ self }: { self: string }) {
-	const { gameState, dispatch } = useGameState() as {
-		gameState: GameInfo
-		dispatch: (a: Action) => void
-	}
-	const player = gameState.players.find((player) => player.name === self)!
+function ChooseAnswer() {
+	const { gameState, dispatch } = useActiveGame()
+	const localPlayer = useLocalPlayer()
+	const player = gameState.players.find((player) => player.name === localPlayer.name)!
 	if (player.imposter === false) {
 		return null
 	}
 	function handleGuess(answer: Answer) {
-		dispatch({ type: 'player-guessed', payload: { name: self, guess: answer } })
+		dispatch({ type: 'player-guessed', payload: { name: localPlayer.name, guess: answer } })
 	}
 	return (
 		<div className="bg-white rounded-lg shadow-md p-8 flex flex-col gap-4 min-w-[360px]">
 			<h2 className="text-md font-bold mb-4 text-center">Choose an answer</h2>
 			<ul className="space-y-4">
-				<AnswerGrid player={player} hasButtons onClick={handleGuess} />
+				<AnswerGrid hasButtons onClick={handleGuess} />
 			</ul>
 		</div>
 	)
 }
 
-function PlayerListItem({ player, self }: { player: Player; self: string }) {
-	const { dispatch } = useGameState()
-
+function PlayerListItem({ player }: { player: Player }) {
+	const { dispatch } = useActiveGame()
+	const localPlayer = useLocalPlayer()
 	function handleVote() {
-		dispatch({ type: 'player-voted', payload: { name: self, vote: player.name } })
+		dispatch({ type: 'player-voted', payload: { name: localPlayer.name, vote: player.name } })
 	}
 
 	return (
 		<li className="flex items-center justify-between">
 			<Button
-				disabled={player.votes.includes(self)}
+				disabled={player.votes.includes(localPlayer.name)}
 				onClick={handleVote}
 				variant="secondary"
 				className="flex items-center justify-between align-middle w-full gap-2 bg-gray-50 hover:bg-gray-50 border"
@@ -69,7 +68,7 @@ function PlayerListItem({ player, self }: { player: Player; self: string }) {
 					<PlayerInitialsIcon player={player} />
 					<span className="font-bold text-start text-nowrap overflow-ellipsis">{player.name}</span>
 				</div>
-				{player.votes.includes(self) ? (
+				{player.votes.includes(localPlayer.name) ? (
 					<span className="text-green-500 text-sm flex items-center">
 						<svg
 							className="w-4 h-4 mr-1"

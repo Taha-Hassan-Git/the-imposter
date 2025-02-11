@@ -18,26 +18,26 @@ export default function GameContainer() {
 	return (
 		<div className="flex flex-col w-full items-center">
 			<GameProvider playerName={playerName} category={category as Category} roomId={roomId}>
-				<Game playerName={playerName} />
+				<Game />
 			</GameProvider>
 		</div>
 	)
 }
 
-function Game({ playerName }: { playerName: string | null }) {
-	const { gameState } = useGameState()
+function Game() {
+	const gameState = useGameState()
 	return (
 		<>
 			{gameState.state === 'loading' ? (
 				<LoadingScreen />
 			) : gameState.state === 'waiting' ? (
-				<WaitingScreen self={playerName as string} />
+				<WaitingScreen />
 			) : gameState.state === 'playing' ? (
-				<PlayingScreen self={playerName as string} />
+				<PlayingScreen />
 			) : gameState.state === 'voting' ? (
-				<VotingScreen self={playerName as string} />
+				<VotingScreen />
 			) : (
-				<ResultsScreen self={playerName as string} />
+				<ResultsScreen />
 			)}
 		</>
 	)

@@ -1,8 +1,8 @@
-import { Action, GameInfo, Player } from '../../../game-logic/types'
-import { useGameState } from '../hooks/useGameState'
+import { Player } from '../../../game-logic/types'
+import { useActiveGame, useLocalPlayer } from '../hooks/useGameState'
 import { Button } from './Button'
 
-export function ResultsScreen({ self }: { self: string }) {
+export function ResultsScreen() {
 	return (
 		<div className="flex flex-col gap-5 p-5 items-center">
 			<div className="flex gap-5 justify-between">
@@ -10,14 +10,14 @@ export function ResultsScreen({ self }: { self: string }) {
 			</div>
 			<div className="flex flex-col gap-5">
 				<ResultsPanel />
-				<NextRoundButton playerName={self} />
+				<NextRoundButton />
 			</div>
 		</div>
 	)
 }
 
 function ResultsPanel() {
-	const { gameState } = useGameState() as { gameState: GameInfo }
+	const { gameState } = useActiveGame()
 	const imposter = gameState.players.find((player) => player.imposter)
 
 	return (
@@ -33,26 +33,24 @@ function ResultsPanel() {
 	)
 }
 
-function NextRoundButton({ playerName }: { playerName: string }) {
-	const { gameState, dispatch } = useGameState() as {
-		gameState: GameInfo
-		dispatch: (v: Action) => void
-	}
+function NextRoundButton() {
+	const { dispatch } = useActiveGame()
+	const localPlayer = useLocalPlayer()
 	function handleNextRound() {
-		dispatch({ type: 'toggle-ready', payload: { name: playerName } })
+		dispatch({ type: 'toggle-ready', payload: { name: localPlayer.name } })
 	}
-	const player = gameState.players.find((player) => player.name === playerName)!
+
 	return (
 		<div className="bg-white rounded-lg shadow-md p-8 min-w-[360px]">
-			<Button onClick={handleNextRound} variant={player.ready ? 'disabled' : 'primary'}>
-				{player.ready ? '...' : 'Next round'}
+			<Button onClick={handleNextRound} variant={localPlayer.ready ? 'disabled' : 'primary'}>
+				{localPlayer.ready ? '...' : 'Next round'}
 			</Button>
 		</div>
 	)
 }
 
 function ScorePanel() {
-	const { gameState } = useGameState() as { gameState: GameInfo }
+	const { gameState } = useActiveGame()
 	return (
 		<div className="bg-white rounded-lg shadow-md p-8 flex-1">
 			<h2 className="text-2xl font-bold mb-4 text-center">Scores</h2>
