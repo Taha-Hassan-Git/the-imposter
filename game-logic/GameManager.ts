@@ -213,7 +213,6 @@ export class GameManager {
 			prevAnswers: [...this.game.prevAnswers, this.game.answer],
 			answer: GameManager.getUnusedAnswer(this.game.category, this.game),
 			round: this.game.round + 1,
-			message: undefined,
 		}
 		this.resetAllPlayers('playing')
 		this.assignImposter()
@@ -254,7 +253,6 @@ export class GameManager {
 		this.game = {
 			...this.game,
 			players: newPlayers,
-			message: { avoidedDetection, guessedCorrectly },
 		}
 	}
 

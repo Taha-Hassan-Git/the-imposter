@@ -17,10 +17,13 @@ export function ResultsScreen() {
 function MessagePanel() {
 	const localPlayer = useLocalPlayer()
 	const { gameState } = useActiveGame()
-	if (!gameState.message) return null
-	const { avoidedDetection, guessedCorrectly } = gameState.message
-	const imposterName = gameState.players.find((player) => player.imposter)?.name
+	const imposter = gameState.players.find((player) => player.imposter)!
+	const mostVotedPlayer = gameState.players.reduce((acc, player) =>
+		player.votes.length > acc.votes.length ? player : acc
+	)
 	const isImposter = localPlayer.imposter
+	const avoidedDetection = mostVotedPlayer.name !== imposter.name
+	const guessedCorrectly = imposter.guess === gameState.answer
 	return (
 		<>
 			{isImposter ? (
@@ -34,7 +37,7 @@ function MessagePanel() {
 					<Panel className="bg-red-50 border border-red-200">You were caught!</Panel>
 				)
 			) : avoidedDetection ? (
-				<Panel className="bg-red-50 border border-red-200">The imposter was {imposterName}</Panel>
+				<Panel className="bg-red-50 border border-red-200">The imposter was {imposter.name}</Panel>
 			) : guessedCorrectly ? (
 				<Panel className="bg-red-50 border border-red-200">
 					You got the imposter, but gave away the answer!
