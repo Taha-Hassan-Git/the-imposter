@@ -1,5 +1,6 @@
+'use client'
+
 import { VenetianMask } from 'lucide-react'
-import { Pill } from './Pill'
 
 export default function Header() {
 	return (
@@ -15,29 +16,6 @@ export default function Header() {
 							<h1 className="text-2xl font-bold text-gray-800">The Imposter</h1>
 							<p className="text-xs text-gray-500">Who doesn&#39;t belong?</p>
 						</div>
-					</div>
-				</div>
-			</div>
-			{/* Game Status Bar - shows when in game */}
-			<div className="bg-gray-50 border-t border-gray-100">
-				<div className="max-w-[640px] mx-auto px-4 sm:px-6 lg:px-8">
-					<div className="flex items-center justify-between h-10 text-sm">
-						<div className="flex items-center space-x-4">
-							<span className="flex items-center">
-								<div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
-								<span className="text-gray-600">Room: </span>
-								<Pill>fat-gay-bee</Pill>
-							</span>
-							<span className="text-gray-300">|</span>
-							<span className="flex items-center">
-								<span className="text-gray-600">Players: </span>
-								<span className="ml-1 font-medium text-gray-900"></span>
-							</span>
-						</div>
-						<Pill>
-							<span className="text-gray-600">Round:</span>
-							<span className="font-medium text-gray-900">0</span>
-						</Pill>
 					</div>
 				</div>
 			</div>
