@@ -4,6 +4,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { generateRoomId } from '../utils/generateRoomId'
 import { Button } from './Button'
 import { Input } from './Input'
+import { Panel } from './Panel'
 
 export type GameFormData = { category: Category; roomId: RoomId; name: string }
 export type Category = 'films' | 'animals' | 'countries' | 'sports'
@@ -45,7 +46,7 @@ export default function NewGameForm() {
 
 	if (showJoinExisting === undefined) {
 		return (
-			<div className="flex flex-col gap-5 bg-white rounded-lg shadow-md p-8 mt-5 w-full">
+			<Panel className="flex flex-col gap-5 mt-5">
 				<Button
 					variant="secondary"
 					onClick={() => {
@@ -67,11 +68,11 @@ export default function NewGameForm() {
 					//disappears after 5 seconds
 					showErrorMessage && <p className="text-red-600 text-center">{errorMessage}</p>
 				}
-			</div>
+			</Panel>
 		)
 	}
 	return (
-		<div className="flex flex-col gap-5 bg-white rounded-lg shadow-md mt-5 w-full">
+		<Panel className="flex flex-col gap-5 mt-5">
 			<div className="flex mt-0 w-full">
 				<Button
 					variant={showJoinExisting ? 'secondary' : 'disabled'}
@@ -131,7 +132,7 @@ export default function NewGameForm() {
 					</Button>
 				</div>
 			</div>
-		</div>
+		</Panel>
 	)
 }
 

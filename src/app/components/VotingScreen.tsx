@@ -1,16 +1,25 @@
 import { Answer, Player } from '../../../game-logic/types'
 import { useActiveGame, useLocalPlayer } from '../hooks/useGameState'
 import { Button } from './Button'
+import { Panel } from './Panel'
 import { PlayerInitialsIcon } from './PlayerInitialsIcon'
 import { AnswerGrid, Presence } from './PlayingScreen'
 
 export function VotingScreen() {
-	const { gameState } = useActiveGame()
-	const localPlayer = useLocalPlayer()
-
 	return (
 		<div className="flex flex-col gap-5 p-5 items-center w-full">
-			<div className="bg-white rounded-lg shadow-md p-8 flex flex-col gap-4 w-full">
+			<ChooseAnswer />
+			<VotePanel />
+		</div>
+	)
+}
+
+function VotePanel() {
+	const { gameState } = useActiveGame()
+	const localPlayer = useLocalPlayer()
+	return (
+		<Panel className="p-0">
+			<div className="p-8">
 				<h2 className="text-md font-bold mb-4 text-center">Who is the imposter?</h2>
 				<ul className="space-y-4">
 					{gameState.players
@@ -20,12 +29,11 @@ export function VotingScreen() {
 						))}
 				</ul>
 			</div>
-			<ChooseAnswer />
-			<div className="w-full bg-white rounded-lg shadow-md p-8 flex flex-col items-center justify-center gap-5">
-				Waiting for all players to vote...
+			<span className="flex w-full items-center justify-center gap-2 mt-2 px-9 py-4 bg-gray-100 border rounded-b-lg">
+				<p className="text-nowrap text-sm text-gray-500">Players voted:</p>
 				<Presence />
-			</div>
-		</div>
+			</span>
+		</Panel>
 	)
 }
 
@@ -40,12 +48,12 @@ function ChooseAnswer() {
 		dispatch({ type: 'player-guessed', payload: { name: localPlayer.name, guess: answer } })
 	}
 	return (
-		<div className="bg-white rounded-lg shadow-md p-8 flex flex-col gap-4 min-w-[360px]">
-			<h2 className="text-md font-bold mb-4 text-center">Choose an answer</h2>
+		<Panel>
+			<h2 className="text-md mb-4 text-start">Choose an answer:</h2>
 			<ul className="space-y-4">
 				<AnswerGrid hasButtons onClick={handleGuess} />
 			</ul>
-		</div>
+		</Panel>
 	)
 }
 
