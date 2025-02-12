@@ -89,17 +89,14 @@ function NextRoundButton() {
 function ScorePanel() {
 	const { gameState } = useActiveGame()
 	return (
-		<div className="w-full">
-			{/* On mobile, remove the panel styling */}
-			<div className="xs:bg-white xs:p-4 xs:rounded-lg">
-				<ul className="flex flex-col gap-4">
-					{gameState.players
-						.sort((a, b) => (a.score > b.score ? -1 : 1))
-						.map((player) => (
-							<PlayerScoreItem key={player.name} player={player} />
-						))}
-				</ul>
-			</div>
+		<div className="w-full bg-gray-50">
+			<ul className="flex flex-col gap-4">
+				{gameState.players
+					.sort((a, b) => (a.score > b.score ? -1 : 1))
+					.map((player) => (
+						<PlayerScoreItem key={player.name} player={player} />
+					))}
+			</ul>
 		</div>
 	)
 }
@@ -112,7 +109,7 @@ function PlayerScoreItem({ player }: { player: Player }) {
 	)
 	const isImposter = player.imposter
 	return (
-		<li className="bg-white xs:bg-gray-50 px-6 py-4 flex flex-col gap-2 items-start rounded-lg shadow-sm ">
+		<li className="bg-white px-6 py-4 flex flex-col gap-2 items-start rounded-lg shadow-sm ">
 			<div className="flex items-center justify-between w-full">
 				<div className="flex items-center space-x-2 gap-1">
 					<PlayerInitialsIcon className="!w-10 !h-10" player={player} />
