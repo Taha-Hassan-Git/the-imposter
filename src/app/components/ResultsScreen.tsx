@@ -107,36 +107,67 @@ function PlayerScoreItem({ player }: { player: Player }) {
 		(acc, player) => (player.score > acc ? player.score : acc),
 		0
 	)
+	const imposter = gameState.players.find((player) => player.imposter)!
+	const mostVotedPlayer = gameState.players.reduce((acc, player) =>
+		player.votes.length > acc.votes.length ? player : acc
+	)
 	const isImposter = player.imposter
+	const avoidedDetection = mostVotedPlayer.name !== imposter.name
+	const guessedCorrectly = imposter.guess === gameState.answer
+	const votedForImposter = imposter.votes.includes(player.name)
+	const scoreDifference = getScoreDifference()
+
+	function getScoreDifference() {
+		if (isImposter) {
+			if (avoidedDetection) {
+				return 3
+			} else if (guessedCorrectly) {
+				return 2
+			} else {
+				return 0
+			}
+		} else if (votedForImposter) {
+			return 1
+		} else {
+			return 0
+		}
+	}
 	return (
-		<li className="bg-white px-6 py-4 flex flex-col gap-2 items-start rounded-lg shadow-sm ">
-			<div className="flex items-center justify-between w-full">
+		<li className="bg-white flex flex-col items-start rounded-lg shadow-sm border">
+			<span className="flex items-center gap-1 pt-2 px-5">
+				{isImposter && (
+					<>
+						<VenetianMask className="w-5 h-5 text-gray-500" />
+						<p className="text-sm text-gray-500">The imposter</p>
+					</>
+				)}
+			</span>
+			<div className="flex px-4 py-4 items-center justify-between w-full">
 				<div className="flex items-center space-x-2 gap-1">
 					<PlayerInitialsIcon className="!w-10 !h-10" player={player} />
-					<div>
+					<div className="flex gap-4">
 						<p className="text-xl">{player.name}</p>
-						<span className="flex items-center gap-1">
-							{isImposter && (
-								<>
-									<VenetianMask className="w-5 h-5 text-gray-500" />
-									<p className="text-sm text-gray-500">The imposter</p>
-								</>
-							)}
-						</span>
 					</div>
 				</div>
-				<span className="text-2xl font-bold text-gray-700">
-					{player.score === highestScore ? (
-						<div className="flex flex-col items-center gap-1">
-							<Crown className="!w-4 !h-4 text-yellow-500" />
-							<span className="group-hover:underline">{player.score}</span>
-						</div>
-					) : (
-						<div className="text-center">{player.score}</div>
-					)}
-				</span>
+				<div className="flex flex-col gap-4">
+					<span className="text-xs font-light text-gray-500">score:</span>
+					<span className="text-2xl font-bold text-gray-700 flex items-center gap-2">
+						{player.score === highestScore ? (
+							<div className="flex flex-col items-center gap-1">
+								<Crown className="!w-4 !h-4 text-yellow-500" />
+								<span className="group-hover:underline">{player.score}</span>
+							</div>
+						) : (
+							<div className="text-center">{player.score}</div>
+						)}
+						<span className="text-sm text-gray-500">
+							<span>{scoreDifference > 0 ? '+' : ''}</span>
+							{scoreDifference}
+						</span>
+					</span>
+				</div>
 			</div>
-			<div className="flex gap-1 text-sm text-gray-500 border-t w-full mt-1 pt-1 items-center">
+			<div className="flex gap-1 text-sm bg-gray-100 text-gray-500 w-full items-center px-4 py-2 rounded-b-lg border-t">
 				Votes:
 				<div className="flex items-center gap-1">
 					{player.votes.length === 0 ? (

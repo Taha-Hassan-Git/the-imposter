@@ -1,11 +1,12 @@
 import { Answer, answersObject } from '../../../game-logic/types'
 import { useActiveGame, useLocalPlayer } from '../hooks/useGameState'
 import { Button } from './Button'
+import { Panel } from './Panel'
 import { PlayerInitialsIcon } from './PlayerInitialsIcon'
 
 const PlayingScreen = () => {
 	return (
-		<div className="flex flex-col gap-5 p-1 items-center w-full mt-1">
+		<div className="flex flex-col gap-5 p-1 items-center w-full mt-4">
 			<AnswerBox />
 			<ReadyToVoteBox />
 			<div className="flex flex-col gap-5 w-full"></div>
@@ -20,13 +21,24 @@ function ReadyToVoteBox() {
 		dispatch({ type: 'toggle-ready', payload: { name: localPlayer.name } })
 	}
 	return (
-		<div className="bg-white rounded-lg shadow-md p-8 flex flex-col items-center justify-center gap-5 w-full">
-			<Presence />
-			<h2 className="text-xl font-bold mb-4 text-center">Ready to Vote?</h2>
-			<Button onClick={toggleReady} variant={localPlayer.ready ? 'disabled' : 'primary'}>
-				{localPlayer.ready ? '...' : 'Ready'}
-			</Button>
-		</div>
+		<Panel className="p-0">
+			<div className="p-8">
+				<div className="w-full border-b">
+					<h2 className="text-md font-bold mb-2 text-center">Ready to Vote?</h2>
+					<Button
+						className="w-full"
+						onClick={toggleReady}
+						variant={localPlayer.ready ? 'disabled' : 'primary'}
+					>
+						{localPlayer.ready ? '...' : 'Ready'}
+					</Button>
+				</div>
+			</div>
+			<span className="flex w-full items-center justify-center gap-4 mt-2 px-9 py-4 bg-gray-100 border rounded-b-lg">
+				<p className="text-nowrap text-sm text-gray-500">Players ready:</p>
+				<Presence />
+			</span>
+		</Panel>
 	)
 }
 
@@ -54,23 +66,15 @@ export function Presence() {
 	)
 }
 function AnswerBox() {
-	const { gameState } = useActiveGame()
 	const localPlayer = useLocalPlayer()
 
 	return (
-		<div className="bg-white rounded-lg shadow-md p-4 w-full">
-			<GameInfoPanel />
+		<Panel variant="column">
+			{localPlayer.imposter && (
+				<span className="font-bold text-2xl text-red-600">You are the imposter</span>
+			)}
 			<AnswerGrid />
-			<div className="mt-6">
-				{localPlayer.imposter ? (
-					<span className="font-bold text-2xl text-red-600">You are the imposter</span>
-				) : (
-					<div className="space-x-2">
-						Answer: <span className="font-bold text-2xl text-green-600">{gameState.answer}</span>
-					</div>
-				)}
-			</div>
-		</div>
+		</Panel>
 	)
 }
 
@@ -114,15 +118,6 @@ function AnswerItem({ answer }: { answer: Answer }) {
 			key={answer}
 		>
 			<p className="font-medium">{answer}</p>
-		</div>
-	)
-}
-function GameInfoPanel() {
-	// contains round and category info
-	const { gameState } = useActiveGame()
-	return (
-		<div className="flex flex-col p-4 font-medium text-sm text-gray-800">
-			<p>Category: {gameState.category}</p>
 		</div>
 	)
 }

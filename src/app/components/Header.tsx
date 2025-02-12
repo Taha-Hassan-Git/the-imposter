@@ -1,4 +1,5 @@
 import { VenetianMask } from 'lucide-react'
+import { Pill } from './Pill'
 
 export default function Header() {
 	return (
@@ -25,9 +26,7 @@ export default function Header() {
 							<span className="flex items-center">
 								<div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
 								<span className="text-gray-600">Room: </span>
-								<span className="ml-1 font-medium rounded-full bg-gray-300 px-2 p-1 text-xs text-gray-900">
-									fat-gay-bee
-								</span>
+								<Pill>fat-gay-bee</Pill>
 							</span>
 							<span className="text-gray-300">|</span>
 							<span className="flex items-center">
@@ -35,10 +34,10 @@ export default function Header() {
 								<span className="ml-1 font-medium text-gray-900"></span>
 							</span>
 						</div>
-						<div className="flex items-center space-x-2 rounded-full bg-gray-300 px-2 p-1 text-xs text-gray-900">
+						<Pill>
 							<span className="text-gray-600">Round:</span>
 							<span className="font-medium text-gray-900">0</span>
-						</div>
+						</Pill>
 					</div>
 				</div>
 			</div>
