@@ -188,7 +188,6 @@ export class GameManager {
 				this.assignImposter()
 			}
 			this.advanceToNextState()
-			this.resetAllPlayers()
 		}
 	}
 
@@ -196,6 +195,7 @@ export class GameManager {
 		const prevState = this.game.state
 		const nextState = this.STATE_TRANSITIONS[prevState]
 		this.game = { ...this.game, state: nextState }
+		this.resetAllPlayers(nextState)
 		if (nextState === 'results') {
 			this.awardPoints()
 		}
@@ -214,7 +214,7 @@ export class GameManager {
 			answer: GameManager.getUnusedAnswer(this.game.category, this.game),
 			round: this.game.round + 1,
 		}
-		this.resetAllPlayers()
+		this.resetAllPlayers('playing')
 		this.assignImposter()
 	}
 	private awardPoints(): void {
@@ -249,7 +249,11 @@ export class GameManager {
 				return player
 			})
 		}
-		this.game = { ...this.game, players: newPlayers }
+
+		this.game = {
+			...this.game,
+			players: newPlayers,
+		}
 	}
 
 	private assignImposter(): void {
@@ -261,13 +265,22 @@ export class GameManager {
 		this.game = { ...this.game, players: newPlayers }
 	}
 
-	private resetAllPlayers(): void {
-		const newPlayers = this.game.players.map((player) => ({
-			...player,
-			guess: null,
-			ready: false,
-			votes: [],
-		}))
+	private resetAllPlayers(nextState: StateNames): void {
+		let newPlayers: Player[]
+		if (nextState === 'results') {
+			newPlayers = this.game.players.map((player) => ({
+				...player,
+				ready: false,
+			}))
+		} else {
+			newPlayers = this.game.players.map((player) => ({
+				...player,
+				guess: null,
+				ready: false,
+				votes: [],
+			}))
+		}
+
 		this.game = { ...this.game, players: newPlayers }
 	}
 

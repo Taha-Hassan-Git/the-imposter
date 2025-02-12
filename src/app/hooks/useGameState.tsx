@@ -24,6 +24,44 @@ export function GameProvider({
 	category: Category | null
 	roomId: string
 }) {
+	// const resultsGame: GameInfo = {
+	// 	state: 'results',
+	// 	roomId: 'test',
+	// 	round: 1,
+	// 	answer: 'Titanic',
+	// 	players: [
+	// 		{
+	// 			name: 'test',
+	// 			guess: null,
+	// 			score: 1,
+	// 			ready: false,
+	// 			avatarColor: avatarColors[0],
+	// 			imposter: false,
+	// 			votes: ['test2'],
+	// 		},
+	// 		{
+	// 			name: 'test2',
+	// 			guess: 'Titanic',
+	// 			score: 3,
+	// 			ready: false,
+	// 			avatarColor: avatarColors[1],
+	// 			imposter: true,
+	// 			votes: ['test', 'test3'],
+	// 		},
+	// 		{
+	// 			name: 'test3',
+	// 			guess: null,
+	// 			score: 0,
+	// 			ready: false,
+	// 			avatarColor: avatarColors[2],
+	// 			imposter: false,
+	// 			votes: [],
+	// 		},
+	// 	],
+	// 	prevAnswers: [],
+	// 	category: 'films',
+	// }
+	// const player = resultsGame.players[0]
 	const [gameState, setGameState] = useState<GameState>({ state: 'loading' })
 	const [localPlayer, setLocalPlayer] = useState<Player | null>(null)
 
