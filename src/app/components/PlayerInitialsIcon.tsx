@@ -1,17 +1,27 @@
+import classNames from 'classnames'
 import { Player } from '../../../game-logic/types'
-
-export function PlayerInitialsIcon({ player }: { player: Player }) {
-	// Get player initials
+export function PlayerInitialsIcon({
+	player,
+	showReady = false,
+	className,
+}: {
+	player: Player
+	showReady?: boolean
+	className?: string
+}) {
 	const initials = player.name
 		.split(' ')
 		.map((word) => word[0])
 		.join('')
 		.toUpperCase()
-
+	const styles = classNames(
+		'w-8 h-8 rounded-full flex items-center justify-center text-white shadow-sm',
+		className
+	)
 	return (
 		<div
-			style={{ backgroundColor: player.ready ? player.avatarColor : 'gray' }}
-			className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-white border border-black"
+			className={`${styles} ${showReady && !player.ready ? 'bg-gray-300' : ''}`}
+			style={showReady && !player.ready ? {} : { backgroundColor: player.avatarColor }}
 		>
 			{initials}
 		</div>

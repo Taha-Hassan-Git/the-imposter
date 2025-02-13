@@ -5,31 +5,29 @@ export type Action =
 	| { type: 'player-joined'; payload: { name: string } }
 	| { type: 'player-left'; payload: { name: string } }
 	| { type: 'player-voted'; payload: { name: string; vote: string } }
+	| { type: 'player-guessed'; payload: { name: string; guess: Answer } }
 
-// nice pastel colours
-export const avatarColors = [
-	'#FFC0CB',
-	'#FFB6C1',
-	'#FF69B4',
-	'#FF1493',
-	'#DB7093',
-	'#C71585',
-	'#FFA07A',
-	'#FA8072',
-	'#E9967A',
-	'#F08080',
-	'#CD5C5C',
-	'#DC143C',
-	'#B22222',
-	'#8B0000',
-	'#FF0000',
-	'#FF6347',
-	'#FF4500',
-	'#FF8C00',
-	'#FFA500',
-	'#FFD700',
-	'#FFFF00',
-] as const
+const createAvatarColors = (): string[] => {
+	const NUMBER_OF_AVATAR_COLORS = 12
+	const ROWS = 3
+	const COLUMNS = 4
+
+	const colors = Array.from(
+		{ length: NUMBER_OF_AVATAR_COLORS },
+		(_, i) => `hsl(${Math.round((i * 360) / NUMBER_OF_AVATAR_COLORS)}, 100%, 75%)`
+	)
+
+	const sortingPattern = []
+	for (let col = 0; col < COLUMNS; col++) {
+		for (let row = 0; row < ROWS; row++) {
+			sortingPattern.push(row * COLUMNS + col)
+		}
+	}
+
+	return sortingPattern.map((index) => colors[index])
+}
+
+export const avatarColors = createAvatarColors()
 
 export type Player = {
 	name: string
@@ -37,6 +35,7 @@ export type Player = {
 	ready: boolean
 	avatarColor: AvatarColor
 	imposter: boolean
+	guess: Answer | null
 	votes: string[]
 }
 export type AvatarColor = (typeof avatarColors)[number]
@@ -87,7 +86,7 @@ export const animalAnswers = [
 	'Polar Bear',
 	'Hippo',
 	'Gorilla',
-	'Panda',
+	'Leopard',
 	'Monkey',
 	'Rhino',
 	'Wolf',

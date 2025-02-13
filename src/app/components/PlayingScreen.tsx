@@ -1,39 +1,49 @@
-import { filmAnswers, GameInfo, Player } from '../../../game-logic/types'
-import { useGameState } from '../hooks/useGameState'
+import { Answer, answersObject } from '../../../game-logic/types'
+import { useActiveGame, useLocalPlayer } from '../hooks/useGameState'
 import { Button } from './Button'
+import { Panel } from './Panel'
 import { PlayerInitialsIcon } from './PlayerInitialsIcon'
 
-const PlayingScreen = ({ self }: { self: string }) => {
-	const { gameState } = useGameState() as { gameState: GameInfo }
-	const player = gameState.players.find((player) => player.name === self)!
-	console.log(player)
+const PlayingScreen = () => {
 	return (
-		<div className="flex flex-col gap-5 p-1 items-center w-full mt-1">
-			<AnswerBox player={player} />
-			<ReadyToVoteBox player={player} />
+		<div className="flex flex-col gap-5 p-1 items-center w-full mt-4">
+			<AnswerBox />
+			<ReadyToVoteBox />
 			<div className="flex flex-col gap-5 w-full"></div>
 		</div>
 	)
 }
-function ReadyToVoteBox({ player }: { player: Player }) {
-	const { dispatch } = useGameState()
+function ReadyToVoteBox() {
+	const { dispatch } = useActiveGame()
+	const localPlayer = useLocalPlayer()
 
 	function toggleReady() {
-		dispatch({ type: 'toggle-ready', payload: { name: player.name } })
+		dispatch({ type: 'toggle-ready', payload: { name: localPlayer.name } })
 	}
 	return (
-		<div className="bg-white rounded-lg shadow-md p-8 flex flex-col items-center justify-center gap-5 w-full">
-			<Presence />
-			<h2 className="text-xl font-bold mb-4 text-center">Ready to Vote?</h2>
-			<Button onClick={toggleReady} variant={player.ready ? 'disabled' : 'primary'}>
-				{player.ready ? '...' : 'Ready'}
-			</Button>
-		</div>
+		<Panel className="p-0">
+			<div className="p-8">
+				<div className="w-full border-b">
+					<h2 className="text-md font-bold mb-2 text-center">Ready to Vote?</h2>
+					<Button
+						className="w-full"
+						onClick={toggleReady}
+						variant={localPlayer.ready ? 'disabled' : 'primary'}
+					>
+						{localPlayer.ready ? '...' : 'Ready'}
+					</Button>
+				</div>
+			</div>
+			<span className="flex w-full items-center justify-center gap-4 mt-2 px-9 py-4 bg-gray-100 border rounded-b-lg">
+				<p className="text-nowrap text-sm text-gray-500">Players ready:</p>
+				<Presence />
+			</span>
+		</Panel>
 	)
 }
 
-function Presence() {
-	const { gameState } = useGameState() as { gameState: GameInfo }
+export function Presence() {
+	const { gameState } = useActiveGame()
 
 	return (
 		<div className="flex self-start w-full overflow-hidden">
@@ -49,48 +59,65 @@ function Presence() {
 						key={player.name}
 						className="flex items-center gap-2"
 					>
-						<PlayerInitialsIcon player={player} />
+						<PlayerInitialsIcon showReady player={player} />
 					</div>
 				))}
 		</div>
 	)
 }
-function AnswerBox({ player }: { player: Player }) {
-	const { gameState } = useGameState() as { gameState: GameInfo }
+function AnswerBox() {
+	const localPlayer = useLocalPlayer()
 
 	return (
-		<div className="bg-white rounded-lg shadow-md p-4 w-full">
-			<GameInfoPanel />
-			<div className="grid grid-cols-4 gap-2 text-xs w-full">
-				{filmAnswers.map((answer) => (
-					<div
-						className={`border border-gray-100 shadow-sm rounded-lg
-					   flex justify-center items-center p-4 
-					   aspect-[2/1] text-center leading-none text-nowrap ${answer === gameState.answer && !player.imposter ? 'bg-green-100' : 'bg-slate-50'}`}
+		<Panel variant="column">
+			{localPlayer.imposter && (
+				<span className="font-bold text-2xl text-red-600">You are the imposter</span>
+			)}
+			<AnswerGrid />
+		</Panel>
+	)
+}
+
+export function AnswerGrid({
+	hasButtons,
+	onClick,
+}: {
+	hasButtons?: boolean
+	onClick?: (answer: Answer) => void
+}) {
+	const { gameState } = useActiveGame()
+	const localPlayer = useLocalPlayer()
+	return (
+		<div className="grid grid-cols-4 gap-2 text-xs w-full">
+			{answersObject[gameState.category].map((answer) =>
+				hasButtons ? (
+					<Button
 						key={answer}
+						className="text-center"
+						onClick={onClick ? () => onClick(answer) : undefined}
+						variant={localPlayer.guess === answer ? 'primary' : 'secondary'}
 					>
-						<p className="font-medium">{answer}</p>
-					</div>
-				))}
-			</div>
-			<div className="mt-6">
-				{player.imposter ? (
-					<span className="font-bold text-2xl text-red-600">You are the imposter</span>
+						{answer}
+					</Button>
 				) : (
-					<div className="space-x-2">
-						Answer: <span className="font-bold text-2xl text-green-600">{gameState.answer}</span>
-					</div>
-				)}
-			</div>
+					<AnswerItem key={answer} answer={answer} />
+				)
+			)}
 		</div>
 	)
 }
-function GameInfoPanel() {
-	// contains round and category info
-	const { gameState } = useGameState() as { gameState: GameInfo }
+function AnswerItem({ answer }: { answer: Answer }) {
+	const { gameState } = useActiveGame()
+	const localPlayer = useLocalPlayer()
+
 	return (
-		<div className="flex flex-col p-4 font-medium text-sm text-gray-800">
-			<p>Category: {gameState.category}</p>
+		<div
+			className={`border border-gray-100 shadow-sm rounded-lg
+		   flex justify-center items-center p-4 
+		   aspect-[2/1] text-center leading-none text-nowrap ${answer === gameState.answer && !localPlayer.imposter ? 'bg-green-100' : 'bg-slate-50'}`}
+			key={answer}
+		>
+			<p className="font-medium">{answer}</p>
 		</div>
 	)
 }

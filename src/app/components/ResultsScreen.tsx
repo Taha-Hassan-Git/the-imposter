@@ -1,92 +1,223 @@
-import { Action, GameInfo, Player } from '../../../game-logic/types'
-import { useGameState } from '../hooks/useGameState'
+import { Crown, VenetianMask } from 'lucide-react'
+import { Player } from '../../../game-logic/types'
+import { useActiveGame, useLocalPlayer } from '../hooks/useGameState'
 import { Button } from './Button'
-
-export function ResultsScreen({ playerName }: { playerName: string }) {
+import { Panel } from './Panel'
+import { PlayerInitialsIcon } from './PlayerInitialsIcon'
+export function ResultsScreen() {
+	const { gameState } = useActiveGame()
+	const mostVotedPlayer = gameState.players.reduce((acc, player) =>
+		player.votes.length > acc.votes.length ? player : acc
+	)
+	const imposter = gameState.players.find((player) => player.imposter)!
+	const avoidedDetection = mostVotedPlayer.name !== imposter.name
+	const guessedCorrectly = imposter.guess === gameState.answer
 	return (
-		<div className="flex flex-col gap-5 p-5 items-center">
-			<div className="flex gap-5 justify-between">
-				<ScorePanel />
-			</div>
-			<div className="flex flex-col gap-5">
-				<ResultsPanel />
-				<NextRoundButton playerName={playerName} />
-			</div>
+		<div className="flex flex-col gap-5 items-center w-full h-full justify-between">
+			<MessagePanel avoidedDetection={avoidedDetection} guessedCorrectly={guessedCorrectly} />
+
+			<ScorePanel avoidedDetection={avoidedDetection} guessedCorrectly={guessedCorrectly} />
+
+			<NextRoundButton />
 		</div>
 	)
 }
 
-function ResultsPanel() {
-	const { gameState } = useGameState() as { gameState: GameInfo }
-	const imposter = gameState.players.find((player) => player.imposter)
+function MessagePanel({
+	avoidedDetection,
+	guessedCorrectly,
+}: {
+	avoidedDetection: boolean
+	guessedCorrectly: boolean
+}) {
+	const localPlayer = useLocalPlayer()
+	const { gameState } = useActiveGame()
+	const imposter = gameState.players.find((player) => player.imposter)!
 
+	const isImposter = localPlayer.imposter
+
+	const votedForImposter = imposter.votes.includes(localPlayer.name)
 	return (
-		<div className="bg-white rounded-lg shadow-md p-8 min-w-[360px]">
-			<h2 className="text-2xl font-bold mb-4 text-center">Results</h2>
-			<p className="text-gray-500 text-xl">The imposter was {imposter?.name}</p>
-			<ul className="space-y-3">
-				{/* {players.map((player: Player) => (
-					<PlayerListItem key={player.name} player={player} />
-				))} */}
-			</ul>
-		</div>
+		<>
+			{isImposter ? (
+				avoidedDetection ? (
+					<GreenMessage message={'You evaded detection!'} />
+				) : guessedCorrectly ? (
+					<GreenMessage message={'You were caught, but guessed the answer!'} />
+				) : (
+					<RedMessage message={'You were caught!'} />
+				)
+			) : avoidedDetection ? (
+				votedForImposter ? (
+					<RedMessage message={'They got away! The imposter was ' + imposter.name + '.'} />
+				) : (
+					<YellowMessage message={'You voted for the imposter, but they got away!'} />
+				)
+			) : guessedCorrectly ? (
+				<YellowMessage message="You got the imposter, but they guessed the answer!" />
+			) : (
+				<GreenMessage message={'You got them! The imposter was ' + imposter.name + '.'} />
+			)}
+		</>
 	)
 }
 
-function NextRoundButton({ playerName }: { playerName: string }) {
-	const { gameState, dispatch } = useGameState() as {
-		gameState: GameInfo
-		dispatch: (v: Action) => void
-	}
+function YellowMessage({ message }: { message: string }) {
+	return (
+		<Panel className="!bg-yellow-50 border-2 border-yellow-200 max-w-[90%] mt-4">{message}</Panel>
+	)
+}
+
+function RedMessage({ message }: { message: string }) {
+	return <Panel className="!bg-red-50 border-2 border-red-200 max-w-[90%] mt-4">{message}</Panel>
+}
+
+function GreenMessage({ message }: { message: string }) {
+	return (
+		<Panel className="!bg-green-50 border-2 border-green-200 max-w-[90%] mt-4">{message}</Panel>
+	)
+}
+
+function NextRoundButton() {
+	const { dispatch } = useActiveGame()
+	const localPlayer = useLocalPlayer()
 	function handleNextRound() {
-		dispatch({ type: 'toggle-ready', payload: { name: playerName } })
+		dispatch({ type: 'toggle-ready', payload: { name: localPlayer.name } })
 	}
-	const player = gameState.players.find((player) => player.name === playerName)!
+
 	return (
-		<div className="bg-white rounded-lg shadow-md p-8 min-w-[360px]">
-			<Button onClick={handleNextRound} variant={player.ready ? 'disabled' : 'primary'}>
-				{player.ready ? '...' : 'Next round'}
+		<Panel className="sticky bottom-0">
+			<Button
+				className="w-full"
+				onClick={handleNextRound}
+				variant={localPlayer.ready ? 'disabled' : 'primary'}
+			>
+				{localPlayer.ready ? 'waiting...' : 'Begin next round'}
 			</Button>
-		</div>
+		</Panel>
 	)
 }
 
-function ScorePanel() {
-	const { gameState } = useGameState() as { gameState: GameInfo }
+function ScorePanel({
+	avoidedDetection,
+	guessedCorrectly,
+}: {
+	avoidedDetection: boolean
+	guessedCorrectly: boolean
+}) {
+	const { gameState } = useActiveGame()
 	return (
-		<div className="bg-white rounded-lg shadow-md p-8 flex-1">
-			<h2 className="text-2xl font-bold mb-4 text-center">Scores</h2>
-			<p>Round: {gameState.round}</p>
-			<ul className="space-y-3">
-				{gameState.players.map((player) => (
-					<PlayerScoreItem key={player.name} player={player} />
-				))}
+		<div className="w-full bg-gray-50">
+			<ul className="flex flex-col gap-4">
+				{gameState.players
+					.sort((a, b) => (a.score > b.score ? -1 : 1))
+					.map((player) => (
+						<PlayerScoreItem
+							avoidedDetection={avoidedDetection}
+							guessedCorrectly={guessedCorrectly}
+							key={player.name}
+							player={player}
+						/>
+					))}
 			</ul>
 		</div>
 	)
 }
 
-function PlayerScoreItem({ player }: { player: Player }) {
-	// Get player initials
-	const initials = player.name
-		.split(' ')
-		.map((word) => word[0])
-		.join('')
-		.toUpperCase()
-		.slice(0, 2)
+const PlayerScoreItem = ({
+	player,
+	avoidedDetection,
+	guessedCorrectly,
+}: {
+	player: Player
+	avoidedDetection: boolean
+	guessedCorrectly: boolean
+}) => {
+	const { gameState } = useActiveGame()
+
+	const imposter = gameState.players.find((player) => player.imposter)!
+
+	const isImposter = player.imposter
+	const votedForImposter = imposter.votes.includes(player.name)
+
+	const scoreDifference = isImposter
+		? avoidedDetection
+			? 3
+			: guessedCorrectly
+				? 2
+				: 0
+		: votedForImposter
+			? 1
+			: 0
 
 	return (
-		<li className="group flex items-center justify-between py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors">
-			<div className="flex items-center space-x-4">
-				<div
-					className="w-10 h-10 rounded-full flex items-center justify-center text-white font-medium shadow-sm"
-					style={{ backgroundColor: player.avatarColor, opacity: player.ready ? 0.7 : 0.5 }}
-				>
-					{initials}
-				</div>
-				<span className="font-semibold text-gray-900">{player.name}</span>
-			</div>
-			<span className="text-2xl font-bold text-gray-700 tabular-nums">{player.score}</span>
+		<li className="bg-white rounded-xl shadow-md transition-all border border-gray-200 overflow-hidden">
+			{isImposter && <ImposterBadge />}
+			<MainSection player={player} scoreDifference={scoreDifference} />
+			<PlayerVotes player={player} />
 		</li>
+	)
+}
+
+function ImposterBadge() {
+	return (
+		<div className="bg-red-50 py-2 px-4 flex items-center gap-2 border-b border-red-100">
+			<VenetianMask className="w-4 h-4 text-red-500" />
+			<p className="text-sm font-medium text-red-600">Imposter</p>
+		</div>
+	)
+}
+
+function MainSection({ player, scoreDifference }: { player: Player; scoreDifference: number }) {
+	const { gameState } = useActiveGame()
+	const highestScore = gameState.players.reduce(
+		(acc, player) => (player.score > acc ? player.score : acc),
+		0
+	)
+	return (
+		<div className="p-4 flex items-center justify-between">
+			<div className="flex items-center gap-4">
+				<PlayerInitialsIcon player={player} />
+				<div>
+					<h3 className="text-lg font-medium text-gray-900">{player.name}</h3>
+					{scoreDifference > 0 && (
+						<p className="text-sm text-green-600">+{scoreDifference} this round</p>
+					)}
+				</div>
+			</div>
+
+			{/* Score */}
+			<div className="flex flex-col items-end gap-1">
+				<div className="flex items-center gap-2">
+					<span className="text-2xl font-bold">{player.score}</span>
+					{player.score === highestScore && <Crown className="w-5 h-5 text-yellow-500" />}
+				</div>
+				<p className="text-sm text-gray-500">points</p>
+			</div>
+		</div>
+	)
+}
+
+function PlayerVotes({ player }: { player: Player }) {
+	const { gameState } = useActiveGame()
+	return (
+		<div className="bg-gray-50 px-4 py-3 border-t border-gray-100">
+			<div className="flex items-center gap-2">
+				<span className="text-sm text-gray-600">Votes:</span>
+				<div className="flex -space-x-1">
+					{player.votes.length === 0 ? (
+						<span className="text-sm text-gray-400">None</span>
+					) : (
+						player.votes.map((vote) => (
+							<PlayerInitialsIcon
+								className="!w-4 !h-4 text-[8px]"
+								key={vote}
+								player={gameState.players.find((player) => player.name === vote)!}
+							/>
+						))
+					)}
+				</div>
+			</div>
+		</div>
 	)
 }

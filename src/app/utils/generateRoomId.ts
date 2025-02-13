@@ -16,19 +16,7 @@ const partOne = [
 	'fast',
 ]
 
-const partTwo = [
-	'gay',
-	'les',
-	'bi',
-	'queer',
-	'trans',
-	'ace',
-	'pan',
-	'poly',
-	'nonbino',
-	'agender',
-	'genderfluid',
-]
+const partTwo = ['gay', 'les', 'bi', 'queer', 'trans', 'ace', 'pan', 'poly', 'nb']
 const partThree = [
 	'bat',
 	'bee',

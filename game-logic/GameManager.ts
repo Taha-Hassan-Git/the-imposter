@@ -41,6 +41,7 @@ export class GameManager {
 			players: [
 				{
 					name: formInfo.playerName,
+					guess: null,
 					score: 0,
 					ready: false,
 					avatarColor,
@@ -81,7 +82,25 @@ export class GameManager {
 				this.handlePlayerVoted(action.payload.name, action.payload.vote)
 				break
 			}
+			case 'player-guessed': {
+				this.handlePlayerGuessed(action.payload.name, action.payload.guess)
+				break
+			}
 		}
+	}
+
+	private handlePlayerGuessed(playerName: string, guess: Answer): void {
+		const player = this.game.players.find((player) => player.name === playerName)
+		if (!player || !player.imposter) return
+
+		// we only want to set the imposter as ready if they have both guessed and voted
+		const hasVoted = this.game.players.some((player) => player.votes.includes(playerName))
+
+		const newPlayers = this.game.players.map((p) =>
+			p.name === playerName ? { ...p, guess, ready: hasVoted } : p
+		)
+		this.game = { ...this.game, players: newPlayers }
+		this.tryAdvanceGameState()
 	}
 
 	private handlePlayerVoted(playerName: string, vote: string): void {
@@ -97,12 +116,17 @@ export class GameManager {
 			return player
 		})
 		// add vote to player
+		// don't set the player to ready if they are the imposter
+		const isReady = !player.imposter
 		newPlayers = newPlayers
-			.map((player) => (player.name === playerName ? { ...player, ready: true } : player))
-			.map((player) =>
-				player.name === vote ? { ...player, votes: [...player.votes, playerName] } : player
-			)
+			.map((p) => (p.name === playerName ? { ...p, ready: isReady } : p))
+			.map((p) => (p.name === vote ? { ...p, votes: [...p.votes, playerName] } : p))
 
+		if (player.imposter && player.guess) {
+			console.log(player.guess)
+			// if the imposter has voted, set them as ready
+			newPlayers = newPlayers.map((p) => (p.name === playerName ? { ...p, ready: true } : p))
+		}
 		this.game = { ...this.game, players: newPlayers }
 		this.tryAdvanceGameState()
 	}
@@ -117,6 +141,7 @@ export class GameManager {
 
 		const newPlayer: Player = {
 			name: playerName,
+			guess: null,
 			score: 0,
 			ready: false,
 			avatarColor: GameManager.assignUnusedAvatarColor(this.game),
@@ -163,7 +188,6 @@ export class GameManager {
 				this.assignImposter()
 			}
 			this.advanceToNextState()
-			this.resetAllPlayers()
 		}
 	}
 
@@ -171,6 +195,7 @@ export class GameManager {
 		const prevState = this.game.state
 		const nextState = this.STATE_TRANSITIONS[prevState]
 		this.game = { ...this.game, state: nextState }
+		this.resetAllPlayers(nextState)
 		if (nextState === 'results') {
 			this.awardPoints()
 		}
@@ -189,15 +214,14 @@ export class GameManager {
 			answer: GameManager.getUnusedAnswer(this.game.category, this.game),
 			round: this.game.round + 1,
 		}
+		this.resetAllPlayers('playing')
 		this.assignImposter()
 	}
 	private awardPoints(): void {
-		const imposter = this.game.players.find((player) => player.imposter)
+		const imposter = this.game.players.find((player) => player.imposter)!
 		const mostVotedPlayer = this.game.players.reduce((acc, player) =>
 			player.votes.length > acc.votes.length ? player : acc
 		)
-
-		if (!imposter) return
 
 		// award points to players that guessed the imposter correctly
 		let newPlayers = this.game.players.map((player) => {
@@ -208,15 +232,28 @@ export class GameManager {
 		})
 
 		// award points to the imposter for evading detection
-		if (mostVotedPlayer.name !== imposter.name) {
+		const avoidedDetection = mostVotedPlayer.name !== imposter.name
+		const guessedCorrectly = imposter.guess === this.game.answer
+		if (avoidedDetection) {
 			newPlayers = newPlayers.map((player) => {
 				if (player.name === imposter.name) {
 					return { ...player, score: player.score + 3 }
 				}
 				return player
 			})
+		} else if (guessedCorrectly) {
+			newPlayers = newPlayers.map((player) => {
+				if (player.name === imposter.name) {
+					return { ...player, score: player.score + 2 }
+				}
+				return player
+			})
 		}
-		this.game = { ...this.game, players: newPlayers }
+
+		this.game = {
+			...this.game,
+			players: newPlayers,
+		}
 	}
 
 	private assignImposter(): void {
@@ -228,26 +265,65 @@ export class GameManager {
 		this.game = { ...this.game, players: newPlayers }
 	}
 
-	private resetAllPlayers(): void {
-		const newPlayers = this.game.players.map((player) => ({
-			...player,
-			ready: false,
-			votes: [],
-		}))
+	private resetAllPlayers(nextState: StateNames): void {
+		let newPlayers: Player[]
+		if (nextState === 'results') {
+			newPlayers = this.game.players.map((player) => ({
+				...player,
+				ready: false,
+			}))
+		} else {
+			newPlayers = this.game.players.map((player) => ({
+				...player,
+				guess: null,
+				ready: false,
+				votes: [],
+			}))
+		}
+
 		this.game = { ...this.game, players: newPlayers }
 	}
 
+	private static currentColorIndex: number | null = null
+
 	private static assignUnusedAvatarColor(game?: GameInfo): AvatarColor {
+		// Initialize the currentColorIndex if it hasn't been set
+		if (this.currentColorIndex === null) {
+			this.currentColorIndex = Math.floor(Math.random() * avatarColors.length)
+		}
+
 		if (!game) {
-			return avatarColors[Math.floor(Math.random() * avatarColors.length)]
+			// For the first player, return the color at the random index
+			return avatarColors[this.currentColorIndex]
 		}
 
 		const usedColors = game.players.map((player) => player.avatarColor)
-		const availableColors = avatarColors.filter((color) => !usedColors.includes(color))
 
+		// Try to find the next unused color starting from currentColorIndex
+		let index = this.currentColorIndex
+		let attempts = 0
+
+		while (attempts < avatarColors.length) {
+			// Get the current color
+			const color = avatarColors[index]
+
+			// If this color isn't used, use it and update the index
+			if (!usedColors.includes(color)) {
+				// Update the index for the next assignment
+				this.currentColorIndex = (index + 1) % avatarColors.length
+				return color
+			}
+
+			// Move to the next color, wrapping around if necessary
+			index = (index + 1) % avatarColors.length
+			attempts++
+		}
+
+		// If all colors are used (shouldn't happen in normal gameplay),
+		// fall back to random selection from remaining colors
+		const availableColors = avatarColors.filter((color) => !usedColors.includes(color))
 		return availableColors[Math.floor(Math.random() * availableColors.length)]
 	}
-
 	private static getUnusedAnswer(category: Category, game?: GameInfo): Answer {
 		const array = answersObject[category]
 
