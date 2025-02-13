@@ -3,7 +3,6 @@ import { usePathname, useSearchParams } from 'next/navigation'
 import { GameProvider, useGameState } from '../hooks/useGameState'
 import { Category } from './NewGameForm'
 import { Pill } from './Pill'
-import { PlayerInitialsIcon } from './PlayerInitialsIcon'
 import PlayingScreen from './PlayingScreen'
 import { ResultsScreen } from './ResultsScreen'
 import { VotingScreen } from './VotingScreen'
@@ -38,32 +37,6 @@ function InfoBar() {
 							<div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
 							<span className="text-gray-600">Room: </span>
 							<Pill>{gameState.roomId}</Pill>
-						</span>
-						<span className="text-gray-300">|</span>
-						<span className="flex items-center gap-1">
-							<span className="text-gray-600">Players: </span>
-							<span className="flex">
-								{gameState.players
-									.sort((a, b) => {
-										if (a.score > b.score) return -1
-										if (a.score < b.score) return 1
-										else return 0
-									})
-									.map((player, i) => (
-										<span
-											style={{
-												zIndex: gameState.players.length - i,
-												transform: `translateX(-${i * 8}px)`,
-											}}
-											key={player.name + 'initalsicon'}
-										>
-											<PlayerInitialsIcon
-												className="!h-5 !w-5 teat-[4px] border border-gray-100"
-												player={player}
-											/>
-										</span>
-									))}
-							</span>
 						</span>
 					</div>
 					<Pill>
