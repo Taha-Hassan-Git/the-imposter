@@ -7,22 +7,27 @@ export type Action =
 	| { type: 'player-voted'; payload: { name: string; vote: string } }
 	| { type: 'player-guessed'; payload: { name: string; guess: Answer } }
 
-// nice pastel colours
-export const avatarColors = [
-	'#FDA349',
-	'#FFD452',
-	'#FFE46B',
-	'#CDFF70',
-	'#70FF77',
-	'#09F1F1',
-	'#B3FFEE',
-	'#72C1FD',
-	'#5C7AFF',
-	'#FDAAD8',
-	'#FF66CF',
-	'#D257FF',
-	'#FF6673',
-] as const
+const createAvatarColors = (): string[] => {
+	const NUMBER_OF_AVATAR_COLORS = 12
+	const ROWS = 3
+	const COLUMNS = 4
+
+	const colors = Array.from(
+		{ length: NUMBER_OF_AVATAR_COLORS },
+		(_, i) => `hsl(${Math.round((i * 360) / NUMBER_OF_AVATAR_COLORS)}, 100%, 75%)`
+	)
+
+	const sortingPattern = []
+	for (let col = 0; col < COLUMNS; col++) {
+		for (let row = 0; row < ROWS; row++) {
+			sortingPattern.push(row * COLUMNS + col)
+		}
+	}
+
+	return sortingPattern.map((index) => colors[index])
+}
+
+export const avatarColors = createAvatarColors()
 
 export type Player = {
 	name: string

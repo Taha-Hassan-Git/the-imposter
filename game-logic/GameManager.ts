@@ -284,17 +284,46 @@ export class GameManager {
 		this.game = { ...this.game, players: newPlayers }
 	}
 
+	private static currentColorIndex: number | null = null
+
 	private static assignUnusedAvatarColor(game?: GameInfo): AvatarColor {
+		// Initialize the currentColorIndex if it hasn't been set
+		if (this.currentColorIndex === null) {
+			this.currentColorIndex = Math.floor(Math.random() * avatarColors.length)
+		}
+
 		if (!game) {
-			return avatarColors[Math.floor(Math.random() * avatarColors.length)]
+			// For the first player, return the color at the random index
+			return avatarColors[this.currentColorIndex]
 		}
 
 		const usedColors = game.players.map((player) => player.avatarColor)
-		const availableColors = avatarColors.filter((color) => !usedColors.includes(color))
 
+		// Try to find the next unused color starting from currentColorIndex
+		let index = this.currentColorIndex
+		let attempts = 0
+
+		while (attempts < avatarColors.length) {
+			// Get the current color
+			const color = avatarColors[index]
+
+			// If this color isn't used, use it and update the index
+			if (!usedColors.includes(color)) {
+				// Update the index for the next assignment
+				this.currentColorIndex = (index + 1) % avatarColors.length
+				return color
+			}
+
+			// Move to the next color, wrapping around if necessary
+			index = (index + 1) % avatarColors.length
+			attempts++
+		}
+
+		// If all colors are used (shouldn't happen in normal gameplay),
+		// fall back to random selection from remaining colors
+		const availableColors = avatarColors.filter((color) => !usedColors.includes(color))
 		return availableColors[Math.floor(Math.random() * availableColors.length)]
 	}
-
 	private static getUnusedAnswer(category: Category, game?: GameInfo): Answer {
 		const array = answersObject[category]
 

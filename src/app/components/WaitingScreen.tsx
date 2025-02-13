@@ -57,7 +57,7 @@ function PlayerListItem({ player }: { player: Player }) {
 			<div
 				className="w-6 h-6 rounded-full mr-3"
 				suppressHydrationWarning
-				style={{ backgroundColor: player.avatarColor, opacity: 0.6 }}
+				style={{ backgroundColor: player.avatarColor }}
 			/>
 			<span className="font-bold flex-1">{player.name}</span>
 			{player.ready ? (
