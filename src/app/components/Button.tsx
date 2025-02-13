@@ -29,7 +29,7 @@ const baseStyles = 'px-4 py-4 rounded-md font-medium transition-colors'
 
 // Variant-specific styles
 const variantStyles: Record<ButtonVariant, string> = {
-	primary: 'bg-gray-700 text-white hover:bg-gray-800',
+	primary: 'bg-blue-500 text-white hover:bg-blue-900',
 	secondary: 'bg-gray-300 text-gray-800 hover:bg-gray-400',
 	disabled: 'bg-gray-200 text-gray-400',
 }

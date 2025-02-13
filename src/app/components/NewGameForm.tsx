@@ -48,7 +48,7 @@ export default function NewGameForm() {
 		return (
 			<Panel className="flex flex-col gap-5 mt-5">
 				<Button
-					variant="secondary"
+					variant="primary"
 					onClick={() => {
 						setShowJoinExisting(false)
 					}}
@@ -56,7 +56,7 @@ export default function NewGameForm() {
 					Create new room
 				</Button>
 				<Button
-					variant="secondary"
+					variant="primary"
 					onClick={() => {
 						setShowJoinExisting(true)
 					}}
