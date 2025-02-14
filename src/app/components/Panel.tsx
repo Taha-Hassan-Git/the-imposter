@@ -12,7 +12,7 @@ export function Panel(props: PanelProps) {
 
 	// Apply padding only if it's not being overridden in className
 	const paddingStyle =
-		props.className?.includes('!p-') || props.className?.includes('p-') ? '' : 'p-8'
+		props.className?.includes(' !p-') || props.className?.includes(' p-') ? '' : 'p-8'
 
 	const styles = classNames(baseStyles, paddingStyle, variantStyles, props.className)
 
