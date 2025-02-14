@@ -18,7 +18,7 @@ function VotePanel() {
 	const { gameState } = useActiveGame()
 	const localPlayer = useLocalPlayer()
 	return (
-		<Panel className="p-0">
+		<Panel className="!p-0">
 			<div className="p-8">
 				<h2 className="text-md font-bold mb-4 text-center">Who is the imposter?</h2>
 				<ul className="space-y-4">

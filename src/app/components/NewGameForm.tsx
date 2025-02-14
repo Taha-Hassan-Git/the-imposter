@@ -48,7 +48,7 @@ export default function NewGameForm() {
 		return (
 			<Panel className="flex flex-col gap-5 mt-5">
 				<Button
-					variant="secondary"
+					variant="primary"
 					onClick={() => {
 						setShowJoinExisting(false)
 					}}
@@ -56,7 +56,7 @@ export default function NewGameForm() {
 					Create new room
 				</Button>
 				<Button
-					variant="secondary"
+					variant="primary"
 					onClick={() => {
 						setShowJoinExisting(true)
 					}}
@@ -72,8 +72,8 @@ export default function NewGameForm() {
 		)
 	}
 	return (
-		<Panel className="flex flex-col gap-5 mt-5">
-			<div className="flex mt-0 w-full">
+		<Panel className="!p-0 ">
+			<div className="flex w-full">
 				<Button
 					variant={showJoinExisting ? 'secondary' : 'disabled'}
 					className="flex-1 px-2 rounded-tl-md rounded-r-none rounded-none bg-gray-100 disabled:bg-white disabled:text-gray-800"
@@ -91,7 +91,7 @@ export default function NewGameForm() {
 					Create new room
 				</Button>
 			</div>
-			<div className="p-8 flex flex-col gap-5">
+			<div className="p-8 flex flex-col gap-5 w-full">
 				{showJoinExisting ? (
 					<Input
 						name={'roomId'}
@@ -122,10 +122,10 @@ export default function NewGameForm() {
 					}}
 				/>
 
-				<div className="self-center">
+				<div className="self-center w-full">
 					<Button
 						disabled={isSubmitDisabled}
-						className="disabled:bg-gray-300 disabled:text-gray-800"
+						className="disabled:bg-gray-300 disabled:text-gray-800 w-full"
 						type="submit"
 					>
 						{showJoinExisting ? 'Join Room' : 'Create Room'}

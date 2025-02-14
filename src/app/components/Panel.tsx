@@ -6,11 +6,15 @@ interface PanelProps {
 }
 
 export function Panel(props: PanelProps) {
-	const styles = classNames(
-		'bg-white rounded-lg shadow-md p-8 w-full',
-		props.variant === 'column' ? 'flex flex-col gap-5 items-center' : '',
-		props.className
-	)
+	const baseStyles = 'bg-white rounded-lg shadow-md w-full'
+
+	const variantStyles = props.variant === 'column' ? 'flex flex-col gap-5 items-center' : ''
+
+	// Apply padding only if it's not being overridden in className
+	const paddingStyle =
+		props.className?.includes('!p-') || props.className?.includes('p-') ? '' : 'p-8'
+
+	const styles = classNames(baseStyles, paddingStyle, variantStyles, props.className)
 
 	return <div className={styles}>{props.children}</div>
 }

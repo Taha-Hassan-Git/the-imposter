@@ -12,7 +12,7 @@ export function Pill({
 	const bgColorStyle = `bg-${bgColor}-50 `
 
 	const styles = classNames(
-		'flex items-center justify-center border rounded-full px-3 py-1',
+		'flex items-center justify-center border rounded-full px-3 py-1 text-nowrap text-ellipses',
 		bgColorStyle,
 		className
 	)

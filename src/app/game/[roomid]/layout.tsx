@@ -1,5 +1,11 @@
 import { ReactNode } from 'react'
+import Header from '../../components/Header'
 
 export default function Layout({ children }: { children: ReactNode }) {
-	return <main className="w-full">{children}</main>
+	return (
+		<>
+			<Header />
+			<main className="w-full max-w-[500px]">{children}</main>
+		</>
+	)
 }

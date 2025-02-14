@@ -1,6 +1,7 @@
 import { Answer, answersObject } from '../../../game-logic/types'
 import { useActiveGame, useLocalPlayer } from '../hooks/useGameState'
 import { Button } from './Button'
+import { Category } from './NewGameForm'
 import { Panel } from './Panel'
 import { PlayerInitialsIcon } from './PlayerInitialsIcon'
 
@@ -8,9 +9,39 @@ const PlayingScreen = () => {
 	return (
 		<div className="flex flex-col gap-5 p-1 items-center w-full mt-4">
 			<AnswerBox />
+			<Hint />
 			<ReadyToVoteBox />
 			<div className="flex flex-col gap-5 w-full"></div>
 		</div>
+	)
+}
+
+function Hint() {
+	const { gameState } = useActiveGame()
+	const firstPlayer = gameState.players[gameState.round % gameState.players.length]
+
+	const hintsObject: Record<Category, string> = {
+		films: 'Was this movie released before 2000?',
+		animals: 'Are you afraid of this animal?',
+		countries: 'Has this country been in the news lately?',
+		sports: 'Is this a team sport?',
+	}
+
+	return (
+		<Panel className="w-full !p-0">
+			<div className="flex flex-col gap-3">
+				<div className="flex items-center gap-3 p-2 pb-4 border-b bg-blue-50 rounded-t-lg">
+					<PlayerInitialsIcon className="!h-6 !w-6" player={firstPlayer} />
+					<span className="text-md">{firstPlayer.name} goes first!</span>
+				</div>
+				<div className="pb-4 px-4">
+					<div className="text-sm text-gray-600">
+						<p>Take turns choosing another player to ask them a question about the secret word.</p>
+						<p className="mt-2 text-gray-500 italic">e.g. {hintsObject[gameState.category]}</p>
+					</div>
+				</div>
+			</div>
+		</Panel>
 	)
 }
 function ReadyToVoteBox() {
@@ -21,16 +52,15 @@ function ReadyToVoteBox() {
 		dispatch({ type: 'toggle-ready', payload: { name: localPlayer.name } })
 	}
 	return (
-		<Panel className="p-0">
-			<div className="p-8">
+		<Panel className="p-0 sticky bottom-0 border-t">
+			<div className="p-4">
 				<div className="w-full border-b">
-					<h2 className="text-md font-bold mb-2 text-center">Ready to Vote?</h2>
 					<Button
 						className="w-full"
 						onClick={toggleReady}
 						variant={localPlayer.ready ? 'disabled' : 'primary'}
 					>
-						{localPlayer.ready ? '...' : 'Ready'}
+						{localPlayer.ready ? '...' : 'Ready to vote?'}
 					</Button>
 				</div>
 			</div>
