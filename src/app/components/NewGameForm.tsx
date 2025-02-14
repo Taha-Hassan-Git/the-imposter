@@ -72,7 +72,7 @@ export default function NewGameForm() {
 		)
 	}
 	return (
-		<Panel className="!p-0 ">
+		<Panel className="!p-0 mt-5">
 			<div className="flex w-full">
 				<Button
 					variant={showJoinExisting ? 'secondary' : 'disabled'}
