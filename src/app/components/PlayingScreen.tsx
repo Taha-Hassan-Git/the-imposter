@@ -52,7 +52,7 @@ function ReadyToVoteBox() {
 		dispatch({ type: 'toggle-ready', payload: { name: localPlayer.name } })
 	}
 	return (
-		<Panel className="p-0 sticky bottom-0 border-t">
+		<Panel className="!p-0 sticky bottom-0 border-t">
 			<div className="p-4">
 				<div className="w-full border-b">
 					<Button
