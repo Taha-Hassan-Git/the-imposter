@@ -51,7 +51,7 @@ function InfoBar() {
 function Game() {
 	const gameState = useGameState()
 	return (
-		<>
+		<div className="flex flex-col gap-5 items-center w-full pt-5">
 			{gameState.state === 'loading' ? (
 				<LoadingScreen />
 			) : gameState.state === 'waiting' ? (
@@ -63,7 +63,7 @@ function Game() {
 			) : (
 				<ResultsScreen />
 			)}
-		</>
+		</div>
 	)
 }
 

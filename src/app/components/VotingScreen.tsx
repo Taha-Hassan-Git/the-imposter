@@ -7,10 +7,10 @@ import { AnswerGrid, Presence } from './PlayingScreen'
 
 export function VotingScreen() {
 	return (
-		<div className="flex flex-col gap-5 p-5 items-center w-full">
+		<>
 			<ChooseAnswer />
 			<VotePanel />
-		</div>
+		</>
 	)
 }
 

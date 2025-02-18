@@ -13,13 +13,11 @@ export function ResultsScreen() {
 	const avoidedDetection = mostVotedPlayer.name !== imposter.name
 	const guessedCorrectly = imposter.guess === gameState.answer
 	return (
-		<div className="flex flex-col gap-5 items-center w-full h-full justify-between">
+		<>
 			<MessagePanel avoidedDetection={avoidedDetection} guessedCorrectly={guessedCorrectly} />
-
 			<ScorePanel avoidedDetection={avoidedDetection} guessedCorrectly={guessedCorrectly} />
-
 			<NextRoundButton />
-		</div>
+		</>
 	)
 }
 

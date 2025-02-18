@@ -7,12 +7,12 @@ import { PlayerInitialsIcon } from './PlayerInitialsIcon'
 
 const PlayingScreen = () => {
 	return (
-		<div className="flex flex-col gap-5 p-1 items-center w-full mt-4">
+		<>
 			<AnswerBox />
 			<Hint />
 			<ReadyToVoteBox />
 			<div className="flex flex-col gap-5 w-full"></div>
-		</div>
+		</>
 	)
 }
 
