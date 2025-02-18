@@ -1,5 +1,3 @@
-import { Category } from '../src/app/components/NewGameForm'
-
 export type Action =
 	| { type: 'toggle-ready'; payload: { name: string } }
 	| { type: 'player-joined'; payload: { name: string } }
@@ -141,7 +139,7 @@ export const answersObject: Record<Category, Answer[]> = {
 	sports: [...sportsAnswers],
 }
 
-export type Category = keyof typeof answersObject
+export type Category = "films" | "animals" | "countries" | "sports"
 
 export const categoriesArray: Array<Category> = ['films', 'animals', 'countries', 'sports']
 

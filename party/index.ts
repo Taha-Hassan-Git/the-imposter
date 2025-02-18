@@ -1,7 +1,6 @@
 import type * as Party from 'partykit/server'
 import { GameManager } from '../game-logic/GameManager'
-import { Action, GameInfo } from '../game-logic/types'
-import { Category } from '../src/app/components/NewGameForm'
+import { Action, Category, GameInfo } from '../game-logic/types'
 
 export interface GameFormInfo {
 	playerName: string

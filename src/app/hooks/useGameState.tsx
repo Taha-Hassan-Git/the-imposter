@@ -1,7 +1,6 @@
 import usePartySocket from 'partysocket/react'
 import { createContext, useCallback, useContext, useState } from 'react'
-import { Action, GameInfo, GameState, Player } from '../../../game-logic/types'
-import { Category } from '../components/NewGameForm'
+import { Action, Category, GameInfo, GameState, Player } from '../../../game-logic/types'
 import { PARTYKIT_HOST } from '../env'
 
 interface GameContext {

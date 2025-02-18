@@ -1,6 +1,6 @@
+import { Category } from '../../../game-logic/types'
 import { useActiveGame, useLocalPlayer } from '../hooks/useGameState'
 import { AnswerGrid } from './AnswerGrid'
-import { Category } from './NewGameForm'
 import { Panel } from './Panel'
 import { PlayerInitialsIcon } from './PlayerInitialsIcon'
 import { ReadyBtnWithPresence } from './ReadyBtnWithPresence'

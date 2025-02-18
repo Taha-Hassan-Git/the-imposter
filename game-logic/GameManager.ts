@@ -1,11 +1,11 @@
 import { GameFormInfo } from '../party'
-import { Category } from '../src/app/components/NewGameForm'
 import {
 	Action,
 	Answer,
 	answersObject,
 	AvatarColor,
 	avatarColors,
+	Category,
 	GameInfo,
 	Player,
 	StateNames,
