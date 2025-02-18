@@ -4,6 +4,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { generateRoomId } from '../utils/generateRoomId'
 import { Button } from './Button'
 import { Input } from './Input'
+import { RedMessage } from './Message'
 import { Panel } from './Panel'
 
 export type GameFormData = { category: Category; roomId: RoomId; name: string }
@@ -46,29 +47,30 @@ export default function NewGameForm() {
 
 	if (showJoinExisting === undefined) {
 		return (
-			<Panel className="flex flex-col gap-5 mt-5">
-				<Button
-					variant="primary"
-					onClick={() => {
-						setShowJoinExisting(false)
-					}}
-				>
-					Create new room
-				</Button>
-				<Button
-					variant="primary"
-					onClick={() => {
-						setShowJoinExisting(true)
-					}}
-				>
-					Join existing room
-				</Button>
-
+			<div className="w-full flex flex-col items-center">
 				{
 					//disappears after 5 seconds
-					showErrorMessage && <p className="text-red-600 text-center">{errorMessage}</p>
+					showErrorMessage && <RedMessage message={errorMessage || 'Something went wrong'} />
 				}
-			</Panel>
+				<Panel className="flex flex-col gap-5 mt-5">
+					<Button
+						variant="primary"
+						onClick={() => {
+							setShowJoinExisting(false)
+						}}
+					>
+						Create new room
+					</Button>
+					<Button
+						variant="primary"
+						onClick={() => {
+							setShowJoinExisting(true)
+						}}
+					>
+						Join existing room
+					</Button>
+				</Panel>
+			</div>
 		)
 	}
 	return (

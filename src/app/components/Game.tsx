@@ -1,6 +1,7 @@
 'use client'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { GameProvider, useGameState } from '../hooks/useGameState'
+import { LoadingScreen } from './LoadingScreen'
 import { Category } from './NewGameForm'
 import { Pill } from './Pill'
 import PlayingScreen from './PlayingScreen'
@@ -65,8 +66,4 @@ function Game() {
 			)}
 		</div>
 	)
-}
-
-export function LoadingScreen() {
-	return <div>Loading... </div>
 }

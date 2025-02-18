@@ -1,5 +1,4 @@
-import { LoadingScreen } from './components/Game'
-
+import { LoadingScreen } from './components/LoadingScreen'
 export default function Loading() {
 	return <LoadingScreen />
 }

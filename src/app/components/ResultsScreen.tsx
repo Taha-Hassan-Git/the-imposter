@@ -1,7 +1,7 @@
 import { Crown, VenetianMask } from 'lucide-react'
 import { Player } from '../../../game-logic/types'
 import { useActiveGame, useLocalPlayer } from '../hooks/useGameState'
-import { Panel } from './Panel'
+import { GreenMessage, RedMessage, YellowMessage } from './Message'
 import { PlayerInitialsIcon } from './PlayerInitialsIcon'
 import { ReadyBtnWithPresence } from './ReadyBtnWithPresence'
 
@@ -58,22 +58,6 @@ function MessagePanel({
 				<GreenMessage message={'You got them! The imposter was ' + imposter.name + '.'} />
 			)}
 		</>
-	)
-}
-
-function YellowMessage({ message }: { message: string }) {
-	return (
-		<Panel className="!bg-yellow-50 border-2 border-yellow-200 max-w-[90%] mt-4">{message}</Panel>
-	)
-}
-
-function RedMessage({ message }: { message: string }) {
-	return <Panel className="!bg-red-50 border-2 border-red-200 max-w-[90%] mt-4">{message}</Panel>
-}
-
-function GreenMessage({ message }: { message: string }) {
-	return (
-		<Panel className="!bg-green-50 border-2 border-green-200 max-w-[90%] mt-4">{message}</Panel>
 	)
 }
 
