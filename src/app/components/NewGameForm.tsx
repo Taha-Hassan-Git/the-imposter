@@ -1,6 +1,7 @@
 'use client'
 import { useSearchParams } from 'next/navigation'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { categoriesArray, Category } from '../../../game-logic/types'
 import { generateRoomId } from '../utils/generateRoomId'
 import { Button } from './Button'
 import { Input } from './Input'
@@ -8,7 +9,7 @@ import { RedMessage } from './Message'
 import { Panel } from './Panel'
 
 export type GameFormData = { category: Category; roomId: RoomId; name: string }
-export type Category = 'films' | 'animals' | 'countries' | 'sports'
+
 type RoomId = string | null
 
 const defaultGameFormData: GameFormData = {
@@ -16,8 +17,6 @@ const defaultGameFormData: GameFormData = {
 	name: '',
 	roomId: null,
 }
-
-const categories: Array<Category> = ['films', 'animals', 'countries', 'sports']
 
 const placeHolderRoomId = generateRoomId()
 
@@ -161,7 +160,7 @@ function SelectCategories({
 				name="category"
 				className="w-full p-2.5 text-base border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
 			>
-				{categories.map((category) => {
+				{categoriesArray.map((category) => {
 					return (
 						<option key={category + 'option'} value={category}>
 							{category.slice(0, 1).toUpperCase() + category.slice(1)}

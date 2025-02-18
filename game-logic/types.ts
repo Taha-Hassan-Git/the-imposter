@@ -141,6 +141,10 @@ export const answersObject: Record<Category, Answer[]> = {
 	sports: [...sportsAnswers],
 }
 
+export type Category = keyof typeof answersObject
+
+export const categoriesArray: Array<Category> = ['films', 'animals', 'countries', 'sports']
+
 export type SportsAnswer = (typeof sportsAnswers)[number]
 
 export type Answer = FilmAnswer | AnimalAnswer | CountryAnswer | SportsAnswer
