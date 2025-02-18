@@ -1,9 +1,10 @@
 import { Crown, VenetianMask } from 'lucide-react'
 import { Player } from '../../../game-logic/types'
 import { useActiveGame, useLocalPlayer } from '../hooks/useGameState'
-import { Button } from './Button'
 import { Panel } from './Panel'
 import { PlayerInitialsIcon } from './PlayerInitialsIcon'
+import { ReadyBtnWithPresence } from './ReadyBtnWithPresence'
+
 export function ResultsScreen() {
 	const { gameState } = useActiveGame()
 	const mostVotedPlayer = gameState.players.reduce((acc, player) =>
@@ -13,13 +14,11 @@ export function ResultsScreen() {
 	const avoidedDetection = mostVotedPlayer.name !== imposter.name
 	const guessedCorrectly = imposter.guess === gameState.answer
 	return (
-		<div className="flex flex-col gap-5 items-center w-full h-full justify-between">
+		<>
 			<MessagePanel avoidedDetection={avoidedDetection} guessedCorrectly={guessedCorrectly} />
-
 			<ScorePanel avoidedDetection={avoidedDetection} guessedCorrectly={guessedCorrectly} />
-
-			<NextRoundButton />
-		</div>
+			<ReadyBtnWithPresence text={'Begin next round'} />
+		</>
 	)
 }
 
@@ -75,26 +74,6 @@ function RedMessage({ message }: { message: string }) {
 function GreenMessage({ message }: { message: string }) {
 	return (
 		<Panel className="!bg-green-50 border-2 border-green-200 max-w-[90%] mt-4">{message}</Panel>
-	)
-}
-
-function NextRoundButton() {
-	const { dispatch } = useActiveGame()
-	const localPlayer = useLocalPlayer()
-	function handleNextRound() {
-		dispatch({ type: 'toggle-ready', payload: { name: localPlayer.name } })
-	}
-
-	return (
-		<Panel className="sticky bottom-0">
-			<Button
-				className="w-full"
-				onClick={handleNextRound}
-				variant={localPlayer.ready ? 'disabled' : 'primary'}
-			>
-				{localPlayer.ready ? 'waiting...' : 'Begin next round'}
-			</Button>
-		</Panel>
 	)
 }
 

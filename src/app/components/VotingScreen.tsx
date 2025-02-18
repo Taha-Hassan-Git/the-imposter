@@ -1,16 +1,18 @@
 import { Answer, Player } from '../../../game-logic/types'
 import { useActiveGame, useLocalPlayer } from '../hooks/useGameState'
+import { AnswerGrid } from './AnswerGrid'
 import { Button } from './Button'
 import { Panel } from './Panel'
 import { PlayerInitialsIcon } from './PlayerInitialsIcon'
-import { AnswerGrid, Presence } from './PlayingScreen'
+
+import { Presence } from './ReadyBtnWithPresence'
 
 export function VotingScreen() {
 	return (
-		<div className="flex flex-col gap-5 p-5 items-center w-full">
+		<>
 			<ChooseAnswer />
 			<VotePanel />
-		</div>
+		</>
 	)
 }
 

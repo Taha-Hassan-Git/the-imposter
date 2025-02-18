@@ -13,7 +13,7 @@ const URL =
 export function WaitingScreen() {
 	const { gameState } = useActiveGame()
 	return (
-		<div className="flex flex-col gap-5 p-5 items- w-full">
+		<>
 			<Panel>
 				<div className="max-h-[280px] overflow-y-scroll w-full">
 					<div className="justify-between flex items-center align-middle mb-2">
@@ -47,7 +47,7 @@ export function WaitingScreen() {
 					<QRCode size={120} value={URL + `?roomId=${gameState.roomId}`} />
 				</div>
 			</Panel>
-		</div>
+		</>
 	)
 }
 
