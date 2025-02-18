@@ -24,7 +24,7 @@ const placeHolderRoomId = generateRoomId()
 export default function NewGameForm() {
 	const searchParams = useSearchParams()
 	const errorMessage = searchParams.get('error')
-	const [showErrorMessage, setShowErrorMessage] = useState<boolean>(true)
+	const [showErrorMessage, setShowErrorMessage] = useState<boolean>(() => !!errorMessage)
 	setTimeout(() => {
 		setShowErrorMessage(false)
 	}, 5000)
