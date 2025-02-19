@@ -1,6 +1,4 @@
-import { GamePage } from './fixtures/GamePage'
-import { HomePage } from './fixtures/HomePage'
-import { expect, test } from './fixtures/the-imposter-test'
+import { expect, PlayerContext, test } from './fixtures/the-imposter-test'
 
 test.beforeEach(async ({ homePage }) => {
 	await homePage.goto()
@@ -29,36 +27,52 @@ test('Can create a room', async ({ homePage, gamePage }) => {
 	await expect(gamePage.readyButton).toBeVisible()
 })
 
-test('Can create a room and join as another user', async ({ browser, homePage, gamePage }) => {
-	// Create a room as the first user
-	await homePage.createNewButton.click()
-	expect(homePage.createRoomFormButton).toBeVisible()
-	expect(homePage.createRoomFormButton).toBeDisabled()
-	await homePage.nameInput.fill('Player1')
-	expect(homePage.createRoomFormButton).toBeEnabled()
-	await homePage.createRoomFormButton.click()
-	await expect(gamePage.readyButton).toBeVisible()
+test('Can create a room and join as multiple users', async ({ createPlayerContext }) => {
+	const [player1, player2, player3] = await createPlayerContext(3)
 
-	// Get the room ID from the URL
+	await createRoom(player1, 'Player1')
+	await expect(player1.gamePage.readyButton).toBeVisible()
+	const roomId = await player1.gamePage.roomId.innerText()
 
-	// remove params by slicing after the first question mark
-	const roomId = await gamePage.getURL().then((url) => url.split('?')[0].split('/').pop()!)
+	await joinRoom(player2, roomId, 'Player2')
+	await expect(player2.gamePage.readyButton).toBeVisible()
 
-	// Create a new browser context for the second user
-	const context = await browser.newContext()
-	const page = await context.newPage()
-	const secondHomePage = new HomePage(page)
-	const secondGamePage = new GamePage(page)
+	expect(await player1.gamePage.getNumberOfPlayers()).toBe(2)
 
-	// Join the room as the second user
-	await secondHomePage.goto()
-	await secondHomePage.joinExistingButton.click()
-	await secondHomePage.roomIdInput.fill(roomId)
-	await secondHomePage.nameInput.fill('Player2')
-	await secondHomePage.joinRoomFormButton.click()
-	await expect(secondGamePage.readyButton).toBeVisible()
-	expect(await secondGamePage.getPlayers()).toBe(2)
+	await joinRoom(player3, roomId, 'Player3')
+	await expect(player3.gamePage.readyButton).toBeVisible()
 
-	// Clean up
-	await context.close()
+	expect(await player1.gamePage.getNumberOfPlayers()).toBe(3)
 })
+
+test('Can join a game after inputting the same name as another player', async ({
+	createPlayerContext,
+}) => {
+	const [player1, player2] = await createPlayerContext(2)
+
+	await createRoom(player1, 'Player1')
+	await expect(player1.gamePage.readyButton).toBeVisible()
+
+	const roomId = await player1.gamePage.roomId.innerText()
+
+	await joinRoom(player2, roomId, 'Player1')
+	await expect(player2.gamePage.readyButton).toBeVisible()
+
+	expect(await player1.gamePage.getNumberOfPlayers()).toBe(2)
+	expect(await player2.gamePage.getNumberOfPlayers()).toBe(2)
+})
+
+async function createRoom(context: PlayerContext, name: string) {
+	await context.homePage.goto()
+	await context.homePage.createNewButton.click()
+	await context.homePage.nameInput.fill(name)
+	await context.homePage.createRoomFormButton.click()
+}
+
+async function joinRoom(context: PlayerContext, roomId: string, name: string) {
+	await context.homePage.goto()
+	await context.homePage.joinExistingButton.click()
+	await context.homePage.roomIdInput.fill(roomId)
+	await context.homePage.nameInput.fill(name)
+	await context.homePage.joinRoomFormButton.click()
+}
