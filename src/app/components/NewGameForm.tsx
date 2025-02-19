@@ -114,7 +114,7 @@ export default function NewGameForm() {
 					name={'name'}
 					type={'text'}
 					label={'Your Name:'}
-					placeholder={"...what's your name?"}
+					placeholder={'...what is your name?'}
 					value={gameFormData.name}
 					handleChange={(e) => {
 						setGameFormData((prev) => {

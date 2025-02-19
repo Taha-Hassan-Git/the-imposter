@@ -9,7 +9,9 @@
 		"start": "next start",
 		"lint": "next lint",
 		"test": "jest",
-		"test:watch": "jest --watch"
+		"test:watch": "jest --watch",
+		"test:e2e": "npx playwright test",
+		"test:e2e:ui": "npx playwright test --ui"
 	},
 	"dependencies": {
 		"classnames": "^2.5.1",
@@ -22,6 +24,7 @@
 	},
 	"devDependencies": {
 		"@eslint/eslintrc": "^3",
+		"@playwright/test": "^1.50.1",
 		"@testing-library/dom": "^10.4.0",
 		"@testing-library/jest-dom": "^6.6.3",
 		"@testing-library/react": "^16.2.0",
