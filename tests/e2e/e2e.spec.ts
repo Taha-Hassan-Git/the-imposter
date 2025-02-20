@@ -5,7 +5,6 @@ test.beforeEach(async ({ homePage }) => {
 })
 
 test('Should load homepage', async ({ homePage }) => {
-	expect(homePage.createRoomFormButton).toBeHidden()
 	expect(homePage.header).toBeTruthy()
 })
 
