@@ -28,6 +28,7 @@ export function GameProvider({
 	const socket = usePartySocket({
 		host: PARTYKIT_HOST,
 		room: roomId,
+		id: playerId,
 		onMessage(event) {
 			const message = JSON.parse(event.data) as GameInfo
 			if (message) {

@@ -60,7 +60,7 @@ export default class Server implements Party.Server {
 			if (leftGame) {
 				this.gameManager?.handleAction({
 					type: 'player-left',
-					payload: { name: connection.id },
+					payload: { id: connection.id },
 				})
 				this.party.broadcast(JSON.stringify(this.gameManager?.getState()))
 			}
