@@ -8,7 +8,7 @@ export function ReadyBtnWithPresence({ text }: { text: string }) {
 	const localPlayer = useLocalPlayer()
 
 	function toggleReady() {
-		dispatch({ type: 'toggle-ready', payload: { name: localPlayer.name } })
+		dispatch({ type: 'toggle-ready', payload: { id: localPlayer.id } })
 	}
 	return (
 		<Panel className="!p-0 sticky bottom-0 border-t">

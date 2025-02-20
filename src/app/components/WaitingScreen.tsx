@@ -26,7 +26,7 @@ export function WaitingScreen() {
 						<div className="flex items-center gap-2">
 							Room ID:
 							<Pill>
-								<p>{gameState.roomId}</p>
+								<p data-testid={'room-id'}>{gameState.roomId}</p>
 							</Pill>
 						</div>
 					</div>
@@ -83,7 +83,7 @@ function ReadyButton() {
 	const localPlayer = useLocalPlayer()
 
 	const handleClick = () => {
-		dispatch({ type: 'toggle-ready', payload: { name: localPlayer.name } })
+		dispatch({ type: 'toggle-ready', payload: { id: localPlayer.id } })
 	}
 
 	const message =

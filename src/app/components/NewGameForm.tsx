@@ -1,6 +1,7 @@
 'use client'
 import { useSearchParams } from 'next/navigation'
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react'
+import { v4 as uuidv4 } from 'uuid'
 import { categoriesArray, Category } from '../../../game-logic/types'
 import { generateRoomId } from '../utils/generateRoomId'
 import { Button } from './Button'
@@ -24,18 +25,33 @@ export default function NewGameForm() {
 	const searchParams = useSearchParams()
 	const errorMessage = searchParams.get('error')
 	const [showErrorMessage, setShowErrorMessage] = useState<boolean>(() => !!errorMessage)
-	setTimeout(() => {
-		setShowErrorMessage(false)
-	}, 5000)
 	const [gameFormData, setGameFormData] = useState<GameFormData>(defaultGameFormData)
 	const [showJoinExisting, setShowJoinExisting] = useState<boolean | undefined>(undefined)
+	const playerIdRef = useRef<string>(uuidv4())
 	const isSubmitDisabled = showJoinExisting
 		? !gameFormData.roomId || !gameFormData.name
 		: !gameFormData.name
 
 	useEffect(() => {
-		const roomId = searchParams.get('roomId')
+		if (errorMessage) {
+			setShowErrorMessage(true)
+			const timer = setTimeout(() => {
+				setShowErrorMessage(false)
+			}, 5000)
+			return () => clearTimeout(timer)
+		}
+	}, [errorMessage])
 
+	useEffect(() => {
+		// check if player id is already set, if not set it
+		const playerId = localStorage.getItem('playerId')
+		if (playerId) {
+			playerIdRef.current = playerId
+		} else {
+			localStorage.setItem('playerId', playerIdRef.current)
+		}
+		// if we have a roomId in the query params, it means they came via a qr code
+		const roomId = searchParams.get('roomId')
 		if (roomId) {
 			setGameFormData((prev) => {
 				return { ...prev, roomId }
@@ -114,7 +130,7 @@ export default function NewGameForm() {
 					name={'name'}
 					type={'text'}
 					label={'Your Name:'}
-					placeholder={"...what's your name?"}
+					placeholder={'...what is your name?'}
 					value={gameFormData.name}
 					handleChange={(e) => {
 						setGameFormData((prev) => {
@@ -122,7 +138,7 @@ export default function NewGameForm() {
 						})
 					}}
 				/>
-
+				<input readOnly className="hidden" name="playerId" value={playerIdRef.current}></input>
 				<div className="self-center w-full">
 					<Button
 						disabled={isSubmitDisabled}

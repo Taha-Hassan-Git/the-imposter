@@ -4,6 +4,7 @@ import { Action, Category, GameInfo } from '../game-logic/types'
 
 export interface GameFormInfo {
 	playerName: string
+	playerId: string
 	roomId: string
 	category: Category
 }
@@ -14,32 +15,36 @@ export default class Server implements Party.Server {
 	gameManager: GameManager | undefined
 
 	async onRequest(req: Party.Request) {
-		if (req.method === 'POST') {
-			const formInfo = (await req.json()) as GameFormInfo
-			this.gameManager = GameManager.createNew(formInfo)
-			await this.saveGame()
-		}
-
-		if (this.gameManager) {
+		const formInfo = (await req.json()) as GameFormInfo
+		try {
+			if (!this.gameManager) {
+				// setting up a new game
+				this.gameManager = GameManager.createNew(formInfo)
+				await this.saveGame()
+			} else {
+				// new player joining an existing game
+				this.gameManager.handleAction({
+					type: 'player-joined',
+					payload: {
+						name: formInfo.playerName,
+						id: formInfo.playerId,
+					},
+				})
+				await this.saveGame()
+				this.party.broadcast(JSON.stringify(this.gameManager.getState()))
+			}
 			return new Response(JSON.stringify(this.gameManager.getState()), {
 				status: 200,
 				headers: { 'Content-Type': 'application/json' },
 			})
+		} catch {
+			return new Response('Error creating game', { status: 500 })
 		}
-
-		return new Response('Not found', { status: 404 })
 	}
 
 	async onConnect(connection: Party.Connection) {
-		console.log('player joined', connection.id)
 		if (!this.gameManager) return
-
-		this.gameManager.handleAction({
-			type: 'player-joined',
-			payload: { name: connection.id },
-		})
-
-		this.party.broadcast(JSON.stringify(this.gameManager.getState()))
+		connection.send(JSON.stringify(this.gameManager.getState()))
 	}
 
 	async onClose(connection: Party.Connection) {
@@ -55,7 +60,7 @@ export default class Server implements Party.Server {
 			if (leftGame) {
 				this.gameManager?.handleAction({
 					type: 'player-left',
-					payload: { name: connection.id },
+					payload: { id: connection.id },
 				})
 				this.party.broadcast(JSON.stringify(this.gameManager?.getState()))
 			}

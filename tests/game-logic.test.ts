@@ -16,6 +16,7 @@ let gameManager: GameManager
 describe('When initialising a game...', () => {
 	gameManager = GameManager.createNew({
 		playerName: PLAYER_1,
+		playerId: PLAYER_1,
 		roomId: ROOM_ID,
 		category: CATEGORY,
 	})
@@ -53,6 +54,7 @@ describe('When in the waiting state...', () => {
 	beforeEach(() => {
 		gameManager = GameManager.createNew({
 			playerName: PLAYER_1,
+			playerId: PLAYER_1,
 			roomId: ROOM_ID,
 			category: CATEGORY,
 		})
@@ -61,7 +63,7 @@ describe('When in the waiting state...', () => {
 	it('can add players', () => {
 		gameManager.handleAction({
 			type: 'player-joined',
-			payload: { name: PLAYER_2 },
+			payload: { id: PLAYER_2, name: PLAYER_2 },
 		})
 
 		const gameState = gameManager.getState()
@@ -73,7 +75,7 @@ describe('When in the waiting state...', () => {
 		// Toggle ready ON
 		gameManager.handleAction({
 			type: 'toggle-ready',
-			payload: { name: PLAYER_1 },
+			payload: { id: PLAYER_1 },
 		})
 
 		let gameState = gameManager.getState()
@@ -83,7 +85,7 @@ describe('When in the waiting state...', () => {
 		// Toggle ready OFF
 		gameManager.handleAction({
 			type: 'toggle-ready',
-			payload: { name: PLAYER_1 },
+			payload: { id: PLAYER_1 },
 		})
 
 		gameState = gameManager.getState()
@@ -95,17 +97,17 @@ describe('When in the waiting state...', () => {
 		// Add one more player (total 2)
 		gameManager.handleAction({
 			type: 'player-joined',
-			payload: { name: PLAYER_2 },
+			payload: { id: PLAYER_2, name: PLAYER_2 },
 		})
 
 		// Make both players ready
 		gameManager.handleAction({
 			type: 'toggle-ready',
-			payload: { name: PLAYER_1 },
+			payload: { id: PLAYER_1 },
 		})
 		gameManager.handleAction({
 			type: 'toggle-ready',
-			payload: { name: PLAYER_2 },
+			payload: { id: PLAYER_2 },
 		})
 
 		const gameState = gameManager.getState()
@@ -117,7 +119,7 @@ describe('When in the waiting state...', () => {
 		for (let i = 1; i < gameManager.getMinPlayers(); i++) {
 			gameManager.handleAction({
 				type: 'player-joined',
-				payload: { name: `player${i + 1}` },
+				payload: { id: `player${i + 1}`, name: `player${i + 1}` },
 			})
 		}
 
@@ -128,7 +130,7 @@ describe('When in the waiting state...', () => {
 			if (!player.ready) {
 				gameManager.handleAction({
 					type: 'toggle-ready',
-					payload: { name: player.name },
+					payload: { id: player.name },
 				})
 			}
 		})
@@ -149,18 +151,18 @@ describe('When in the waiting state...', () => {
 		// Add two more players
 		gameManager.handleAction({
 			type: 'player-joined',
-			payload: { name: PLAYER_2 },
+			payload: { id: PLAYER_2, name: PLAYER_2 },
 		})
 		gameManager.handleAction({
 			type: 'player-joined',
-			payload: { name: PLAYER_3 },
+			payload: { id: PLAYER_3, name: PLAYER_3 },
 		})
 
 		// Make all players ready
 		gameManager.getState().players.forEach((player) => {
 			gameManager.handleAction({
 				type: 'toggle-ready',
-				payload: { name: player.name },
+				payload: { id: player.name },
 			})
 		})
 
@@ -170,7 +172,7 @@ describe('When in the waiting state...', () => {
 		// Remove a player
 		gameManager.handleAction({
 			type: 'player-left',
-			payload: { name: PLAYER_3 },
+			payload: { id: PLAYER_3 },
 		})
 
 		const gameState = gameManager.getState()
@@ -191,15 +193,15 @@ describe('When in the playing state...', () => {
 		// All players are ready
 		gameManager.handleAction({
 			type: 'toggle-ready',
-			payload: { name: PLAYER_1 },
+			payload: { id: PLAYER_1 },
 		})
 		gameManager.handleAction({
 			type: 'toggle-ready',
-			payload: { name: PLAYER_2 },
+			payload: { id: PLAYER_2 },
 		})
 		gameManager.handleAction({
 			type: 'toggle-ready',
-			payload: { name: PLAYER_3 },
+			payload: { id: PLAYER_3 },
 		})
 
 		const gameState = gameManager.getState()
@@ -210,7 +212,7 @@ describe('When in the playing state...', () => {
 		// Remove a player
 		gameManager.handleAction({
 			type: 'player-left',
-			payload: { name: PLAYER_3 },
+			payload: { id: PLAYER_3 },
 		})
 
 		const gameState = gameManager.getState()
@@ -226,7 +228,7 @@ describe('When in the voting state...', () => {
 	it('handles player voting', () => {
 		gameManager.handleAction({
 			type: 'player-voted',
-			payload: { name: PLAYER_1, vote: PLAYER_2 },
+			payload: { id: PLAYER_1, vote: PLAYER_2 },
 		})
 
 		const gameState = gameManager.getState()
@@ -240,12 +242,12 @@ describe('When in the voting state...', () => {
 		// Vote for player 2
 		gameManager.handleAction({
 			type: 'player-voted',
-			payload: { name: PLAYER_1, vote: PLAYER_2 },
+			payload: { id: PLAYER_1, vote: PLAYER_2 },
 		})
 		// Try to vote again for player 2
 		gameManager.handleAction({
 			type: 'player-voted',
-			payload: { name: PLAYER_1, vote: PLAYER_2 },
+			payload: { id: PLAYER_1, vote: PLAYER_2 },
 		})
 
 		let gameState = gameManager.getState()
@@ -255,7 +257,7 @@ describe('When in the voting state...', () => {
 		// Switch vote to player 3
 		gameManager.handleAction({
 			type: 'player-voted',
-			payload: { name: PLAYER_1, vote: PLAYER_3 },
+			payload: { id: PLAYER_1, vote: PLAYER_3 },
 		})
 
 		gameState = gameManager.getState()
@@ -268,7 +270,7 @@ describe('When in the voting state...', () => {
 	it('allows the imposter to guess the word', () => {
 		gameManager.handleAction({
 			type: 'player-guessed',
-			payload: { name: PLAYER_2, guess: TEST_ANSWER },
+			payload: { id: PLAYER_2, guess: TEST_ANSWER },
 		})
 
 		const gameState = gameManager.getState()
@@ -280,7 +282,7 @@ describe('When in the voting state...', () => {
 		// Imposter guesses
 		gameManager.handleAction({
 			type: 'player-guessed',
-			payload: { name: PLAYER_2, guess: TEST_ANSWER },
+			payload: { id: PLAYER_2, guess: TEST_ANSWER },
 		})
 
 		let gameState = gameManager.getState()
@@ -290,7 +292,7 @@ describe('When in the voting state...', () => {
 		// Imposter votes
 		gameManager.handleAction({
 			type: 'player-voted',
-			payload: { name: PLAYER_2, vote: PLAYER_1 },
+			payload: { id: PLAYER_2, vote: PLAYER_1 },
 		})
 
 		gameState = gameManager.getState()
@@ -301,7 +303,7 @@ describe('When in the voting state...', () => {
 	it('does not allow non-imposters to guess the word', () => {
 		gameManager.handleAction({
 			type: 'player-guessed',
-			payload: { name: PLAYER_1, guess: TEST_ANSWER },
+			payload: { id: PLAYER_1, guess: TEST_ANSWER },
 		})
 
 		const gameState = gameManager.getState()
@@ -313,21 +315,21 @@ describe('When in the voting state...', () => {
 		// Non-imposters vote
 		gameManager.handleAction({
 			type: 'player-voted',
-			payload: { name: PLAYER_1, vote: PLAYER_2 },
+			payload: { id: PLAYER_1, vote: PLAYER_2 },
 		})
 		gameManager.handleAction({
 			type: 'player-voted',
-			payload: { name: PLAYER_3, vote: PLAYER_2 },
+			payload: { id: PLAYER_3, vote: PLAYER_2 },
 		})
 
 		// Imposter votes and guesses
 		gameManager.handleAction({
 			type: 'player-voted',
-			payload: { name: PLAYER_2, vote: PLAYER_1 },
+			payload: { id: PLAYER_2, vote: PLAYER_1 },
 		})
 		gameManager.handleAction({
 			type: 'player-guessed',
-			payload: { name: PLAYER_2, guess: TEST_ANSWER },
+			payload: { id: PLAYER_2, guess: TEST_ANSWER },
 		})
 
 		const gameState = gameManager.getState()
@@ -348,7 +350,7 @@ describe('When starting a new round...', () => {
 		gameManager.getState().players.forEach((player) => {
 			gameManager.handleAction({
 				type: 'toggle-ready',
-				payload: { name: player.name },
+				payload: { id: player.name },
 			})
 		})
 
@@ -373,6 +375,7 @@ const createTestGameState = (state: 'playing' | 'voting' | 'results'): GameInfo 
 	players: [
 		{
 			name: PLAYER_1,
+			id: PLAYER_1,
 			guess: null,
 			score: 0,
 			ready: false,
@@ -382,6 +385,7 @@ const createTestGameState = (state: 'playing' | 'voting' | 'results'): GameInfo 
 		},
 		{
 			name: PLAYER_2,
+			id: PLAYER_2,
 			guess: null,
 			score: 0,
 			ready: false,
@@ -391,6 +395,7 @@ const createTestGameState = (state: 'playing' | 'voting' | 'results'): GameInfo 
 		},
 		{
 			name: PLAYER_3,
+			id: PLAYER_3,
 			guess: null,
 			score: 0,
 			ready: false,
