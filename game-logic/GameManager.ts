@@ -135,13 +135,19 @@ export class GameManager {
 	private handlePlayerJoined(playerName: string, id: string): void {
 		const playerExists = this.game.players.some((player) => player.name === playerName)
 		const isWaiting = this.game.state === 'waiting'
+		let nameToUse = playerName
+		if (!isWaiting) return
 
-		if (playerExists || !isWaiting) {
-			return
+		if (playerExists) {
+			// does this player have the same id?, if so, do nothing
+			const sameId = this.game.players.some((player) => player.id === id)
+			if (sameId) return
+			//if not then it's a different player, update the playerName to be different
+			nameToUse = playerName + Math.floor(Math.random() * 100)
 		}
 
 		const newPlayer: Player = {
-			name: playerName,
+			name: nameToUse,
 			id,
 			guess: null,
 			score: 0,

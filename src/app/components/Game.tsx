@@ -1,6 +1,5 @@
 'use client'
 import { usePathname, useSearchParams } from 'next/navigation'
-import { Category } from '../../../game-logic/types'
 import { GameProvider, useGameState } from '../hooks/useGameState'
 import { LoadingScreen } from './LoadingScreen'
 import { Pill } from './Pill'
@@ -15,11 +14,9 @@ export default function GameContainer() {
 	const roomId = path.slice(ROUTE.length)
 	const searchParams = useSearchParams()
 	const playerName = searchParams.get('playerName')
-	const category = searchParams.get('category')
-
 	return (
 		<div className="flex flex-col w-full items-center">
-			<GameProvider playerName={playerName} category={category as Category} roomId={roomId}>
+			<GameProvider playerName={playerName} roomId={roomId}>
 				<InfoBar />
 				<Game />
 			</GameProvider>

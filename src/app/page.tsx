@@ -28,7 +28,7 @@ export default function Home() {
 			console.error(`Error fetching or creating room ${roomId}`, error)
 			redirect('/?error=Room+not+found')
 		}
-		redirect(`/game/${data.roomId}?playerName=${playerName}&category=${data.category}`)
+		redirect(`/game/${data.roomId}?playerName=${playerName}`)
 	}
 
 	return (

@@ -29,7 +29,7 @@ export default function NewGameForm() {
 	const [gameFormData, setGameFormData] = useState<GameFormData>(defaultGameFormData)
 	const [showJoinExisting, setShowJoinExisting] = useState<boolean | undefined>(undefined)
 	const [playerId] = useLocalStorageState<string>('playerId', uuidv4())
-
+	
 	const isSubmitDisabled = showJoinExisting
 		? !gameFormData.roomId || !gameFormData.name
 		: !gameFormData.name

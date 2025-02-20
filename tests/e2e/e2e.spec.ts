@@ -44,22 +44,22 @@ test('Can create a room and join as multiple users', async ({ createPlayerContex
 	expect(await player1.gamePage.getNumberOfPlayers()).toBe(3)
 })
 
-// test('Can join a game after inputting the same name as another player', async ({
-// 	createPlayerContext,
-// }) => {
-// 	const [player1, player2] = await createPlayerContext(2)
+test('Can join a game after inputting the same name as another player', async ({
+	createPlayerContext,
+}) => {
+	const [player1, player2] = await createPlayerContext(2)
 
-// 	await createRoom(player1, 'Player1')
-// 	await expect(player1.gamePage.readyButton).toBeVisible()
+	await createRoom(player1, 'Player1')
+	await expect(player1.gamePage.readyButton).toBeVisible()
 
-// 	const roomId = await player1.gamePage.roomId.innerText()
+	const roomId = await player1.gamePage.roomId.innerText()
 
-// 	await joinRoom(player2, roomId, 'Player1')
-// 	await expect(player2.gamePage.readyButton).toBeVisible()
+	await joinRoom(player2, roomId, 'Player1')
+	await expect(player2.gamePage.readyButton).toBeVisible()
 
-// 	expect(await player1.gamePage.getNumberOfPlayers()).toBe(2)
-// 	expect(await player2.gamePage.getNumberOfPlayers()).toBe(2)
-// })
+	expect(await player1.gamePage.getNumberOfPlayers()).toBe(2)
+	expect(await player2.gamePage.getNumberOfPlayers()).toBe(2)
+})
 
 async function createRoom(context: PlayerContext, name: string) {
 	await context.homePage.goto()

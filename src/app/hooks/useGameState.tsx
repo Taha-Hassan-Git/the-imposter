@@ -1,6 +1,6 @@
 import usePartySocket from 'partysocket/react'
 import { createContext, useCallback, useContext, useState } from 'react'
-import { Action, Category, GameInfo, GameState, Player } from '../../../game-logic/types'
+import { Action, GameInfo, GameState, Player } from '../../../game-logic/types'
 import { PARTYKIT_HOST } from '../env'
 
 interface GameContext {
@@ -20,7 +20,6 @@ export function GameProvider({
 }: {
 	children: React.ReactNode
 	playerName: string | null
-	category: Category | null
 	roomId: string
 }) {
 	const [gameState, setGameState] = useState<GameState>({ state: 'loading' })
