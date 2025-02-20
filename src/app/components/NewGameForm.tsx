@@ -43,8 +43,15 @@ export default function NewGameForm() {
 	}, [errorMessage])
 
 	useEffect(() => {
+		// check if player id is already set, if not set it
+		const playerId = localStorage.getItem('playerId')
+		if (playerId) {
+			playerIdRef.current = playerId
+		} else {
+			localStorage.setItem('playerId', playerIdRef.current)
+		}
+		// if we have a roomId in the query params, it means they came via a qr code
 		const roomId = searchParams.get('roomId')
-		localStorage.setItem('playerId', playerIdRef.current)
 		if (roomId) {
 			setGameFormData((prev) => {
 				return { ...prev, roomId }
