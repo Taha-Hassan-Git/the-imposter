@@ -83,7 +83,7 @@ function ReadyButton() {
 	const localPlayer = useLocalPlayer()
 
 	const handleClick = () => {
-		dispatch({ type: 'toggle-ready', payload: { name: localPlayer.name } })
+		dispatch({ type: 'toggle-ready', payload: { id: localPlayer.id } })
 	}
 
 	const message =
