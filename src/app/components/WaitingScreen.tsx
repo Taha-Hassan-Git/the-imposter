@@ -26,7 +26,7 @@ export function WaitingScreen() {
 						<div className="flex items-center gap-2">
 							Room ID:
 							<Pill>
-								<p>{gameState.roomId}</p>
+								<p data-testid={'room-id'}>{gameState.roomId}</p>
 							</Pill>
 						</div>
 					</div>
