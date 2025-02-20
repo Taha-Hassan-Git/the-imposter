@@ -1,7 +1,9 @@
 'use client'
 import { useSearchParams } from 'next/navigation'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { v4 as uuidv4 } from 'uuid'
 import { categoriesArray, Category } from '../../../game-logic/types'
+import { useLocalStorageState } from '../hooks/useLocalStorageState'
 import { generateRoomId } from '../utils/generateRoomId'
 import { Button } from './Button'
 import { Input } from './Input'
@@ -26,6 +28,7 @@ export default function NewGameForm() {
 	const [showErrorMessage, setShowErrorMessage] = useState<boolean>(() => !!errorMessage)
 	const [gameFormData, setGameFormData] = useState<GameFormData>(defaultGameFormData)
 	const [showJoinExisting, setShowJoinExisting] = useState<boolean | undefined>(undefined)
+	const [playerId] = useLocalStorageState<string>('playerId', uuidv4())
 
 	const isSubmitDisabled = showJoinExisting
 		? !gameFormData.roomId || !gameFormData.name
@@ -130,6 +133,8 @@ export default function NewGameForm() {
 						})
 					}}
 				/>
+
+				<input readOnly className="hidden" name="playerId" value={playerId}></input>
 
 				<div className="self-center w-full">
 					<Button

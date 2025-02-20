@@ -13,11 +13,12 @@ export default function Home() {
 		const playerName = formData.get('name')
 		const roomId = formData.get('roomId') || generateRoomId()
 		const category = formData.get('category')
+		const playerId = formData.get('playerId')
 		let data: GameInfo
 		try {
 			const res = await fetch(`${PARTYKIT_URL}/party/${roomId}`, {
 				method: 'POST',
-				body: JSON.stringify({ playerName, category, roomId }),
+				body: JSON.stringify({ playerName, category, roomId, playerId }),
 				headers: {
 					'Content-Type': 'application/json',
 				},

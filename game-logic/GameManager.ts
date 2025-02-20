@@ -152,7 +152,7 @@ export class GameManager {
 		}
 
 		const newPlayers = [...this.game.players, newPlayer]
-
+		console.log(newPlayers)
 		this.game = { ...this.game, players: newPlayers }
 	}
 
