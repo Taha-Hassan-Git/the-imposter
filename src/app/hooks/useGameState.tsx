@@ -33,6 +33,7 @@ export function GameProvider({
 		onMessage(event) {
 			const message = JSON.parse(event.data) as GameInfo
 			if (message) {
+				console.log('received message', message)
 				setGameState(message)
 				setLocalPlayer(getPlayer(playerName!, message))
 			}

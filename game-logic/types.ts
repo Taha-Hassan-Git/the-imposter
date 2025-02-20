@@ -1,6 +1,6 @@
 export type Action =
 	| { type: 'toggle-ready'; payload: { name: string } }
-	| { type: 'player-joined'; payload: { name: string } }
+	| { type: 'player-joined'; payload: { name: string; id: string } }
 	| { type: 'player-left'; payload: { name: string } }
 	| { type: 'player-voted'; payload: { name: string; vote: string } }
 	| { type: 'player-guessed'; payload: { name: string; guess: Answer } }
@@ -29,6 +29,7 @@ export const avatarColors = createAvatarColors()
 
 export type Player = {
 	name: string
+	id: string
 	score: number
 	ready: boolean
 	avatarColor: AvatarColor
@@ -139,7 +140,7 @@ export const answersObject: Record<Category, Answer[]> = {
 	sports: [...sportsAnswers],
 }
 
-export type Category = "films" | "animals" | "countries" | "sports"
+export type Category = 'films' | 'animals' | 'countries' | 'sports'
 
 export const categoriesArray: Array<Category> = ['films', 'animals', 'countries', 'sports']
 

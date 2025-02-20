@@ -41,6 +41,7 @@ export class GameManager {
 			players: [
 				{
 					name: formInfo.playerName,
+					id: formInfo.playerId,
 					guess: null,
 					score: 0,
 					ready: false,
@@ -67,7 +68,7 @@ export class GameManager {
 	handleAction(action: Action): void {
 		switch (action.type) {
 			case 'player-joined': {
-				this.handlePlayerJoined(action.payload.name)
+				this.handlePlayerJoined(action.payload.name, action.payload.id)
 				break
 			}
 			case 'player-left': {
@@ -131,7 +132,7 @@ export class GameManager {
 		this.tryAdvanceGameState()
 	}
 
-	private handlePlayerJoined(playerName: string): void {
+	private handlePlayerJoined(playerName: string, id: string): void {
 		const playerExists = this.game.players.some((player) => player.name === playerName)
 		const isWaiting = this.game.state === 'waiting'
 
@@ -141,6 +142,7 @@ export class GameManager {
 
 		const newPlayer: Player = {
 			name: playerName,
+			id,
 			guess: null,
 			score: 0,
 			ready: false,
@@ -286,7 +288,7 @@ export class GameManager {
 
 	private static currentColorIndex: number | null = null
 
-	private static assignUnusedAvatarColor(game?: GameInfo): AvatarColor {	
+	private static assignUnusedAvatarColor(game?: GameInfo): AvatarColor {
 		if (this.currentColorIndex === null) {
 			this.currentColorIndex = Math.floor(Math.random() * avatarColors.length)
 		}
