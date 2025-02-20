@@ -31,6 +31,7 @@ export default class Server implements Party.Server {
 					},
 				})
 				await this.saveGame()
+				this.party.broadcast(JSON.stringify(this.gameManager.getState()))
 			}
 			return new Response(JSON.stringify(this.gameManager.getState()), {
 				status: 200,

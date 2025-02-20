@@ -24,14 +24,22 @@ export default function NewGameForm() {
 	const searchParams = useSearchParams()
 	const errorMessage = searchParams.get('error')
 	const [showErrorMessage, setShowErrorMessage] = useState<boolean>(() => !!errorMessage)
-	setTimeout(() => {
-		setShowErrorMessage(false)
-	}, 5000)
 	const [gameFormData, setGameFormData] = useState<GameFormData>(defaultGameFormData)
 	const [showJoinExisting, setShowJoinExisting] = useState<boolean | undefined>(undefined)
+
 	const isSubmitDisabled = showJoinExisting
 		? !gameFormData.roomId || !gameFormData.name
 		: !gameFormData.name
+
+	useEffect(() => {
+		if (errorMessage) {
+			setShowErrorMessage(true)
+			const timer = setTimeout(() => {
+				setShowErrorMessage(false)
+			}, 5000)
+			return () => clearTimeout(timer)
+		}
+	}, [errorMessage])
 
 	useEffect(() => {
 		const roomId = searchParams.get('roomId')
