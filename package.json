@@ -5,6 +5,7 @@
 	"scripts": {
 		"dev": "next dev",
 		"dev:party": "npx partykit dev",
+		"dev-app": "concurrently \"npm run dev\" \"npm run dev:party\"",
 		"build": "next build",
 		"start": "next start",
 		"lint": "next lint",
