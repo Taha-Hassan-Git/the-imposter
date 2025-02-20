@@ -12,7 +12,7 @@ test('Can toggle between create and join room forms', async ({ homePage }) => {
 	await homePage.createNewButton.click()
 	expect(homePage.createRoomFormButton).toBeVisible()
 	await homePage.joinExistingButton.click()
-	expect(homePage.createRoomFormButton).toBeUndefined()
+	expect(homePage.createRoomFormButton).toBeHidden()
 	expect(homePage.joinRoomFormButton).toBeVisible()
 })
 
