@@ -1,5 +1,6 @@
 import { Brain, Gamepad, Trophy, Users } from 'lucide-react'
 import { redirect } from 'next/navigation'
+import { GameInfo } from '../../game-logic/types'
 import { Lockup } from './components/Lockup'
 import NewGameForm from './components/NewGameForm'
 import { Panel } from './components/Panel'
@@ -10,34 +11,24 @@ export default function Home() {
 	async function createOrJoinRoom(formData: FormData) {
 		'use server'
 		const playerName = formData.get('name')
-		let roomId = formData.get('roomId')
-		let category = formData.get('category')
-
-		if (!roomId) {
-			roomId = generateRoomId()
-			await fetch(`${PARTYKIT_URL}/party/${roomId}`, {
+		const roomId = formData.get('roomId') || generateRoomId()
+		const category = formData.get('category')
+		const playerId = formData.get('playerId')
+		let data: GameInfo
+		try {
+			const res = await fetch(`${PARTYKIT_URL}/party/${roomId}`, {
 				method: 'POST',
-				body: JSON.stringify({ playerName, category, roomId }),
+				body: JSON.stringify({ playerName, category, roomId, playerId }),
 				headers: {
 					'Content-Type': 'application/json',
 				},
 			})
-		} else {
-			try {
-				const res = await fetch(`${PARTYKIT_URL}/party/${roomId}`, {
-					method: 'GET',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-				})
-				const data = await res.json()
-				category = data.category
-			} catch (error) {
-				console.error(`Error fetching room ${roomId}`, error)
-				redirect('/?error=Room+not+found')
-			}
+			data = (await res.json()) as GameInfo
+		} catch (error) {
+			console.error(`Error fetching or creating room ${roomId}`, error)
+			redirect('/?error=Room+not+found')
 		}
-		redirect(`/game/${roomId}?playerName=${playerName}&category=${category}`)
+		redirect(`/game/${data.roomId}`)
 	}
 
 	return (

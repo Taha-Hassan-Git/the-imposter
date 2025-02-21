@@ -40,14 +40,11 @@ function VotePanel() {
 }
 
 function ChooseAnswer() {
-	const { gameState, dispatch } = useActiveGame()
+	const { dispatch } = useActiveGame()
 	const localPlayer = useLocalPlayer()
-	const player = gameState.players.find((player) => player.name === localPlayer.name)!
-	if (player.imposter === false) {
-		return null
-	}
+
 	function handleGuess(answer: Answer) {
-		dispatch({ type: 'player-guessed', payload: { name: localPlayer.name, guess: answer } })
+		dispatch({ type: 'player-guessed', payload: { id: localPlayer.id, guess: answer } })
 	}
 	return (
 		<Panel>
@@ -63,7 +60,7 @@ function PlayerListItem({ player }: { player: Player }) {
 	const { dispatch } = useActiveGame()
 	const localPlayer = useLocalPlayer()
 	function handleVote() {
-		dispatch({ type: 'player-voted', payload: { name: localPlayer.name, vote: player.name } })
+		dispatch({ type: 'player-voted', payload: { id: localPlayer.id, vote: player.name } })
 	}
 
 	return (

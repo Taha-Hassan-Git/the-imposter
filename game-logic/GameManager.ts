@@ -41,6 +41,7 @@ export class GameManager {
 			players: [
 				{
 					name: formInfo.playerName,
+					id: formInfo.playerId,
 					guess: null,
 					score: 0,
 					ready: false,
@@ -67,51 +68,51 @@ export class GameManager {
 	handleAction(action: Action): void {
 		switch (action.type) {
 			case 'player-joined': {
-				this.handlePlayerJoined(action.payload.name)
+				this.handlePlayerJoined(action.payload.name, action.payload.id)
 				break
 			}
 			case 'player-left': {
-				this.handlePlayerLeft(action.payload.name)
+				this.handlePlayerLeft(action.payload.id)
 				break
 			}
 			case 'toggle-ready': {
-				this.handleToggleReady(action.payload.name)
+				this.handleToggleReady(action.payload.id)
 				break
 			}
 			case 'player-voted': {
-				this.handlePlayerVoted(action.payload.name, action.payload.vote)
+				this.handlePlayerVoted(action.payload.id, action.payload.vote)
 				break
 			}
 			case 'player-guessed': {
-				this.handlePlayerGuessed(action.payload.name, action.payload.guess)
+				this.handlePlayerGuessed(action.payload.id, action.payload.guess)
 				break
 			}
 		}
 	}
 
-	private handlePlayerGuessed(playerName: string, guess: Answer): void {
-		const player = this.game.players.find((player) => player.name === playerName)
+	private handlePlayerGuessed(id: string, guess: Answer): void {
+		const player = this.game.players.find((player) => player.id === id)
 		if (!player || !player.imposter) return
 
 		// we only want to set the imposter as ready if they have both guessed and voted
-		const hasVoted = this.game.players.some((player) => player.votes.includes(playerName))
+		const hasVoted = this.game.players.some((player) => player.votes.includes(id))
 
 		const newPlayers = this.game.players.map((p) =>
-			p.name === playerName ? { ...p, guess, ready: hasVoted } : p
+			p.name === id ? { ...p, guess, ready: hasVoted } : p
 		)
 		this.game = { ...this.game, players: newPlayers }
 		this.tryAdvanceGameState()
 	}
 
-	private handlePlayerVoted(playerName: string, vote: string): void {
-		const player = this.game.players.find((player) => player.name === playerName)
-		const votedForPlayer = this.game.players.find((player) => player.name === vote)
-		if (!player || !votedForPlayer || player.name === vote) return
+	private handlePlayerVoted(id: string, vote: string): void {
+		const player = this.game.players.find((player) => player.id === id)
+		const votedForPlayer = this.game.players.find((player) => player.id === vote)
+		if (!player || !votedForPlayer || player.id === vote) return
 
 		// if player has already voted for someone else, remove that vote
 		let newPlayers = this.game.players.map((player) => {
-			if (player.votes.includes(playerName)) {
-				player.votes = player.votes.filter((voter) => voter !== playerName)
+			if (player.votes.includes(id)) {
+				player.votes = player.votes.filter((voter) => voter !== id)
 			}
 			return player
 		})
@@ -119,28 +120,40 @@ export class GameManager {
 		// don't set the player to ready if they are the imposter
 		const isReady = !player.imposter
 		newPlayers = newPlayers
-			.map((p) => (p.name === playerName ? { ...p, ready: isReady } : p))
-			.map((p) => (p.name === vote ? { ...p, votes: [...p.votes, playerName] } : p))
+			.map((p) => (p.id === id ? { ...p, ready: isReady } : p))
+			.map((p) => (p.id === vote ? { ...p, votes: [...p.votes, id] } : p))
 
 		if (player.imposter && player.guess) {
-			console.log(player.guess)
 			// if the imposter has voted, set them as ready
-			newPlayers = newPlayers.map((p) => (p.name === playerName ? { ...p, ready: true } : p))
+			newPlayers = newPlayers.map((p) => (p.id === id ? { ...p, ready: true } : p))
 		}
 		this.game = { ...this.game, players: newPlayers }
 		this.tryAdvanceGameState()
 	}
 
-	private handlePlayerJoined(playerName: string): void {
-		const playerExists = this.game.players.some((player) => player.name === playerName)
+	private readonly playerNameAdditions: string[] = [
+		'The Second',
+		'But Cooler',
+		'2 Electric Boogaloo',
+		'Jr',
+	]
+	private handlePlayerJoined(playerName: string, id: string): void {
+		const sameName = this.game.players.some((player) => player.name === playerName)
 		const isWaiting = this.game.state === 'waiting'
+		let nameToUse = playerName
+		if (!isWaiting) return
 
-		if (playerExists || !isWaiting) {
-			return
+		if (sameName) {
+			// does this player have the same id?, if so, do nothing
+			const sameId = this.game.players.some((player) => player.id === id)
+			if (sameId) return
+			//if not then it's a different player, update the playerName to be different
+			nameToUse = `${playerName} ${this.playerNameAdditions[Math.floor(Math.random() * this.playerNameAdditions.length)]}`
 		}
 
 		const newPlayer: Player = {
-			name: playerName,
+			name: nameToUse,
+			id,
 			guess: null,
 			score: 0,
 			ready: false,
@@ -154,8 +167,8 @@ export class GameManager {
 		this.game = { ...this.game, players: newPlayers }
 	}
 
-	private handlePlayerLeft(playerName: string): void {
-		const updatedPlayers = this.game.players.filter((player) => player.name !== playerName)
+	private handlePlayerLeft(id: string): void {
+		const updatedPlayers = this.game.players.filter((player) => player.id !== id)
 
 		if (updatedPlayers.length < GameManager.MIN_PLAYERS) {
 			this.game = {
@@ -171,9 +184,9 @@ export class GameManager {
 		this.game = { ...this.game, players: updatedPlayers }
 	}
 
-	private handleToggleReady(playerName: string): void {
+	private handleToggleReady(id: string): void {
 		const newPlayers = this.game.players.map((player) =>
-			player.name === playerName ? { ...player, ready: !player.ready } : player
+			player.id === id ? { ...player, ready: !player.ready } : player
 		)
 		this.game = { ...this.game, players: newPlayers }
 		this.tryAdvanceGameState()
@@ -225,25 +238,25 @@ export class GameManager {
 
 		// award points to players that guessed the imposter correctly
 		let newPlayers = this.game.players.map((player) => {
-			if (imposter.votes.includes(player.name)) {
+			if (imposter.votes.includes(player.id)) {
 				return { ...player, score: player.score + 1 }
 			}
 			return player
 		})
 
 		// award points to the imposter for evading detection
-		const avoidedDetection = mostVotedPlayer.name !== imposter.name
+		const avoidedDetection = mostVotedPlayer.id !== imposter.id
 		const guessedCorrectly = imposter.guess === this.game.answer
 		if (avoidedDetection) {
 			newPlayers = newPlayers.map((player) => {
-				if (player.name === imposter.name) {
+				if (player.id === imposter.id) {
 					return { ...player, score: player.score + 3 }
 				}
 				return player
 			})
 		} else if (guessedCorrectly) {
 			newPlayers = newPlayers.map((player) => {
-				if (player.name === imposter.name) {
+				if (player.id === imposter.id) {
 					return { ...player, score: player.score + 2 }
 				}
 				return player
@@ -286,7 +299,7 @@ export class GameManager {
 
 	private static currentColorIndex: number | null = null
 
-	private static assignUnusedAvatarColor(game?: GameInfo): AvatarColor {	
+	private static assignUnusedAvatarColor(game?: GameInfo): AvatarColor {
 		if (this.currentColorIndex === null) {
 			this.currentColorIndex = Math.floor(Math.random() * avatarColors.length)
 		}
