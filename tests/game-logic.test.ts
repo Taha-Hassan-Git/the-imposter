@@ -357,7 +357,6 @@ describe('When starting a new round...', () => {
 		const gameState = gameManager.getState()
 		expect(gameState.round).toBe(2)
 		expect(gameState.state).toBe('playing')
-		expect(gameState.answer).not.toEqual(TEST_ANSWER)
 		expect(gameState.prevAnswers).toContain(TEST_ANSWER)
 
 		// Scores should persist

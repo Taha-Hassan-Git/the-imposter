@@ -5,27 +5,42 @@ export type Action =
 	| { type: 'player-voted'; payload: { id: string; vote: string } }
 	| { type: 'player-guessed'; payload: { id: string; guess: Answer } }
 
-const createAvatarColors = (): string[] => {
-	const NUMBER_OF_AVATAR_COLORS = 12
-	const ROWS = 3
-	const COLUMNS = 4
+// const createAvatarColors = (): string[] => {
+// 	const NUMBER_OF_AVATAR_COLORS = 12
+// 	const ROWS = 3
+// 	const COLUMNS = 4
 
-	const colors = Array.from(
-		{ length: NUMBER_OF_AVATAR_COLORS },
-		(_, i) => `hsl(${Math.round((i * 360) / NUMBER_OF_AVATAR_COLORS)}, 100%, 75%)`
-	)
+// 	const colors = Array.from(
+// 		{ length: NUMBER_OF_AVATAR_COLORS },
+// 		(_, i) => `hsl(${Math.round((i * 360) / NUMBER_OF_AVATAR_COLORS)}, 100%, 75%)`
+// 	)
 
-	const sortingPattern = []
-	for (let col = 0; col < COLUMNS; col++) {
-		for (let row = 0; row < ROWS; row++) {
-			sortingPattern.push(row * COLUMNS + col)
-		}
-	}
+// 	const sortingPattern = []
+// 	for (let col = 0; col < COLUMNS; col++) {
+// 		for (let row = 0; row < ROWS; row++) {
+// 			sortingPattern.push(row * COLUMNS + col)
+// 		}
+// 	}
 
-	return sortingPattern.map((index) => colors[index])
-}
+// 	return sortingPattern.map((index) => colors[index])
+// }
 
-export const avatarColors = createAvatarColors()
+// export const avatarColors = createAvatarColors()
+
+export const avatarColors = [
+	'hsl(0, 100%, 75%)',
+	'hsl(120, 100%, 75%)',
+	'hsl(240, 100%, 75%)',
+	'hsl(30, 100%, 75%)',
+	'hsl(150, 100%, 75%)',
+	'hsl(270, 100%, 75%)',
+	'hsl(60, 100%, 75%)',
+	'hsl(180, 100%, 75%)',
+	'hsl(300, 100%, 75%)',
+	'hsl(90, 100%, 75%)',
+	'hsl(210, 100%, 75%)',
+	'hsl(330, 100%, 75%)',
+]
 
 export type Player = {
 	name: string
