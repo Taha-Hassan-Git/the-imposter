@@ -1,5 +1,5 @@
 import usePartySocket from 'partysocket/react'
-import { createContext, useCallback, useContext, useState } from 'react'
+import { createContext, useCallback, useContext, useMemo, useState } from 'react'
 import { Action, GameInfo, GameState, Player } from '../../../game-logic/types'
 import { PARTYKIT_HOST } from '../env'
 
@@ -23,7 +23,11 @@ export function GameProvider({
 	roomId: string
 }) {
 	const [gameState, setGameState] = useState<GameState>({ state: 'loading' })
-	const [localPlayer, setLocalPlayer] = useState<Player | null>(null)
+
+	const localPlayer = useMemo(() => {
+		if (gameState.state === 'loading') return null
+		return gameState.players.find((player) => player.id === playerId) ?? null
+	}, [gameState, playerId])
 
 	const socket = usePartySocket({
 		host: PARTYKIT_HOST,
@@ -34,14 +38,9 @@ export function GameProvider({
 			if (message) {
 				console.log('received message', message)
 				setGameState(message)
-				setLocalPlayer(getPlayer(playerId, message))
 			}
 		},
 	})
-
-	function getPlayer(id: string, game: GameInfo): Player {
-		return game.players.find((player) => player.id === id)!
-	}
 
 	// memoise this function
 	const dispatch = useCallback(

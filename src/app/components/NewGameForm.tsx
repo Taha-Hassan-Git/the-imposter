@@ -1,8 +1,8 @@
 'use client'
 import { useSearchParams } from 'next/navigation'
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react'
-import { v4 as uuidv4 } from 'uuid'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { categoriesArray, Category } from '../../../game-logic/types'
+import { usePlayerId } from '../hooks/usePlayerId'
 import { generateRoomId } from '../utils/generateRoomId'
 import { Button } from './Button'
 import { Input } from './Input'
@@ -27,7 +27,7 @@ export default function NewGameForm() {
 	const [showErrorMessage, setShowErrorMessage] = useState<boolean>(() => !!errorMessage)
 	const [gameFormData, setGameFormData] = useState<GameFormData>(defaultGameFormData)
 	const [showJoinExisting, setShowJoinExisting] = useState<boolean | undefined>(undefined)
-	const playerIdRef = useRef<string>(uuidv4())
+	const playerId = usePlayerId()
 	const isSubmitDisabled = showJoinExisting
 		? !gameFormData.roomId || !gameFormData.name
 		: !gameFormData.name
@@ -43,13 +43,6 @@ export default function NewGameForm() {
 	}, [errorMessage])
 
 	useEffect(() => {
-		// check if player id is already set, if not set it
-		const playerId = localStorage.getItem('playerId')
-		if (playerId) {
-			playerIdRef.current = playerId
-		} else {
-			localStorage.setItem('playerId', playerIdRef.current)
-		}
 		// if we have a roomId in the query params, it means they came via a qr code
 		const roomId = searchParams.get('roomId')
 		if (roomId) {
@@ -138,7 +131,7 @@ export default function NewGameForm() {
 						})
 					}}
 				/>
-				<input readOnly className="hidden" name="playerId" value={playerIdRef.current}></input>
+				<input readOnly className="hidden" name="playerId" value={playerId}></input>
 				<div className="self-center w-full">
 					<Button
 						disabled={isSubmitDisabled}
