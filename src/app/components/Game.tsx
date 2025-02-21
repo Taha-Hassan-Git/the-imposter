@@ -1,5 +1,6 @@
 'use client'
 import { usePathname } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import { GameProvider, useGameState } from '../hooks/useGameState'
 import { LoadingScreen } from './LoadingScreen'
 import { Pill } from './Pill'
@@ -12,7 +13,18 @@ const ROUTE = '/game/'
 export default function GameContainer() {
 	const path = usePathname()
 	const roomId = path.slice(ROUTE.length)
-	const playerId = localStorage.getItem('playerId')!
+	const [playerId, setPlayerId] = useState<string | null>(null)
+
+	useEffect(() => {
+		const playerId = localStorage.getItem('playerId')
+		if (playerId) {
+			setPlayerId(playerId)
+		}
+	}, [roomId])
+
+	if (!playerId) {
+		return <LoadingScreen />
+	}
 
 	return (
 		<div className="flex flex-col w-full items-center">
