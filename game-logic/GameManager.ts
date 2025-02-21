@@ -131,6 +131,12 @@ export class GameManager {
 		this.tryAdvanceGameState()
 	}
 
+	private readonly playerNameAdditions: string[] = [
+		'The Second',
+		'But Cooler',
+		'2 Electric Boogaloo',
+		'Jr',
+	]
 	private handlePlayerJoined(playerName: string, id: string): void {
 		const sameName = this.game.players.some((player) => player.name === playerName)
 		const isWaiting = this.game.state === 'waiting'
@@ -142,7 +148,7 @@ export class GameManager {
 			const sameId = this.game.players.some((player) => player.id === id)
 			if (sameId) return
 			//if not then it's a different player, update the playerName to be different
-			nameToUse = playerName + Math.floor(Math.random() * 100)
+			nameToUse = `${playerName} ${this.playerNameAdditions[Math.floor(Math.random() * this.playerNameAdditions.length)]}`
 		}
 
 		const newPlayer: Player = {
