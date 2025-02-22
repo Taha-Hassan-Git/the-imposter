@@ -130,7 +130,7 @@ describe('When in the waiting state...', () => {
 			if (!player.ready) {
 				gameManager.handleAction({
 					type: 'toggle-ready',
-					payload: { id: player.name },
+					payload: { id: player.id },
 				})
 			}
 		})
@@ -162,7 +162,7 @@ describe('When in the waiting state...', () => {
 		gameManager.getState().players.forEach((player) => {
 			gameManager.handleAction({
 				type: 'toggle-ready',
-				payload: { id: player.name },
+				payload: { id: player.id },
 			})
 		})
 

@@ -9,6 +9,7 @@ export function PlayerInitialsIcon({
 	showReady?: boolean
 	className?: string
 }) {
+	
 	const initials = player.name
 		.split(' ')
 		.map((word) => word[0])

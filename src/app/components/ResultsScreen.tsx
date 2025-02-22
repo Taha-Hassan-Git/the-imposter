@@ -11,7 +11,7 @@ export function ResultsScreen() {
 		player.votes.length > acc.votes.length ? player : acc
 	)
 	const imposter = gameState.players.find((player) => player.imposter)!
-	const avoidedDetection = mostVotedPlayer.name !== imposter.name
+	const avoidedDetection = mostVotedPlayer.id !== imposter.id
 	const guessedCorrectly = imposter.guess === gameState.answer
 	return (
 		<>
@@ -35,7 +35,7 @@ function MessagePanel({
 
 	const isImposter = localPlayer.imposter
 
-	const votedForImposter = imposter.votes.includes(localPlayer.name)
+	const votedForImposter = imposter.votes.includes(localPlayer.id)
 	return (
 		<>
 			{isImposter ? (
@@ -163,6 +163,7 @@ function MainSection({ player, scoreDifference }: { player: Player; scoreDiffere
 
 function PlayerVotes({ player }: { player: Player }) {
 	const { gameState } = useActiveGame()
+	console.log(gameState.players)
 	return (
 		<div className="bg-gray-50 px-4 py-3 border-t border-gray-100">
 			<div className="flex items-center gap-2">
@@ -175,7 +176,7 @@ function PlayerVotes({ player }: { player: Player }) {
 							<PlayerInitialsIcon
 								className="!w-4 !h-4 text-[8px]"
 								key={vote}
-								player={gameState.players.find((player) => player.name === vote)!}
+								player={gameState.players.find((player) => player.id === vote)!}
 							/>
 						))
 					)}

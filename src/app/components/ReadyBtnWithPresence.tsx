@@ -33,7 +33,6 @@ export function ReadyBtnWithPresence({ text }: { text: string }) {
 
 export function Presence() {
 	const { gameState } = useActiveGame()
-
 	return (
 		<div className="flex self-start w-full overflow-hidden">
 			{gameState.players

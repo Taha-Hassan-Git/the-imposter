@@ -5,8 +5,6 @@ import { Button } from './Button'
 import { Panel } from './Panel'
 import { PlayerInitialsIcon } from './PlayerInitialsIcon'
 
-import { Presence } from './ReadyBtnWithPresence'
-
 export function VotingScreen() {
 	return (
 		<>
@@ -25,16 +23,12 @@ function VotePanel() {
 				<h2 className="text-md font-bold mb-4 text-center">Who is the imposter?</h2>
 				<ul className="space-y-4">
 					{gameState.players
-						.filter((player) => player.name !== localPlayer.name)
+						.filter((player) => player.id !== localPlayer.id)
 						.map((player: Player) => (
 							<PlayerListItem key={player.name} player={player} />
 						))}
 				</ul>
 			</div>
-			<span className="flex w-full items-center justify-center gap-2 mt-2 px-9 py-4 bg-gray-100 border rounded-b-lg">
-				<p className="text-nowrap text-sm text-gray-500">Players voted:</p>
-				<Presence />
-			</span>
 		</Panel>
 	)
 }
@@ -46,6 +40,7 @@ function ChooseAnswer() {
 	function handleGuess(answer: Answer) {
 		dispatch({ type: 'player-guessed', payload: { id: localPlayer.id, guess: answer } })
 	}
+	if (!localPlayer.imposter) return null
 	return (
 		<Panel>
 			<h2 className="text-md mb-4 text-start">Choose an answer:</h2>
@@ -60,7 +55,7 @@ function PlayerListItem({ player }: { player: Player }) {
 	const { dispatch } = useActiveGame()
 	const localPlayer = useLocalPlayer()
 	function handleVote() {
-		dispatch({ type: 'player-voted', payload: { id: localPlayer.id, vote: player.name } })
+		dispatch({ type: 'player-voted', payload: { id: localPlayer.id, vote: player.id } })
 	}
 
 	return (
@@ -75,7 +70,7 @@ function PlayerListItem({ player }: { player: Player }) {
 					<PlayerInitialsIcon player={player} />
 					<span className="font-bold text-start text-nowrap overflow-ellipsis">{player.name}</span>
 				</div>
-				{player.votes.includes(localPlayer.name) ? (
+				{player.votes.includes(localPlayer.id) ? (
 					<span className="text-green-500 text-sm flex items-center">
 						<svg
 							className="w-4 h-4 mr-1"

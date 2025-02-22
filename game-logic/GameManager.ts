@@ -93,21 +93,21 @@ export class GameManager {
 	private handlePlayerGuessed(id: string, guess: Answer): void {
 		const player = this.game.players.find((player) => player.id === id)
 		if (!player || !player.imposter) return
-
 		// we only want to set the imposter as ready if they have both guessed and voted
 		const hasVoted = this.game.players.some((player) => player.votes.includes(id))
 
 		const newPlayers = this.game.players.map((p) =>
-			p.name === id ? { ...p, guess, ready: hasVoted } : p
+			p.id === id ? { ...p, guess, ready: hasVoted } : p
 		)
 		this.game = { ...this.game, players: newPlayers }
+
 		this.tryAdvanceGameState()
 	}
 
 	private handlePlayerVoted(id: string, vote: string): void {
 		const player = this.game.players.find((player) => player.id === id)
 		const votedForPlayer = this.game.players.find((player) => player.id === vote)
-		if (!player || !votedForPlayer || player.id === vote) return
+		if (!player || !votedForPlayer) return
 
 		// if player has already voted for someone else, remove that vote
 		let newPlayers = this.game.players.map((player) => {
