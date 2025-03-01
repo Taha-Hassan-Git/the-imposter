@@ -405,4 +405,5 @@ const createTestGameState = (state: 'playing' | 'voting' | 'results'): GameInfo 
 	],
 	prevAnswers: [],
 	category: CATEGORY,
+	archivedPlayers: [],
 })

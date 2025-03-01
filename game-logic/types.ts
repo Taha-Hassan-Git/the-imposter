@@ -64,6 +64,7 @@ export interface GameInfo {
 	answer: Answer
 	prevAnswers: Answer[]
 	category: Category
+	archivedPlayers: Player[]
 }
 
 export const filmAnswers = [

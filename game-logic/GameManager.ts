@@ -52,6 +52,7 @@ export class GameManager {
 			],
 			prevAnswers: [],
 			category: formInfo.category,
+			archivedPlayers: [],
 		}
 
 		return new GameManager(initialGame)

@@ -48,9 +48,9 @@ function MessagePanel({
 				)
 			) : avoidedDetection ? (
 				votedForImposter ? (
-					<RedMessage message={'They got away! The imposter was ' + imposter.name + '.'} />
-				) : (
 					<YellowMessage message={'You voted for the imposter, but they got away!'} />
+				) : (
+					<RedMessage message={'They got away! The imposter was ' + imposter.name + '.'} />
 				)
 			) : guessedCorrectly ? (
 				<YellowMessage message="You got the imposter, but they guessed the answer!" />
