@@ -181,6 +181,9 @@ describe('When in the waiting state...', () => {
 		expect(gameState.players.length).toBe(2)
 		// All players should be unready
 		expect(gameState.players.every((player) => !player.ready)).toBeTruthy()
+		// Player 3 should be archived
+		console.log(gameState.archivedPlayers)
+		expect(gameState.archivedPlayers.some((player) => player.id === PLAYER_3)).toBeTruthy()
 	})
 })
 

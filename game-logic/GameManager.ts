@@ -169,11 +169,14 @@ export class GameManager {
 	}
 
 	private handlePlayerLeft(id: string): void {
+		const leavingPlayer = this.game.players.find((player) => player.id === id)!
 		const updatedPlayers = this.game.players.filter((player) => player.id !== id)
+		const updatedArchivedPlayers = [...this.game.archivedPlayers, leavingPlayer]
 
 		if (updatedPlayers.length < GameManager.MIN_PLAYERS) {
 			this.game = {
 				...this.game,
+				archivedPlayers: updatedArchivedPlayers,
 				state: 'waiting',
 				players: updatedPlayers.map((player) => ({
 					...player,
@@ -182,7 +185,8 @@ export class GameManager {
 			}
 			return
 		}
-		this.game = { ...this.game, players: updatedPlayers }
+
+		this.game = { ...this.game, players: updatedPlayers, archivedPlayers: updatedArchivedPlayers }
 	}
 
 	private handleToggleReady(id: string): void {
