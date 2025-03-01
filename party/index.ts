@@ -44,6 +44,14 @@ export default class Server implements Party.Server {
 
 	async onConnect(connection: Party.Connection) {
 		if (!this.gameManager) return
+		// if the player is archived, they are rejoining the game
+		const player = this.gameManager.getState().archivedPlayers.find((p) => p.id === connection.id)
+		if (player) {
+			this.gameManager.handleAction({
+				type: 'player-joined',
+				payload: { id: player.id, name: player.name },
+			})
+		}
 		connection.send(JSON.stringify(this.gameManager.getState()))
 	}
 
