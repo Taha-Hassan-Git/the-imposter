@@ -50,7 +50,8 @@ export default class Server implements Party.Server {
 	async onClose(connection: Party.Connection) {
 		console.log('player left', connection.id)
 		if (!this.gameManager) return
-		// wait for 20 seconds then check if player rejoined
+		// wait for 5 minutes then check if player rejoined
+		const timeout = 1000 * 60 * 5
 		setTimeout(() => {
 			const connectionsArray = []
 			for (const c of this.party.getConnections()) {
@@ -64,7 +65,7 @@ export default class Server implements Party.Server {
 				})
 				this.party.broadcast(JSON.stringify(this.gameManager?.getState()))
 			}
-		}, 20000)
+		}, timeout)
 	}
 
 	async onMessage(message: string) {

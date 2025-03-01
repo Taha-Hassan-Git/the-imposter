@@ -139,10 +139,20 @@ export class GameManager {
 		'Jr',
 	]
 	private handlePlayerJoined(playerName: string, id: string): void {
+		const isRejoining = this.game.archivedPlayers.some((player) => player.id === id)
+		if (isRejoining) {
+			const player = this.game.archivedPlayers.find((player) => player.id === id)!
+			const updatedPlayers = [...this.game.players, player]
+			const filteredArchivedPlayers = this.game.archivedPlayers.filter((player) => player.id !== id)
+			this.game = {
+				...this.game,
+				players: updatedPlayers,
+				archivedPlayers: filteredArchivedPlayers,
+			}
+			return
+		}
 		const sameName = this.game.players.some((player) => player.name === playerName)
-		const isWaiting = this.game.state === 'waiting'
 		let nameToUse = playerName
-		if (!isWaiting) return
 
 		if (sameName) {
 			// does this player have the same id?, if so, do nothing

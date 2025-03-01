@@ -182,8 +182,18 @@ describe('When in the waiting state...', () => {
 		// All players should be unready
 		expect(gameState.players.every((player) => !player.ready)).toBeTruthy()
 		// Player 3 should be archived
-		console.log(gameState.archivedPlayers)
 		expect(gameState.archivedPlayers.some((player) => player.id === PLAYER_3)).toBeTruthy()
+
+		// rejoin as player 3
+		gameManager.handleAction({
+			type: 'player-joined',
+			payload: { id: PLAYER_3, name: PLAYER_3 },
+		})
+
+		// archive should be empty
+		expect(gameManager.getState().archivedPlayers.length).toBe(0)
+		// player should be added back
+		expect(gameManager.getState().players.length).toBe(3)
 	})
 })
 
