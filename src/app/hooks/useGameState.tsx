@@ -20,7 +20,7 @@ export function GameProvider({
 }: {
 	children: React.ReactNode
 	playerId: string
-	roomId: string
+roomId: string
 }) {
 	const [gameState, setGameState] = useState<GameState>({ state: 'loading' })
 
