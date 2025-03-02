@@ -52,6 +52,7 @@ export class GameManager {
 			],
 			prevAnswers: [],
 			category: formInfo.category,
+			archivedPlayers: [],
 		}
 
 		return new GameManager(initialGame)
@@ -138,10 +139,21 @@ export class GameManager {
 		'Jr',
 	]
 	private handlePlayerJoined(playerName: string, id: string): void {
+		const isRejoining = this.game.archivedPlayers.some((player) => player.id === id)
+		if (isRejoining) {
+			// promote the player out of the archive, set their ready state to false
+			const player = this.game.archivedPlayers.find((player) => player.id === id)!
+			const updatedPlayers = [...this.game.players, { ...player, ready: false }]
+			const filteredArchivedPlayers = this.game.archivedPlayers.filter((player) => player.id !== id)
+			this.game = {
+				...this.game,
+				players: updatedPlayers,
+				archivedPlayers: filteredArchivedPlayers,
+			}
+			return
+		}
 		const sameName = this.game.players.some((player) => player.name === playerName)
-		const isWaiting = this.game.state === 'waiting'
 		let nameToUse = playerName
-		if (!isWaiting) return
 
 		if (sameName) {
 			// does this player have the same id?, if so, do nothing
@@ -168,11 +180,14 @@ export class GameManager {
 	}
 
 	private handlePlayerLeft(id: string): void {
+		const leavingPlayer = this.game.players.find((player) => player.id === id)!
 		const updatedPlayers = this.game.players.filter((player) => player.id !== id)
+		const updatedArchivedPlayers = [...this.game.archivedPlayers, leavingPlayer]
 
 		if (updatedPlayers.length < GameManager.MIN_PLAYERS) {
 			this.game = {
 				...this.game,
+				archivedPlayers: updatedArchivedPlayers,
 				state: 'waiting',
 				players: updatedPlayers.map((player) => ({
 					...player,
@@ -181,7 +196,8 @@ export class GameManager {
 			}
 			return
 		}
-		this.game = { ...this.game, players: updatedPlayers }
+
+		this.game = { ...this.game, players: updatedPlayers, archivedPlayers: updatedArchivedPlayers }
 	}
 
 	private handleToggleReady(id: string): void {

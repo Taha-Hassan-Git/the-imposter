@@ -8,14 +8,14 @@ export function usePlayerId() {
 
 	useEffect(() => {
 		// Check for existing player ID in sessionStorage
-		const existingPlayerId = sessionStorage.getItem(PLAYER_ID_KEY)
+		const existingPlayerId = localStorage.getItem(PLAYER_ID_KEY)
 
 		if (existingPlayerId) {
 			setPlayerId(existingPlayerId)
 		} else {
 			// Generate new player ID if none exists
 			const newPlayerId = uuidv4()
-			sessionStorage.setItem(PLAYER_ID_KEY, newPlayerId)
+			localStorage.setItem(PLAYER_ID_KEY, newPlayerId)
 			setPlayerId(newPlayerId)
 		}
 	}, [])

@@ -44,13 +44,31 @@ export default class Server implements Party.Server {
 
 	async onConnect(connection: Party.Connection) {
 		if (!this.gameManager) return
-		connection.send(JSON.stringify(this.gameManager.getState()))
+		// if the player is archived, they are rejoining the game
+		const hasArchivedPlayers = this.gameManager.getState().archivedPlayers.length > 0
+		if (hasArchivedPlayers) {
+			console.log('player rejoining', connection.id)
+			console.log({
+				connectionId: connection.id,
+				archivedPlayers: this.gameManager.getState().archivedPlayers,
+			})
+			const player = this.gameManager.getState().archivedPlayers.find((p) => p.id === connection.id)
+			if (player) {
+				this.gameManager.handleAction({
+					type: 'player-joined',
+					payload: { id: player.id, name: player.name },
+				})
+			}
+		}
+
+		this.party.broadcast(JSON.stringify(this.gameManager.getState()))
 	}
 
 	async onClose(connection: Party.Connection) {
 		console.log('player left', connection.id)
 		if (!this.gameManager) return
-		// wait for 20 seconds then check if player rejoined
+		// wait for 5 minutes then check if player rejoined
+		const timeout = 1000 * 60 * 5
 		setTimeout(() => {
 			const connectionsArray = []
 			for (const c of this.party.getConnections()) {
@@ -64,7 +82,7 @@ export default class Server implements Party.Server {
 				})
 				this.party.broadcast(JSON.stringify(this.gameManager?.getState()))
 			}
-		}, 20000)
+		}, timeout)
 	}
 
 	async onMessage(message: string) {

@@ -48,9 +48,9 @@ function MessagePanel({
 				)
 			) : avoidedDetection ? (
 				votedForImposter ? (
-					<RedMessage message={'They got away! The imposter was ' + imposter.name + '.'} />
-				) : (
 					<YellowMessage message={'You voted for the imposter, but they got away!'} />
+				) : (
+					<RedMessage message={'They got away! The imposter was ' + imposter.name + '.'} />
 				)
 			) : guessedCorrectly ? (
 				<YellowMessage message="You got the imposter, but they guessed the answer!" />
@@ -163,7 +163,7 @@ function MainSection({ player, scoreDifference }: { player: Player; scoreDiffere
 
 function PlayerVotes({ player }: { player: Player }) {
 	const { gameState } = useActiveGame()
-	console.log(gameState.players)
+
 	return (
 		<div className="bg-gray-50 px-4 py-3 border-t border-gray-100">
 			<div className="flex items-center gap-2">
