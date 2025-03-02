@@ -15,6 +15,7 @@
 		"test:e2e:ui": "npx playwright test --ui"
 	},
 	"dependencies": {
+		"@radix-ui/react-dialog": "^1.1.6",
 		"classnames": "^2.5.1",
 		"lucide-react": "^0.475.0",
 		"next": "15.1.4",

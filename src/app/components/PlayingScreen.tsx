@@ -35,7 +35,9 @@ function Hint() {
 				</div>
 				<div className="pb-4 px-4">
 					<div className="text-sm text-gray-600">
-						<p>Take turns choosing another player to ask them a question about the secret word.</p>
+						<p>Take turns asking another player about the secret word.</p>
+						<p>Try not to be too obvious, or the imposter will figure it out.</p>
+						<p>After two rounds of questions, it&apos;s time to vote!</p>
 						<p className="mt-2 text-gray-500 italic">e.g. {hintsObject[gameState.category]}</p>
 					</div>
 				</div>
