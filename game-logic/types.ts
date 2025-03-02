@@ -148,6 +148,7 @@ export const sportsAnswers = [
 	'Surfing',
 	'Wrestling',
 ] as const
+export type SportsAnswer = (typeof sportsAnswers)[number]
 
 export const answersObject: Record<Category, Answer[]> = {
 	films: [...filmAnswers],
@@ -156,14 +157,11 @@ export const answersObject: Record<Category, Answer[]> = {
 	sports: [...sportsAnswers],
 }
 
-export type Category = 'films' | 'animals' | 'countries' | 'sports'
-
-export const categoriesArray: Array<Category> = ['films', 'animals', 'countries', 'sports']
-
-export type SportsAnswer = (typeof sportsAnswers)[number]
+export const categoriesArray = ['films', 'animals', 'countries', 'sports'] as const
+export type Category = (typeof categoriesArray)[number]
 
 export type Answer = FilmAnswer | AnimalAnswer | CountryAnswer | SportsAnswer
 
-export type GameError = { state: 'loading' }
+export type GameLoading = { state: 'loading' }
 
-export type GameState = GameInfo | GameError
+export type GameState = GameInfo | GameLoading
