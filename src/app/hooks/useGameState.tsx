@@ -28,7 +28,7 @@ export function GameProvider({
 		if (gameState.state === 'loading') return null
 		return gameState.players.find((player) => player.id === playerId) ?? null
 	}, [gameState, playerId])
-
+	console.log('playerid:', playerId)
 	const socket = usePartySocket({
 		host: PARTYKIT_HOST,
 		room: roomId,

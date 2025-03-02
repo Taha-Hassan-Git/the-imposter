@@ -141,8 +141,9 @@ export class GameManager {
 	private handlePlayerJoined(playerName: string, id: string): void {
 		const isRejoining = this.game.archivedPlayers.some((player) => player.id === id)
 		if (isRejoining) {
+			// promote the player out of the archive, set their ready state to false
 			const player = this.game.archivedPlayers.find((player) => player.id === id)!
-			const updatedPlayers = [...this.game.players, player]
+			const updatedPlayers = [...this.game.players, { ...player, ready: false }]
 			const filteredArchivedPlayers = this.game.archivedPlayers.filter((player) => player.id !== id)
 			this.game = {
 				...this.game,
