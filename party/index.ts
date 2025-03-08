@@ -10,8 +10,7 @@ export interface GameFormInfo {
 }
 
 function getEnvironmentTimeout() {
-	const timeout = process.env.NODE_ENV === 'production' ? 5000 : 500
-	console.log('timeout', timeout)
+	const timeout = process.env.NODE_ENV === 'production' ? 1000 * 60 * 5 : 5000
 	return timeout
 }
 
@@ -53,11 +52,6 @@ export default class Server implements Party.Server {
 		// if the player is archived, they are rejoining the game
 		const hasArchivedPlayers = this.gameManager.getState().archivedPlayers.length > 0
 		if (hasArchivedPlayers) {
-			console.log('player rejoining', connection.id)
-			console.log({
-				connectionId: connection.id,
-				archivedPlayers: this.gameManager.getState().archivedPlayers,
-			})
 			const player = this.gameManager.getState().archivedPlayers.find((p) => p.id === connection.id)
 			if (player) {
 				this.gameManager.handleAction({
