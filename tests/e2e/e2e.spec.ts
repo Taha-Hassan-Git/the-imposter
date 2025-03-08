@@ -61,6 +61,40 @@ test('Can join a game after inputting the same name as another player', async ({
 	expect(await player2.gamePage.getNumberOfPlayers()).toBe(2)
 })
 
+test('Can leave a room by closing page', async ({ createPlayerContext }) => {
+	const [player1, player2] = await createPlayerContext(2)
+
+	await createRoom(player1, 'Player1')
+	await expect(player1.gamePage.readyButton).toBeVisible()
+
+	const roomId = await player1.gamePage.roomId.innerText()
+
+	await joinRoom(player2, roomId, 'Player2')
+	await expect(player2.gamePage.readyButton).toBeVisible()
+
+	expect(await player1.gamePage.getNumberOfPlayers()).toBe(2)
+
+	// player 2 closes the old tab
+	await player2.page.close()
+	// todo: we should await the element being removed instead
+	await player1.page.waitForTimeout(1000)
+	// player 2 has now left the game
+	expect(await player1.gamePage.getNumberOfPlayers()).toBe(1)
+
+	// todo: test that player 2 can rejoin the game
+
+	// player2.homePage2.goto()
+	// player2.homePage2.joinExistingButton.click()
+	// expect(player2.homePage2.joinRoomFormButton).toBeVisible()
+	// player2.homePage2.roomIdInput.fill(roomId)
+	// player2.homePage2.nameInput.fill('Player2')
+	// player2.homePage2.joinRoomFormButton.click()
+
+	// expect(player2.gamePage2.readyButton).toBeVisible()
+	// await player1.page.waitForTimeout(1000)
+	// expect(await player1.gamePage.getNumberOfPlayers()).toBe(2)
+})
+
 async function createRoom(context: PlayerContext, name: string) {
 	await context.homePage.goto()
 	await context.homePage.createNewButton.click()
