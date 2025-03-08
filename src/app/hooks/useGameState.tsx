@@ -20,7 +20,7 @@ export function GameProvider({
 }: {
 	children: React.ReactNode
 	playerId: string
-roomId: string
+	roomId: string
 }) {
 	const [gameState, setGameState] = useState<GameState>({ state: 'loading' })
 
@@ -28,7 +28,6 @@ roomId: string
 		if (gameState.state === 'loading') return null
 		return gameState.players.find((player) => player.id === playerId) ?? null
 	}, [gameState, playerId])
-	console.log('playerid:', playerId)
 	const socket = usePartySocket({
 		host: PARTYKIT_HOST,
 		room: roomId,
