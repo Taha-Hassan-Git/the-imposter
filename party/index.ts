@@ -9,6 +9,12 @@ export interface GameFormInfo {
 	category: Category
 }
 
+function getEnvironmentTimeout() {
+	const timeout = process.env.NODE_ENV === 'production' ? 5000 : 500
+	console.log('timeout', timeout)
+	return timeout
+}
+
 export default class Server implements Party.Server {
 	constructor(readonly party: Party.Room) {}
 
@@ -65,10 +71,9 @@ export default class Server implements Party.Server {
 	}
 
 	async onClose(connection: Party.Connection) {
-		console.log('player left', connection.id)
 		if (!this.gameManager) return
-		// wait for 5 minutes then check if player rejoined
-		const timeout = 1000 * 60 * 5
+
+		const timeout = getEnvironmentTimeout()
 		setTimeout(() => {
 			const connectionsArray = []
 			for (const c of this.party.getConnections()) {

@@ -10,8 +10,11 @@ interface ImposterFixtures {
 export interface PlayerContext {
 	context: BrowserContext
 	page: Page
+	page2: Page
 	homePage: HomePage
 	gamePage: GamePage
+	homePage2: HomePage
+	gamePage2: GamePage
 }
 
 export const test = base.extend<ImposterFixtures>({
@@ -25,11 +28,15 @@ export const test = base.extend<ImposterFixtures>({
 		const createPlayerContext = async (): Promise<PlayerContext> => {
 			const context = await browser.newContext()
 			const page = await context.newPage()
+			const page2 = await context.newPage()
 			return {
 				context,
+				page2,
 				page,
 				homePage: new HomePage(page),
 				gamePage: new GamePage(page),
+				homePage2: new HomePage(page2),
+				gamePage2: new GamePage(page2),
 			}
 		}
 
