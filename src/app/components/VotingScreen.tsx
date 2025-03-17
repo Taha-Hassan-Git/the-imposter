@@ -21,11 +21,11 @@ function VotePanel() {
 		<Panel className="!p-0">
 			<div className="p-8">
 				<h2 className="text-md font-bold mb-4 text-center">Who is the imposter?</h2>
-				<ul className="space-y-4">
+				<ul data-testid="player-vote-list" className="space-y-4">
 					{gameState.players
 						.filter((player) => player.id !== localPlayer.id)
 						.map((player: Player) => (
-							<PlayerListItem key={player.name} player={player} />
+							<PlayerVoteItem key={player.name} player={player} />
 						))}
 				</ul>
 			</div>
@@ -51,7 +51,7 @@ function ChooseAnswer() {
 	)
 }
 
-function PlayerListItem({ player }: { player: Player }) {
+function PlayerVoteItem({ player }: { player: Player }) {
 	const { dispatch } = useActiveGame()
 	const localPlayer = useLocalPlayer()
 	function handleVote() {
@@ -66,7 +66,7 @@ function PlayerListItem({ player }: { player: Player }) {
 				variant="secondary"
 				className="flex items-center justify-between align-middle w-full gap-2 bg-gray-50 hover:bg-gray-50 border"
 			>
-				<div className="flex items-center gap-4">
+				<div data-testid="player-vote" className="flex items-center gap-4">
 					<PlayerInitialsIcon player={player} />
 					<span className="font-bold text-start text-nowrap overflow-ellipsis">{player.name}</span>
 				</div>

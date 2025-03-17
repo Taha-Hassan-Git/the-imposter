@@ -44,7 +44,9 @@ function InfoBar() {
 					</div>
 					<Pill>
 						<span className="text-gray-600">Round:</span>
-						<span className="font-medium text-gray-900">{gameState.round}</span>
+						<span data-testid="info-bar-round" className="font-medium text-gray-900">
+							{gameState.round}
+						</span>
 					</Pill>
 				</div>
 			</div>

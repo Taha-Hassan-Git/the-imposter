@@ -1,7 +1,6 @@
 export type Action =
 	| { type: 'toggle-ready'; payload: { id: string } }
 	| { type: 'player-joined'; payload: { name: string; id: string } }
-	| { type: 'player-left'; payload: { id: string } }
 	| { type: 'player-voted'; payload: { id: string; vote: string } }
 	| { type: 'player-guessed'; payload: { id: string; guess: Answer } }
 
@@ -64,7 +63,6 @@ export interface GameInfo {
 	answer: Answer
 	prevAnswers: Answer[]
 	category: Category
-	archivedPlayers: Player[]
 }
 
 export const filmAnswers = [

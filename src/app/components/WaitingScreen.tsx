@@ -98,7 +98,7 @@ function ReadyButton() {
 			>
 				{localPlayer.ready ? '...' : 'Ready?'}
 			</Button>
-			<p>{localPlayer.ready && message}</p>
+			{localPlayer.ready && <p>{message}</p>}
 		</div>
 	)
 }
