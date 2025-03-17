@@ -12,7 +12,7 @@ export function AnswerGrid({
 	const { gameState } = useActiveGame()
 	const localPlayer = useLocalPlayer()
 	return (
-		<div className="grid grid-cols-4 gap-2 text-xs w-full">
+		<div data-testid="answer-grid" className="grid grid-cols-4 gap-2 text-xs w-full">
 			{answersObject[gameState.category].map((answer) =>
 				hasButtons ? (
 					<Button
@@ -36,6 +36,7 @@ function AnswerItem({ answer }: { answer: Answer }) {
 
 	return (
 		<div
+			data-testid="answer-item"
 			className={`border border-gray-100 shadow-sm rounded-lg
 		   flex justify-center items-center p-4 
 		   aspect-[2/1] text-center leading-none text-nowrap ${answer === gameState.answer && !localPlayer.imposter ? 'bg-green-100' : 'bg-slate-50'}`}

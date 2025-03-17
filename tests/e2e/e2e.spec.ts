@@ -1,105 +1,209 @@
 import { expect, PlayerContext, test } from './fixtures/the-imposter-test'
 
-test.beforeEach(async ({ homePage }) => {
-	await homePage.goto()
+test.describe('The Imposter Game', () => {
+	// Simple UI element tests
+	test.describe('Homepage', () => {
+		test.beforeEach(async ({ homePage }) => {
+			await homePage.goto()
+		})
+
+		test('Should load homepage elements', async ({ homePage }) => {
+			expect(homePage.header).toBeTruthy()
+			expect(homePage.createNewButton).toBeVisible()
+			expect(homePage.joinExistingButton).toBeVisible()
+		})
+
+		test('Can toggle between create and join room forms', async ({ homePage }) => {
+			// Test create form
+			await homePage.createNewButton.click()
+			expect(homePage.createRoomFormButton).toBeVisible()
+			expect(homePage.joinRoomFormButton).toBeHidden()
+
+			// Test create form validation
+			expect(homePage.createRoomFormButton).toBeDisabled()
+			await homePage.nameInput.fill('PlayerName')
+			expect(homePage.createRoomFormButton).toBeEnabled()
+
+			// Test join form
+			await homePage.joinExistingButton.click()
+			expect(homePage.createRoomFormButton).toBeHidden()
+			expect(homePage.joinRoomFormButton).toBeVisible()
+		})
+
+		test('Can create a room and join the game', async ({ homePage, gamePage }) => {
+			await homePage.createNewButton.click()
+			await homePage.nameInput.fill('PlayerName')
+			await homePage.createRoomFormButton.click()
+
+			await expect(gamePage.readyButton).toBeVisible()
+		})
+	})
+
+	// Game room functionality tests
+	test.describe('Game Room', () => {
+		test('Multiple users can join the same game room', async ({ createPlayerContext }) => {
+			const [player1, player2, player3] = await createPlayerContext(3)
+
+			// Host creates room
+			const roomId = await createRoom(player1, 'Player1')
+
+			// Player 2 joins
+			await joinRoom(player2, roomId, 'Player2')
+			await verifyPlayerCount(player1, 2)
+			await verifyPlayerCount(player2, 2)
+
+			// Player 3 joins
+			await joinRoom(player3, roomId, 'Player3')
+			await verifyPlayerCount(player1, 3)
+			await verifyPlayerCount(player2, 3)
+			await verifyPlayerCount(player3, 3)
+		})
+
+		test('Players with duplicate names can still join', async ({ createPlayerContext }) => {
+			const [player1, player2] = await createPlayerContext(2)
+
+			// Host creates room
+			const roomId = await createRoom(player1, 'SameName')
+
+			// Player 2 joins with the same name
+			await joinRoom(player2, roomId, 'SameName')
+			await verifyPlayerCount(player1, 2)
+			await verifyPlayerCount(player2, 2)
+		})
+
+		test('Full game e2e', async ({ createPlayerContext }) => {
+			const [player1, player2, player3, player4] = await createPlayerContext(4)
+			const playerArr = [player1, player2, player3, player4]
+			const playerNames = ['Player1', 'Player2', 'Player3', 'Player4']
+
+			// Host creates room
+			const roomId = await createRoom(player1, 'Player1')
+
+			// Players join the room
+			await joinRoom(player2, roomId, 'Player2')
+			await joinRoom(player3, roomId, 'Player3')
+			await joinRoom(player4, roomId, 'Player4')
+
+			// Verify all players are in the room
+			for (const player of playerArr) {
+				expect(player.gamePage.infoBarRound).toContainText('1')
+				await verifyPlayerCount(player, 4)
+			}
+
+			// All players click the ready button
+			for (const player of playerArr) {
+				await player.gamePage.readyButton.click()
+			}
+
+			// Verify answer grid is visible for all players
+			for (const player of playerArr) {
+				await expect(player.gamePage.answerGrid).toBeVisible()
+			}
+
+			// Count imposters and detectives
+			let numberOfImposters = 0
+			let numberOfDetectives = 0
+			for (const player of playerArr) {
+				if (await player.gamePage.imposterText.isVisible()) {
+					numberOfImposters++
+				}
+				const highlightedItems = await player.gamePage.getHasHighlightedAnswer()
+				// there should only be 0 or 1 highlighted items
+				expect([0, 1]).toContain(highlightedItems)
+				if (highlightedItems) {
+					numberOfDetectives++
+				}
+			}
+			expect(numberOfImposters).toBe(1)
+			expect(numberOfDetectives).toBe(3)
+
+			// All players click the ready to vote button
+			for (const player of playerArr) {
+				await player.gamePage.readyToVoteButton.click()
+			}
+
+			// Verify vote panel is visible for all players
+			for (const player of playerArr) {
+				await expect(player.gamePage.votePanel).toBeVisible()
+			}
+
+			// All players vote for the next player in the list
+			for (let i = 0; i < playerArr.length; i++) {
+				const player = playerArr[i]
+				const playerToVoteFor = playerNames[(i + 1) % playerNames.length]
+
+				// if the player is the imposter, they have to guess the answer
+				if (await player.gamePage.answerGrid.isVisible()) {
+					await player.gamePage.answerGrid.getByRole('button').getByText('Titanic').click()
+				}
+
+				await voteForPlayer(player, playerToVoteFor)
+			}
+
+			for (const player of playerArr) {
+				// verify the ui is in the correct state
+				expect(player.gamePage.beginNextRoundButton).toBeVisible()
+				expect(await player.gamePage.getNumberOfPlayerScoreItems()).toBe(4)
+				expect(player.gamePage.imposterBadge).toBeVisible()
+			}
+
+			// All players click the begin next round button
+			for (const player of playerArr) {
+				await player.gamePage.beginNextRoundButton.click()
+			}
+
+			// new round has started
+			for (const player of playerArr) {
+				await expect(player.gamePage.answerGrid).toBeVisible()
+				await expect(player.gamePage.readyButton).toBeVisible()
+				expect(player.gamePage.infoBarRound).toContainText('2')
+			}
+		})
+
+		test('Players cannot leave the game', async ({ createPlayerContext }) => {
+			// create 4 players
+			const [player1, player2, player3, player4] = await createPlayerContext(4)
+			const playerArr = [player1, player2, player3, player4]
+			// they all join the same room
+			const roomId = await createRoom(player1, 'Player1')
+			await joinRoom(player2, roomId, 'Player2')
+			await joinRoom(player3, roomId, 'Player3')
+			await joinRoom(player4, roomId, 'Player4')
+			// they start the game
+			for (const player of playerArr) {
+				await player.gamePage.readyButton.click()
+			}
+			for (const player of playerArr) {
+				await expect(player.gamePage.answerGrid).toBeVisible()
+			}
+
+			for (const player of playerArr) {
+				await player.gamePage.readyToVoteButton.click()
+			}
+			for (const player of playerArr) {
+				await expect(player.gamePage.votePanel).toBeVisible()
+			}
+			// one player closes their browser
+			await player1.page.close()
+			// there are no errors, and their avatar is still in the game
+
+			await player2.page.waitForTimeout(1000)
+			await expect(player2.page.getByText('Player1')).toBeVisible()
+		})
+	})
 })
 
-test('Should load homepage', async ({ homePage }) => {
-	expect(homePage.header).toBeTruthy()
-})
-
-test('Can toggle between create and join room forms', async ({ homePage }) => {
-	await homePage.createNewButton.click()
-	expect(homePage.createRoomFormButton).toBeVisible()
-	await homePage.joinExistingButton.click()
-	expect(homePage.createRoomFormButton).toBeHidden()
-	expect(homePage.joinRoomFormButton).toBeVisible()
-})
-
-test('Can create a room', async ({ homePage, gamePage }) => {
-	await homePage.createNewButton.click()
-	expect(homePage.createRoomFormButton).toBeVisible()
-	expect(homePage.createRoomFormButton).toBeDisabled()
-	await homePage.nameInput.fill('PlayerName')
-	expect(homePage.createRoomFormButton).toBeEnabled()
-	await homePage.createRoomFormButton.click()
-	await expect(gamePage.readyButton).toBeVisible()
-})
-
-test('Can create a room and join as multiple users', async ({ createPlayerContext }) => {
-	const [player1, player2, player3] = await createPlayerContext(3)
-
-	await createRoom(player1, 'Player1')
-	await expect(player1.gamePage.readyButton).toBeVisible()
-	const roomId = await player1.gamePage.roomId.innerText()
-
-	await joinRoom(player2, roomId, 'Player2')
-	await expect(player2.gamePage.readyButton).toBeVisible()
-
-	expect(await player1.gamePage.getNumberOfPlayers()).toBe(2)
-
-	await joinRoom(player3, roomId, 'Player3')
-	await expect(player3.gamePage.readyButton).toBeVisible()
-
-	expect(await player1.gamePage.getNumberOfPlayers()).toBe(3)
-})
-
-test('Can join a game after inputting the same name as another player', async ({
-	createPlayerContext,
-}) => {
-	const [player1, player2] = await createPlayerContext(2)
-
-	await createRoom(player1, 'Player1')
-	await expect(player1.gamePage.readyButton).toBeVisible()
-
-	const roomId = await player1.gamePage.roomId.innerText()
-
-	await joinRoom(player2, roomId, 'Player1')
-	await expect(player2.gamePage.readyButton).toBeVisible()
-
-	expect(await player1.gamePage.getNumberOfPlayers()).toBe(2)
-	expect(await player2.gamePage.getNumberOfPlayers()).toBe(2)
-})
-
-test('Can leave a room by closing page', async ({ createPlayerContext }) => {
-	const [player1, player2] = await createPlayerContext(2)
-
-	await createRoom(player1, 'Player1')
-	await expect(player1.gamePage.readyButton).toBeVisible()
-
-	const roomId = await player1.gamePage.roomId.innerText()
-
-	await joinRoom(player2, roomId, 'Player2')
-	await expect(player2.gamePage.readyButton).toBeVisible()
-
-	expect(await player1.gamePage.getNumberOfPlayers()).toBe(2)
-
-	// player 2 closes the old tab
-	await player2.page.close()
-	// todo: we should await the element being removed instead
-	await player1.page.waitForTimeout(1000)
-	// player 2 has now left the game
-	expect(await player1.gamePage.getNumberOfPlayers()).toBe(1)
-
-	// todo: test that player 2 can rejoin the game
-
-	// player2.homePage2.goto()
-	// player2.homePage2.joinExistingButton.click()
-	// expect(player2.homePage2.joinRoomFormButton).toBeVisible()
-	// player2.homePage2.roomIdInput.fill(roomId)
-	// player2.homePage2.nameInput.fill('Player2')
-	// player2.homePage2.joinRoomFormButton.click()
-
-	// expect(player2.gamePage2.readyButton).toBeVisible()
-	// await player1.page.waitForTimeout(1000)
-	// expect(await player1.gamePage.getNumberOfPlayers()).toBe(2)
-})
-
-async function createRoom(context: PlayerContext, name: string) {
+async function createRoom(context: PlayerContext, name: string): Promise<string> {
 	await context.homePage.goto()
 	await context.homePage.createNewButton.click()
 	await context.homePage.nameInput.fill(name)
 	await context.homePage.createRoomFormButton.click()
+
+	// Wait for redirect and verify
+	await expect(context.gamePage.readyButton).toBeVisible()
+
+	// Return the room ID for reuse
+	return await context.gamePage.roomId.innerText()
 }
 
 async function joinRoom(context: PlayerContext, roomId: string, name: string) {
@@ -108,4 +212,21 @@ async function joinRoom(context: PlayerContext, roomId: string, name: string) {
 	await context.homePage.roomIdInput.fill(roomId)
 	await context.homePage.nameInput.fill(name)
 	await context.homePage.joinRoomFormButton.click()
+
+	// Wait for redirect and verify
+	await expect(context.gamePage.readyButton).toBeVisible()
+}
+
+// Add a more robust way to verify player count with retry
+async function verifyPlayerCount(context: PlayerContext, expectedCount: number, timeout = 2000) {
+	// Use a retry mechanism instead of arbitrary timeout
+	await expect(async () => {
+		const count = await context.gamePage.getNumberOfWaitingPlayers()
+		expect(count).toBe(expectedCount)
+	}).toPass({ timeout })
+}
+
+async function voteForPlayer(context: PlayerContext, playerName: string) {
+	expect(context.gamePage.playerVoteButtons.getByText(playerName)).toBeVisible()
+	await context.gamePage.playerVoteButtons.getByText(playerName).click()
 }

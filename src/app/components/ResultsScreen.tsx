@@ -71,7 +71,7 @@ function ScorePanel({
 	const { gameState } = useActiveGame()
 	return (
 		<div className="w-full bg-gray-50">
-			<ul className="flex flex-col gap-4">
+			<ul data-testid="player-score-panel" className="flex flex-col gap-4">
 				{gameState.players
 					.sort((a, b) => (a.score > b.score ? -1 : 1))
 					.map((player) => (
@@ -114,7 +114,10 @@ const PlayerScoreItem = ({
 			: 0
 
 	return (
-		<li className="bg-white rounded-xl shadow-md transition-all border border-gray-200 overflow-hidden">
+		<li
+			data-testid="player-score-item"
+			className="bg-white rounded-xl shadow-md transition-all border border-gray-200 overflow-hidden"
+		>
 			{isImposter && <ImposterBadge />}
 			<MainSection player={player} scoreDifference={scoreDifference} />
 			<PlayerVotes player={player} />
@@ -124,9 +127,12 @@ const PlayerScoreItem = ({
 
 function ImposterBadge() {
 	return (
-		<div className="bg-red-50 py-2 px-4 flex items-center gap-2 border-b border-red-100">
+		<div
+			data-testid="imposter-badge"
+			className="bg-red-50 py-2 px-4 flex items-center gap-2 border-b border-red-100"
+		>
 			<VenetianMask className="w-4 h-4 text-red-500" />
-			<p className="text-sm font-medium text-red-600">Imposter</p>
+			<p className="text-sm font-medium text-red-600">IMPOSTER</p>
 		</div>
 	)
 }

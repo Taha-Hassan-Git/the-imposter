@@ -146,55 +146,6 @@ describe('When in the waiting state...', () => {
 		const imposterCount = gameState.players.filter((player) => player.imposter).length
 		expect(imposterCount).toBe(1)
 	})
-
-	it('handles player leaving', () => {
-		// Add two more players
-		gameManager.handleAction({
-			type: 'player-joined',
-			payload: { id: PLAYER_2, name: PLAYER_2 },
-		})
-		gameManager.handleAction({
-			type: 'player-joined',
-			payload: { id: PLAYER_3, name: PLAYER_3 },
-		})
-
-		// Make all players ready
-		gameManager.getState().players.forEach((player) => {
-			gameManager.handleAction({
-				type: 'toggle-ready',
-				payload: { id: player.id },
-			})
-		})
-
-		// Game should be in playing state
-		expect(gameManager.getState().state).toEqual('playing')
-
-		// Remove a player
-		gameManager.handleAction({
-			type: 'player-left',
-			payload: { id: PLAYER_3 },
-		})
-
-		const gameState = gameManager.getState()
-		// Game should return to waiting state when below minimum players
-		expect(gameState.state).toEqual('waiting')
-		expect(gameState.players.length).toBe(2)
-		// All players should be unready
-		expect(gameState.players.every((player) => !player.ready)).toBeTruthy()
-		// Player 3 should be archived
-		expect(gameState.archivedPlayers.some((player) => player.id === PLAYER_3)).toBeTruthy()
-
-		// rejoin as player 3
-		gameManager.handleAction({
-			type: 'player-joined',
-			payload: { id: PLAYER_3, name: PLAYER_3 },
-		})
-
-		// archive should be empty
-		expect(gameManager.getState().archivedPlayers.length).toBe(0)
-		// player should be added back
-		expect(gameManager.getState().players.length).toBe(3)
-	})
 })
 
 describe('When in the playing state...', () => {
@@ -219,17 +170,6 @@ describe('When in the playing state...', () => {
 
 		const gameState = gameManager.getState()
 		expect(gameState.state).toEqual('voting')
-	})
-
-	it('returns to the waiting state if there are not enough players', () => {
-		// Remove a player
-		gameManager.handleAction({
-			type: 'player-left',
-			payload: { id: PLAYER_3 },
-		})
-
-		const gameState = gameManager.getState()
-		expect(gameState.state).toEqual('waiting')
 	})
 })
 
@@ -418,5 +358,4 @@ const createTestGameState = (state: 'playing' | 'voting' | 'results'): GameInfo 
 	],
 	prevAnswers: [],
 	category: CATEGORY,
-	archivedPlayers: [],
 })

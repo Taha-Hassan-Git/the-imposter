@@ -9,11 +9,6 @@ export interface GameFormInfo {
 	category: Category
 }
 
-function getEnvironmentTimeout() {
-	const timeout = process.env.NODE_ENV === 'production' ? 1000 * 60 * 5 : 5000
-	return timeout
-}
-
 export default class Server implements Party.Server {
 	constructor(readonly party: Party.Room) {}
 
@@ -49,39 +44,7 @@ export default class Server implements Party.Server {
 
 	async onConnect(connection: Party.Connection) {
 		if (!this.gameManager) return
-		// if the player is archived, they are rejoining the game
-		const hasArchivedPlayers = this.gameManager.getState().archivedPlayers.length > 0
-		if (hasArchivedPlayers) {
-			const player = this.gameManager.getState().archivedPlayers.find((p) => p.id === connection.id)
-			if (player) {
-				this.gameManager.handleAction({
-					type: 'player-joined',
-					payload: { id: player.id, name: player.name },
-				})
-			}
-		}
-
-		this.party.broadcast(JSON.stringify(this.gameManager.getState()))
-	}
-
-	async onClose(connection: Party.Connection) {
-		if (!this.gameManager) return
-
-		const timeout = getEnvironmentTimeout()
-		setTimeout(() => {
-			const connectionsArray = []
-			for (const c of this.party.getConnections()) {
-				connectionsArray.push(c.id)
-			}
-			const leftGame = !connectionsArray.includes(connection.id)
-			if (leftGame) {
-				this.gameManager?.handleAction({
-					type: 'player-left',
-					payload: { id: connection.id },
-				})
-				this.party.broadcast(JSON.stringify(this.gameManager?.getState()))
-			}
-		}, timeout)
+		connection.send(JSON.stringify(this.gameManager.getState()))
 	}
 
 	async onMessage(message: string) {
