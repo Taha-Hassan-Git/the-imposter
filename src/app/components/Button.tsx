@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import { ReactNode } from 'react'
 
-type ButtonVariant = 'primary' | 'secondary' | 'disabled'
+type ButtonVariant = 'primary' | 'secondary' | 'disabled' | 'answerGrid'
 type ButtonBaseProps = {
 	children: ReactNode
 	className?: string
@@ -31,6 +31,7 @@ const baseStyles = 'px-4 py-4 rounded-md font-medium transition-colors'
 const variantStyles: Record<ButtonVariant, string> = {
 	primary: 'bg-blue-500 text-white hover:bg-blue-900',
 	secondary: 'bg-gray-300 text-gray-800 hover:bg-gray-400',
+	answerGrid: 'text-center bg-gray-100 hover:bg-gray-200',
 	disabled: 'bg-gray-200 text-gray-400',
 }
 

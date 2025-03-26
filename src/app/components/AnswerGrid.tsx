@@ -17,9 +17,9 @@ export function AnswerGrid({
 				hasButtons ? (
 					<Button
 						key={answer}
-						className="text-center"
+						className={localPlayer.guess === answer ? '!bg-green-100' : ''}
 						onClick={onClick ? () => onClick(answer) : undefined}
-						variant={localPlayer.guess === answer ? 'primary' : 'secondary'}
+						variant="answerGrid"
 					>
 						{answer}
 					</Button>
