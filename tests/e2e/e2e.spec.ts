@@ -122,9 +122,11 @@ test.describe('The Imposter Game', () => {
 				await player.gamePage.readyToVoteButton.click()
 			}
 
-			// Verify vote panel is visible for all players
+			// Verify we're on the voting screen
 			for (const player of playerArr) {
-				await expect(player.gamePage.votePanel).toBeVisible()
+				if (await player.gamePage.votePanel.isHidden()) {
+					await expect(player.gamePage.answerGrid).toBeVisible()
+				}
 			}
 
 			// All players vote for the next player in the list
@@ -134,7 +136,19 @@ test.describe('The Imposter Game', () => {
 
 				// if the player is the imposter, they have to guess the answer
 				if (await player.gamePage.answerGrid.isVisible()) {
-					await player.gamePage.answerGrid.getByRole('button').getByText('Titanic').click()
+					const answerButton = player.gamePage.answerGrid.getByRole('button').getByText('Titanic')
+
+					// Verify the initial color is gray
+					await expect(answerButton).toHaveCSS('background-color', 'rgb(243, 244, 246)')
+
+					// Click the answer
+					await answerButton.click()
+
+					// Verify the color changes to green
+					await expect(answerButton).toHaveCSS('background-color', 'rgb(220, 252, 231)')
+
+					// Click the confirm button
+					await player.gamePage.confirmButtonVotingScreen.click()
 				}
 
 				await voteForPlayer(player, playerToVoteFor)
@@ -181,7 +195,11 @@ test.describe('The Imposter Game', () => {
 				await player.gamePage.readyToVoteButton.click()
 			}
 			for (const player of playerArr) {
-				await expect(player.gamePage.votePanel).toBeVisible()
+				if (await player.gamePage.votePanel.isHidden()) {
+					await expect(player.gamePage.answerGrid).toBeVisible()
+				} else {
+					expect(player.gamePage.votePanel).toBeVisible()
+				}
 			}
 			// one player closes their browser
 			await player1.page.close()

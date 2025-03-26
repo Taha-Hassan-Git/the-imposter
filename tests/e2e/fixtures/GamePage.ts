@@ -15,6 +15,7 @@ export class GamePage {
 	public readonly playerScoreItem: Locator
 	public readonly imposterBadge: Locator
 	public readonly infoBarRound: Locator
+	public readonly confirmButtonVotingScreen: Locator
 	constructor(private readonly page: Page) {
 		this.readyButton = page.getByRole('button').getByText('Ready')
 		this.readyButtonDisabled = page.getByRole('button').getByText('...')
@@ -30,6 +31,7 @@ export class GamePage {
 		this.playerScoreItem = page.getByTestId('player-score-item')
 		this.imposterBadge = page.getByTestId('imposter-badge').getByText('IMPOSTER')
 		this.infoBarRound = page.getByTestId('info-bar-round')
+		this.confirmButtonVotingScreen = page.getByRole('button').getByText('Confirm')
 	}
 
 	async getNumberOfWaitingPlayers() {

@@ -1,15 +1,22 @@
+import { useState } from 'react'
 import { Answer, Player } from '../../../game-logic/types'
 import { useActiveGame, useLocalPlayer } from '../hooks/useGameState'
 import { AnswerGrid } from './AnswerGrid'
 import { Button } from './Button'
 import { Panel } from './Panel'
 import { PlayerInitialsIcon } from './PlayerInitialsIcon'
+import { Presence } from './ReadyBtnWithPresence'
 
 export function VotingScreen() {
+	const localPlayer = useLocalPlayer()
+	const [hasChosenAnswer, setHasChosenAnswer] = useState(false)
 	return (
 		<>
-			<ChooseAnswer />
-			<VotePanel />
+			{localPlayer.imposter && !hasChosenAnswer ? (
+				<ChooseAnswer onChoose={() => setHasChosenAnswer(true)} />
+			) : (
+				<VotePanel />
+			)}
 		</>
 	)
 }
@@ -29,11 +36,12 @@ function VotePanel() {
 						))}
 				</ul>
 			</div>
+			<Presence />
 		</Panel>
 	)
 }
 
-function ChooseAnswer() {
+function ChooseAnswer({ onChoose }: { onChoose: () => void }) {
 	const { dispatch } = useActiveGame()
 	const localPlayer = useLocalPlayer()
 
@@ -42,11 +50,19 @@ function ChooseAnswer() {
 	}
 	if (!localPlayer.imposter) return null
 	return (
-		<Panel>
+		<Panel variant="column">
 			<h2 className="text-md mb-4 text-start">Choose an answer:</h2>
 			<ul className="space-y-4">
 				<AnswerGrid hasButtons onClick={handleGuess} />
 			</ul>
+			<Button
+				className="w-full"
+				disabled={localPlayer.guess === undefined}
+				onClick={onChoose}
+				variant="primary"
+			>
+				Confirm
+			</Button>
 		</Panel>
 	)
 }
