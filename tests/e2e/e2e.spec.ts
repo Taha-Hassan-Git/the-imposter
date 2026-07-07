@@ -8,26 +8,26 @@ test.describe('The Imposter Game', () => {
 		})
 
 		test('Should load homepage elements', async ({ homePage }) => {
-			expect(homePage.header).toBeTruthy()
-			expect(homePage.createNewButton).toBeVisible()
-			expect(homePage.joinExistingButton).toBeVisible()
+			await expect(homePage.header).toBeVisible()
+			await expect(homePage.createNewButton).toBeVisible()
+			await expect(homePage.joinExistingButton).toBeVisible()
 		})
 
 		test('Can toggle between create and join room forms', async ({ homePage }) => {
 			// Test create form
 			await homePage.createNewButton.click()
-			expect(homePage.createRoomFormButton).toBeVisible()
-			expect(homePage.joinRoomFormButton).toBeHidden()
+			await expect(homePage.createRoomFormButton).toBeVisible()
+			await expect(homePage.joinRoomFormButton).toBeHidden()
 
 			// Test create form validation
-			expect(homePage.createRoomFormButton).toBeDisabled()
+			await expect(homePage.createRoomFormButton).toBeDisabled()
 			await homePage.nameInput.fill('PlayerName')
-			expect(homePage.createRoomFormButton).toBeEnabled()
+			await expect(homePage.createRoomFormButton).toBeEnabled()
 
 			// Test join form
 			await homePage.joinExistingButton.click()
-			expect(homePage.createRoomFormButton).toBeHidden()
-			expect(homePage.joinRoomFormButton).toBeVisible()
+			await expect(homePage.createRoomFormButton).toBeHidden()
+			await expect(homePage.joinRoomFormButton).toBeVisible()
 		})
 
 		test('Can create a room and join the game', async ({ homePage, gamePage }) => {
@@ -86,7 +86,7 @@ test.describe('The Imposter Game', () => {
 
 			// Verify all players are in the room
 			for (const player of playerArr) {
-				expect(player.gamePage.infoBarRound).toContainText('1')
+				await expect(player.gamePage.infoBarRound).toContainText('1')
 				await verifyPlayerCount(player, 4)
 			}
 
@@ -122,11 +122,10 @@ test.describe('The Imposter Game', () => {
 				await player.gamePage.readyToVoteButton.click()
 			}
 
-			// Verify we're on the voting screen
+			// Verify we're on the voting screen: each player settles into either the
+			// vote panel (detective) or the answer grid to guess (imposter).
 			for (const player of playerArr) {
-				if (await player.gamePage.votePanel.isHidden()) {
-					await expect(player.gamePage.answerGrid).toBeVisible()
-				}
+				await expect(player.gamePage.votePanel.or(player.gamePage.answerGrid)).toBeVisible()
 			}
 
 			// All players vote for the next player in the list
@@ -134,22 +133,8 @@ test.describe('The Imposter Game', () => {
 				const player = playerArr[i]
 				const playerToVoteFor = playerNames[(i + 1) % playerNames.length]
 
-				// if the player is the imposter, they have to guess the answer
-				if (await player.gamePage.answerGrid.isVisible()) {
-					const answerButton = player.gamePage.answerGrid.getByRole('button').getByText('Titanic')
-
-					// Verify the initial color is gray
-					await expect(answerButton).toHaveCSS('background-color', 'rgb(243, 244, 246)')
-
-					// Click the answer
-					await answerButton.click()
-
-					// Verify the color changes to green
-					await expect(answerButton).toHaveCSS('background-color', 'rgb(220, 252, 231)')
-
-					// Click the confirm button
-					await player.gamePage.confirmButtonVotingScreen.click()
-				}
+				// if the player is the imposter, they have to guess the answer first
+				await submitImposterGuessIfNeeded(player)
 
 				await voteForPlayer(player, playerToVoteFor)
 			}
@@ -194,19 +179,23 @@ test.describe('The Imposter Game', () => {
 			for (const player of playerArr) {
 				await player.gamePage.readyToVoteButton.click()
 			}
-			for (const player of playerArr) {
-				if (await player.gamePage.votePanel.isHidden()) {
-					await expect(player.gamePage.answerGrid).toBeVisible()
-				} else {
-					expect(player.gamePage.votePanel).toBeVisible()
+
+			// Find a detective (non-imposter) from among player2–4 to check from their
+			// perspective. Wait for each client to settle into either screen first so the
+			// visibility check below isn't racing the websocket state update.
+			let detective: typeof player2 | null = null
+			for (const player of [player2, player3, player4]) {
+				await expect(player.gamePage.votePanel.or(player.gamePage.answerGrid)).toBeVisible()
+				if (await player.gamePage.votePanel.isVisible()) {
+					detective ??= player
 				}
 			}
+
 			// one player closes their browser
 			await player1.page.close()
-			// there are no errors, and their avatar is still in the game
+			// there are no errors, and their avatar is still in the game (visible to detectives)
 
-			await player2.page.waitForTimeout(1000)
-			await expect(player2.page.getByText('Player1')).toBeVisible()
+			await expect(detective!.page.getByText('Player1')).toBeVisible()
 		})
 	})
 })
@@ -235,9 +224,10 @@ async function joinRoom(context: PlayerContext, roomId: string, name: string) {
 	await expect(context.gamePage.readyButton).toBeVisible()
 }
 
-// Add a more robust way to verify player count with retry
-async function verifyPlayerCount(context: PlayerContext, expectedCount: number, timeout = 2000) {
-	// Use a retry mechanism instead of arbitrary timeout
+// Poll the rendered player list until it reaches the expected count. The count is
+// driven by a websocket broadcast, so we retry rather than asserting once. The 5s
+// window matches Playwright's default expect timeout used elsewhere in the suite.
+async function verifyPlayerCount(context: PlayerContext, expectedCount: number, timeout = 5000) {
 	await expect(async () => {
 		const count = await context.gamePage.getNumberOfWaitingPlayers()
 		expect(count).toBe(expectedCount)
@@ -245,6 +235,25 @@ async function verifyPlayerCount(context: PlayerContext, expectedCount: number, 
 }
 
 async function voteForPlayer(context: PlayerContext, playerName: string) {
-	expect(context.gamePage.playerVoteButtons.getByText(playerName)).toBeVisible()
+	await expect(context.gamePage.playerVoteButtons.getByText(playerName)).toBeVisible()
 	await context.gamePage.playerVoteButtons.getByText(playerName).click()
+}
+
+// The imposter must pick an answer before they can vote. Detectives skip this.
+async function submitImposterGuessIfNeeded(context: PlayerContext) {
+	if (!(await context.gamePage.answerGrid.isVisible())) return
+
+	const answerButton = context.gamePage.answerGrid.getByRole('button').getByText('Titanic')
+
+	// Verify the initial color is gray
+	await expect(answerButton).toHaveCSS('background-color', 'rgb(243, 244, 246)')
+
+	// Click the answer
+	await answerButton.click()
+
+	// Verify the color changes to green
+	await expect(answerButton).toHaveCSS('background-color', 'rgb(220, 252, 231)')
+
+	// Click the confirm button
+	await context.gamePage.confirmButtonVotingScreen.click()
 }

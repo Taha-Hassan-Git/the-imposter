@@ -13,7 +13,7 @@ export class HomePage {
 		this.joinExistingButton = page.getByRole('button').getByText('Join existing room')
 		this.createRoomFormButton = page.getByRole('button').getByText('Create Room')
 		this.joinRoomFormButton = page.getByRole('button').getByText('Join Room')
-		this.header = page.getByText('The Imposter')
+		this.header = page.getByRole('heading', { name: 'The Imposter' })
 		this.nameInput = page.getByRole('textbox', { name: 'Your Name:' })
 		this.roomIdInput = page.getByRole('textbox', { name: 'Room Id:' })
 	}
