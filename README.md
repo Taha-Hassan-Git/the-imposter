@@ -43,22 +43,27 @@ cd the-imposter
 npm install
 ```
 
-3. Start the development server:
+3. Start the Next.js app and the PartyKit server together:
 ```bash
-npm run dev
+npm run dev-app
 ```
 
-4. Start the PartyKit server:
+Or run them in separate terminals:
 ```bash
-npm run dev:party
+npm run dev        # Next.js app on http://localhost:3000
+npm run dev:party  # PartyKit server on http://127.0.0.1:1999
 ```
 
 ### Environment Variables
 
-Create a `.env.local` file in the root directory with:
+For local development no environment variables are required — the app defaults to
+the local PartyKit server at `127.0.0.1:1999`.
+
+To point the app at a deployed PartyKit backend, create a `.env.local` file in the
+root directory with:
 
 ```env
-NEXT_PUBLIC_VERCEL_ENV=development
+NEXT_PUBLIC_PARTYKIT_HOST=<your-project>.<your-username>.partykit.dev
 ```
 
 ## Game Flow
@@ -85,6 +90,31 @@ NEXT_PUBLIC_VERCEL_ENV=development
      - +3 points for the imposter if they avoid detection
    - Players can start next round
 
+## Deployment
+
+The app has two parts that are deployed separately: the Next.js frontend (e.g. on
+Vercel) and the PartyKit real-time backend.
+
+1. Deploy the PartyKit server:
+```bash
+npm run deploy:party
+```
+The first deploy will prompt you to log in. On success it prints the backend URL,
+e.g. `https://the-imposter-party.<your-username>.partykit.dev`.
+
+2. Configure the frontend to use the deployed backend by setting the following
+environment variable in your hosting provider (and in `.env.local` for local
+testing against production):
+```env
+NEXT_PUBLIC_PARTYKIT_HOST=the-imposter-party.<your-username>.partykit.dev
+```
+
+3. Deploy / redeploy the Next.js app so it picks up the environment variable.
+
+> **Note:** Whenever the game types in `/game-logic` change, redeploy the PartyKit
+> server with `npm run deploy:party`. The server persists room state and bumping
+> `SCHEMA_VERSION` in `party/index.ts` invalidates rooms saved against the old shape.
+
 ## Testing
 
 Run the test suite:
@@ -101,6 +131,8 @@ npm run test:watch
 
 - `npm run dev`: Start Next.js development server
 - `npm run dev:party`: Start PartyKit server
+- `npm run dev-app`: Start both the Next.js app and PartyKit server together
+- `npm run deploy:party`: Deploy the PartyKit server
 - `npm run build`: Build for production
 - `npm run start`: Start production server
 - `npm run lint`: Run ESLint

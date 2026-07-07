@@ -5,10 +5,8 @@ const partOne = [
 	'hot',
 	'old',
 	'new',
-	'bad',
 	'wet',
 	'dry',
-	'raw',
 	'juicy',
 	'ripe',
 	'cold',
@@ -53,8 +51,6 @@ const partThree = [
 	'pig',
 	'rat',
 	'ram',
-	'vix',
-	'wolf',
 	'ape',
 	'ant',
 	'elk',
@@ -78,9 +74,7 @@ export function generateRoomId() {
 	const identity = partTwo[Math.floor(Math.random() * partTwo.length)]
 	const animal = partThree[Math.floor(Math.random() * partThree.length)]
 
-	const number = Math.floor(Math.random() * 100)
-
-	const roomId = `${adj}-${identity}-${animal}-${number.toString().padStart(2, '0')}`
+	const roomId = `${adj}${identity}${animal}`
 
 	return roomId
 }
