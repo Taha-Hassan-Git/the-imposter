@@ -156,9 +156,9 @@ test.describe('The Imposter Game', () => {
 
 			for (const player of playerArr) {
 				// verify the ui is in the correct state
-				expect(player.gamePage.beginNextRoundButton).toBeVisible()
-				expect(await player.gamePage.getNumberOfPlayerScoreItems()).toBe(4)
-				expect(player.gamePage.imposterBadge).toBeVisible()
+				await expect(player.gamePage.beginNextRoundButton).toBeVisible()
+				await expect(player.gamePage.playerScoreItem).toHaveCount(4)
+				await expect(player.gamePage.imposterBadge).toBeVisible()
 			}
 
 			// All players click the begin next round button
@@ -170,7 +170,7 @@ test.describe('The Imposter Game', () => {
 			for (const player of playerArr) {
 				await expect(player.gamePage.answerGrid).toBeVisible()
 				await expect(player.gamePage.readyButton).toBeVisible()
-				expect(player.gamePage.infoBarRound).toContainText('2')
+				await expect(player.gamePage.infoBarRound).toContainText('2')
 			}
 		})
 
