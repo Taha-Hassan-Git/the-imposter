@@ -39,10 +39,10 @@ function AnswerItem({ answer }: { answer: Answer }) {
 			data-testid="answer-item"
 			className={`border border-gray-100 shadow-sm rounded-lg
 		   flex justify-center items-center p-4 
-		   aspect-[2/1] text-center leading-none text-nowrap ${answer === gameState.answer && !localPlayer.imposter ? 'bg-green-100' : 'bg-slate-50'}`}
+		   aspect-[2/1] text-center text-wrap leading-none  ${answer === gameState.answer && !localPlayer.imposter ? 'bg-green-100' : 'bg-slate-50'}`}
 			key={answer}
 		>
-			<p className="font-medium">{answer}</p>
+			{answer}
 		</div>
 	)
 }

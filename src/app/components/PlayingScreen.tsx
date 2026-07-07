@@ -23,7 +23,8 @@ function Hint() {
 		films: 'Was this movie released before 2000?',
 		animals: 'Are you afraid of this animal?',
 		countries: 'Has this country been in the news lately?',
-		sports: 'Is this a team sport?',
+		monsters: "Does this creature's silhouette look like a human?",
+		'video-game-characters': 'Does this character use a weapon?',
 	}
 
 	return (
