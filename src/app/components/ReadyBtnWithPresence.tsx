@@ -1,7 +1,6 @@
 import { useActiveGame, useLocalPlayer } from '../hooks/useGameState'
 import { Button } from './Button'
 import { Panel } from './Panel'
-import { PlayerInitialsIcon } from './PlayerInitialsIcon'
 
 export function ReadyBtnWithPresence({ text }: { text: string }) {
 	const { dispatch } = useActiveGame()
@@ -31,26 +30,36 @@ export function ReadyBtnWithPresence({ text }: { text: string }) {
 
 export function Presence() {
 	const { gameState } = useActiveGame()
+
+	const readyPlayers = gameState.players.filter((player) => player.ready)
+	const notReadyPlayers = gameState.players.filter((player) => !player.ready)
+
+	console.log(readyPlayers)
 	return (
 		<div className="flex w-full items-center justify-center gap-1 mt-2 p-3 bg-gray-100 border rounded-b-lg">
-			<p className="text-nowrap text-xs text-gray-500">Players ready:</p>
+			<p className="text-nowrap text-xs text-gray-500">
+				Players ready {readyPlayers.length}/{gameState.players.length}:
+			</p>
 
 			<div className="flex self-start w-full overflow-hidden">
-				{gameState.players
-					.sort((a, b) => {
-						if (a.ready && !b.ready) return -1
-						if (!a.ready && b.ready) return 1
-						return 0
-					})
-					.map((player, i) => (
-						<div
-							style={{ transform: `translateX(-${i * 8}px)`, zIndex: gameState.players.length - i }}
-							key={player.name}
-							className="flex items-center gap-2"
-						>
-							<PlayerInitialsIcon className="!w-5 !h-5 text-xs" showReady player={player} />
-						</div>
-					))}
+				{readyPlayers.map((player, i) => (
+					<div
+						style={{ transform: `translateX(-${i * 10}px)`, zIndex: gameState.players.length - i }}
+						key={player.name}
+						className="flex items-center gap-2"
+					>
+						<span className="w-8 h-8 rounded-full bg-green-300 border shadow-md" />
+					</div>
+				))}
+				{notReadyPlayers.map((player, i) => (
+					<div
+						style={{ transform: `translateX(-${i * 10}px)`, zIndex: gameState.players.length - i }}
+						key={player.name}
+						className="flex items-center gap-2"
+					>
+						<span className="w-8 h-8 rounded-full bg-gray-300 border shadow-md" />
+					</div>
+				))}
 			</div>
 		</div>
 	)
