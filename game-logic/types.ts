@@ -87,22 +87,22 @@ export const filmAnswers = [
 export type FilmAnswer = (typeof filmAnswers)[number]
 
 export const animalAnswers = [
-	'Lion',
 	'Elephant',
 	'Giraffe',
-	'Penguin',
-	'Kangaroo',
-	'Panda',
-	'Tiger',
-	'Zebra',
 	'Koala',
-	'Polar Bear',
-	'Hippo',
-	'Gorilla',
+	'Tiger',
+	'Lion',
 	'Leopard',
-	'Monkey',
-	'Rhino',
-	'Wolf',
+	'Meerkat',
+	'Buffalo',
+	'Ostrich',
+	'Owl',
+	'Eagle',
+	'Parrot',
+	'Scorpion',
+	'Alligator',
+	'Zebra',
+	'Gorilla',
 ] as const
 
 export type AnimalAnswer = (typeof animalAnswers)[number]
@@ -128,37 +128,69 @@ export const countryAnswers = [
 
 export type CountryAnswer = (typeof countryAnswers)[number]
 
-export const sportsAnswers = [
-	'Football',
-	'Basketball',
-	'Tennis',
-	'Golf',
-	'Rugby',
-	'Cricket',
-	'Baseball',
-	'Hockey',
-	'Boxing',
-	'F1',
-	'Cycling',
-	'Swimming',
-	'Skiing',
-	'Skateboarding',
-	'Surfing',
-	'Wrestling',
+export const monstersAnswers = [
+	'Frankenstein',
+	'Dracula',
+	'Werewolf',
+	'Zombie',
+	'Bigfoot',
+	'Loch Ness Monster',
+	'Kraken',
+	'Cyclops',
+	'Medusa',
+	'Yeti',
+	'Mummy',
+	'Banshee',
+	'Chupacabra',
+	'Minotaur',
+	'Golem',
+	'Gargoyle',
 ] as const
-export type SportsAnswer = (typeof sportsAnswers)[number]
+export type MonstersAnswer = (typeof monstersAnswers)[number]
+
+export const videoGameCharactersAnswers = [
+	'Mario',
+	'Luigi',
+	'Princess Peach',
+	'Link',
+	'Zelda',
+	'Pikachu',
+	'Kirby',
+	'Sonic',
+	'Pac-Man',
+	'Mega Man',
+	'Lara Croft',
+	'Crash Bandicoot',
+	'Master Chief',
+	'Knuckles',
+	'Ryu',
+	'Bowser',
+] as const
+export type VideoGameCharactersAnswer = (typeof videoGameCharactersAnswers)[number]
 
 export const answersObject: Record<Category, Answer[]> = {
 	films: [...filmAnswers],
 	animals: [...animalAnswers],
 	countries: [...countryAnswers],
-	sports: [...sportsAnswers],
+	monsters: [...monstersAnswers],
+	'video-game-characters': [...videoGameCharactersAnswers],
 }
 
-export const categoriesArray = ['films', 'animals', 'countries', 'sports'] as const
+export const categoriesArray = [
+	'films',
+	'animals',
+	'countries',
+	'monsters',
+	'video-game-characters',
+] as const
 export type Category = (typeof categoriesArray)[number]
 
-export type Answer = FilmAnswer | AnimalAnswer | CountryAnswer | SportsAnswer
+export type Answer =
+	| FilmAnswer
+	| AnimalAnswer
+	| CountryAnswer
+	| MonstersAnswer
+	| VideoGameCharactersAnswer
 
 export type GameLoading = { state: 'loading' }
 

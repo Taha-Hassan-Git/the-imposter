@@ -170,9 +170,14 @@ function SelectCategories({
 				className="w-full p-2.5 text-base border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
 			>
 				{categoriesArray.map((category) => {
+					const categoryLabel = category
+						.split('-')
+						.map((word) => word.slice(0, 1).toUpperCase() + word.slice(1))
+						.join(' ')
+
 					return (
 						<option key={category + 'option'} value={category}>
-							{category.slice(0, 1).toUpperCase() + category.slice(1)}
+							{categoryLabel}
 						</option>
 					)
 				})}
